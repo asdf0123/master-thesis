@@ -1,1 +1,15 @@
-Tmp
+/Biblio
+/picturegeneration
+/Tmp
+Thesis.*
+
+
+
+!.gitignore
+!Thesis.tex
+!Biblio/ref.bib
+!picturegeneration/genpic.py
+!picturegeneration/testtikz/tmp.tex
+!Style
+!Img
+!Tex

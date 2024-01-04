@@ -1,0 +1,30 @@
+%---------------------------------------------------------------------------%
+%->> Main content
+%---------------------------------------------------------------------------%
+\renewcommand{\thefigure}{\thechapter-\arabic{figure}}
+\renewcommand{\thetable}{\thechapter-\arabic{table}}
+\renewcommand{\theequation}{\thechapter-\arabic{equation}}
+
+\newcommand{\equationref}[1]{公式\eqref{#1}}
+%\newcommand{\figureref}[1]{图\ref{#1}}
+\newcommand{\figureref}[1]{\figurename{\ref{#1}}}
+\newcommand{\tableref}[1]{\tablename{\ref{#1}}}
+\newcommand{\apptableref}[1]{附\tablename{\ref{#1}}}
+\newcommand{\appfigureref}[1]{附\figurename{\ref{#1}}}
+%search ucasthesis.cls
+\newcommand{\algorithmref}[1]{\algname\ref{#1}}
+\newcommand{\propositionref}[1]{\propositionname\ref{#1}}
+\newcommand{\exampleref}[1]{\examplename\ref{#1}}
+
+\newcommand{\tabnote}[1]{\fignote{#1}}
+
+
+
+%\input{Tex/chapter1}
+\input{Tex/chapter2}
+%\input{Tex/chapter3}
+\input{Tex/chapter4}
+%\input{Tex/Chap_Intro}
+%\input{Tex/Chap_Guide}
+%\input{Tex/Chap_UCAS}
+%---------------------------------------------------------------------------%

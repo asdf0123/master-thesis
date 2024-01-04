@@ -1,0 +1,135 @@
+\chapter{面向侧信道分析的自适应数据增强方法}\label{chap:search1}{
+	研究的动机。
+	\section{自适应数据增强方法框架}
+	\subsection{主控制器}
+	\subsection{数据增强单元}
+	
+	\begin{algorithm}
+		\caption{位移变换 shift\_deformation}\label{alg:shift}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} 能量迹$\vec x=\begin{bmatrix}
+			x_1&x_2&\cdots&x_{M-1}
+			\end{bmatrix}$,最大位移幅度$m_1, 0\le m_1<M$
+			\Statex \textbf{输出:}能量迹$\vec y=\begin{bmatrix}
+			y_1&y_2&\cdots&y_{M-1}
+			\end{bmatrix}$
+			\State $s\gets\{-m_1,-m_1+1,-m_1+2,\dots,m_1-1,m_1\}$
+			\For{$n = 0, \dots, M-1$}
+			\State $y_i:= x_{(i+s)\mod M}$
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{添加噪声 add\_noise}\label{alg:noise}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} 能量迹$\vec x=\begin{bmatrix}
+			x_1&x_2&\cdots&x_{M-1}
+			\end{bmatrix}$,噪声方差$m_2$
+			\Statex \textbf{输出:}能量迹$\vec y=\begin{bmatrix}
+			y_1&y_2&\cdots&y_{M-1}
+			\end{bmatrix}$
+			\For{$n = 0, \dots, M-1$}
+			\State $e_i\gets N(0,m_2)$
+			\State $y_i:= x_i+e_i$
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+		\caption{合成少数类过采样法 SMOTE}\label{alg:smote}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} 能量迹$\vec x=\begin{bmatrix}
+			x_1&x_2&\cdots&x_{M-1}
+			\end{bmatrix},\vec y=\begin{bmatrix}
+			y_1&y_2&\cdots&y_{M-1}
+			\end{bmatrix}$,参数$m_3$
+			\Statex \textbf{输出:}能量迹$\vec z=\begin{bmatrix}
+			z_1&z_2&\cdots&z_{M-1}
+			\end{bmatrix}$
+			\State $\lambda\gets B(m_3,m_3)$
+			\For{$n = 0, \dots, M-1$}
+			\State $z_i:=(1-\lambda)x_i+\lambda y_i$
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	\subsection{攻击评估单元}
+	\section{自适应数据增强方法在AES算法实现分析中的应用}
+	\subsection{实验设置}
+	\subsubsection{主控制器设置}
+	\begin{figure}[!h]
+		\begin{center}
+			\begin{tikzpicture}[node distance=23pt]
+			\node[draw, rounded corners,align=center]  (start)  {设置初始温度$temp$、退火速度$\gamma$、参数搜索范围};
+			%\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,below=of start](geninit){随机生成初始解$p_{sd},m_{sd},p_{an},m_{an},p_{os},m_{os}$};
+			\node[draw,align=center,below=of start](geninit){随机生成初始解$p_{sd},m_{sd},p_{an},m_{an},p_{os},m_{os}$作为当前解};
+			\node[draw, below=of geninit,align=center]  (getcost)  {依据当前解，分别调用\\数据增强单元、DL-SCA模型、攻击评估单元\\得到攻击代价$cost$};
+			\node[draw, below=of getcost,align=center]  (gennewstate)  {扰动当前解产生新解$p_{sd}^\prime,m_{sd}^\prime,p_{an}^\prime,m_{an}^\prime,p_{os}^\prime,m_{os}^\prime$};
+			\node[draw, below=of gennewstate,align=center]  (getnewcost)  {依据新解，分别调用\\数据增强单元、DL-SCA模型、攻击评估单元\\得到攻击代价$newcost$};
+			\node[draw, below=of getnewcost,align=center] (calcdelta)  {$\Delta:=newcost-cost$};
+			\node[draw, diamond, aspect=2, below=of calcdelta,align=center]     (deltaminus)  {$\Delta<0$?};
+			\node[draw, below=of deltaminus,align=center] (acceptnew)  {接受新解（更新当前解为新解）\\$p_{sd},m_{sd},p_{an},m_{an},p_{os},m_{os}$\\$:=p_{sd}^\prime,m_{sd}^\prime,p_{an}^\prime,m_{an}^\prime,p_{os}^\prime,m_{os}^\prime$\\$cost:=newcost$};
+			\node[draw, right=50pt of deltaminus,align=center] (calcp)  {按Metropolis准则\\计算概率阈值$p_{th}=e^{\frac{-\Delta}{temp}}$\\采样$p\stackrel{\$}\gets U(0,1)$};
+			\node[draw, diamond, aspect=2, below=of acceptnew,align=center]     (paccept)  {是否达到\\迭代次数?};
+			\node[draw, diamond, aspect=2, align=center] at (acceptnew -|calcp)    (itend)  {$p\le p_{th}$?};
+			\node[draw,align=center] at (paccept -|itend)  (reserve)  {保留当前解};
+			\node[draw, left=80pt of deltaminus,align=center] (update)  {降低温度\\$temp=\gamma\cdot temp$};
+			\node[draw, rounded corners, below=of paccept,align=center]  (end) {运算结束\\返回当前解（最优解）};
+			%\draw (paccept)--node[below]{否} ++(-4,0) |- (reserve);
+			%\path[->] 
+			\draw[->] (paccept) -|node[midway, near start,below] {否} (update);
+			%\draw[->] (itend) --node[midway, near start,left] {否} (reserve);
+			%\draw[->] (itend) --node[midway, near start,below] {是} (acceptnew);
+			\graph{
+				(start) -> (geninit) -> (getcost) -> (gennewstate) -> (getnewcost) -> (calcdelta) -> (deltaminus) ->["是"left] (acceptnew) ->(paccept)->["是"] (end);
+				(deltaminus) ->["否"] (calcp) ->(itend)->["否"right](reserve)->(paccept);
+				(update)->[to path={|- (\tikztotarget)}](gennewstate);
+				(itend)->["是"below](acceptnew)
+			};
+			\end{tikzpicture}
+			\bicaption{\enspace 主控制器}{\enspace controller}
+		\end{center}
+	\end{figure}
+	\subsubsection{数据增强单元设置}
+	
+	\begin{algorithm}
+		\caption{组合式数据增强}\label{alg:combined_da}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} 能量迹$\vec x=\begin{bmatrix}
+			x_1&x_2&\cdots&x_{M-1}
+			\end{bmatrix},\vec y=\begin{bmatrix}
+			y_1&y_2&\cdots&y_{M-1}
+			\end{bmatrix}$,参数$p_1,p_2,p_3,m_1,m_2,m_3$
+			\Statex \textbf{输出:}能量迹$\vec z=\begin{bmatrix}
+			z_1&z_2&\cdots&z_{M-1}
+			\end{bmatrix}$
+			\State $p\gets U(0,1)$
+			\If {$p<p_1$}
+			\State $x:= \mathrm {shift\_deformation}(x,m_1)$
+			\EndIf
+			\State $p\gets U(0,1)$
+			\If {$p<p_2$}
+			\State $x:= \mathrm{add\_noise}(x,m_2)$
+			\EndIf
+			\State $p\gets U(0,1)$
+			\If {$p<p_3$}
+			\State $z:= SMOTE(x,y,m_3)$
+			\EndIf
+		\end{algorithmic}
+	\end{algorithm}
+	\subsubsection{攻击评估单元设置}
+	\subsubsection{基于深度学习的侧信道攻击模型设置}
+	\subsection{AES算法实现数据集}
+	\subsection{参数验证}
+	\subsection{自适应数据增强方法在AES算法实现分析中的实证研究}
+	\subsubsection{自适应数据增强方法的技术效果}
+	\subsubsection{无数据增强的技术效果}
+	\subsubsection{位移变形的技术效果}
+	有做实验(复现)。
+	\subsubsection{添加噪声的技术效果}
+	有做实验(复现)。
+	\subsubsection{合成少数类过采样法的技术效果}
+	有做实验(复现)。
+	\subsection{讨论与分析}
+	总表对比结果。
+}
