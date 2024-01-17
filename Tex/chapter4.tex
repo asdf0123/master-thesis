@@ -1,25 +1,8 @@
 \chapter{基于深度学习的ECDSA签名智能卡的侧信道分析方法}\label{chap:search2}{
-	\section{智能卡ECDSA算法实现攻击点选择}
+	\section{智能卡ECDSA算法实现攻击点选择}\label{sec:vulnerable}
 	
 	作为研究目标的智能卡所属的产品家族(Product Family)为J3D081，它是符合ISO7816\citep{ISO/IEC7816}与ISO14443 A\citep{ISO/IEC14443}规范的双界面的JAVA产品，其JCOP版本是Java Card3.0.1，GlobalPlatform版本是2.2.1。该智能卡使用了SmartMX\citep{p5x}安全微控制器芯片。Roche等\citep{Roche21}对同样使用SmartMX的两款智能卡进行过研究，并对其在ECDSA算法中的数乘实现进行了分析和猜想。因为芯片型号完全相同，我们认为J3D081智能卡与Roche等\citep{Roche21}研究的智能卡中ECDSA中的数乘实现也相同。
-	
-	ECDSA签名过程使用的一次性随机数$\nonce$是敏感信息。如果它出现泄漏，那么攻击者有可能使用数学方法恢复私钥$\sk$。随机数$\nonce$泄漏越多，攻击恢复私钥的可能性越大。
-	
-	对于本文研究的ECDSA签名智能卡，不能直接使用侧信道攻击恢复随机数$\nonce$的泄漏。如\algorithmref{alg:improvesignscalar}所示，算法的敏感信息是$\tilde{\nonce}_i,i=0,1,\cdots, 128$，但它不存在泄漏（或泄漏程度小到不能直接利用）。我们注意到$\leakedmultiplier_i$敏感信息有关（\algorithmref{alg:improvesignscalar}第5行）且它存在可以利用的泄漏，因此可以将攻击点选为$\leakedmultiplier_i$，恢复$\leakedmultiplier_i$后可以恢复$\tilde \nonce_i$的一部分信息。
-	
-	\begin{figure}[!h]
-		\begin{center}
-			\includegraphics[width=\textwidth]{expotime}
-			\bicaption{\enspace 侧信道攻击泄漏恢复准确率对攻击时间期望的影响}{\enspace Impact of SCA Leakage Recovery Accuracy on the Expectation of Attack Time}
-			\label{fig:expotime}
-		\end{center}
-	\end{figure}
-	
-	需要注意的是，本研究所使用的求解算法$S$要求\textbf{用于构造方程的签名中的随机数泄漏}的准确率是100\%,而没有要求\textbf{签名中的随机数泄漏}准确率是100\%。因此，在侧信道攻击恢复泄漏的准确率略小于100\%的情况下，可以多次尝试仅使用部分泄漏并使用$S$求解。如果选取到的部分泄漏恰好没有错误，那么求解算法能求解出实际私钥$\sk$。这样带来的代价是需要消耗更多时间才能恢复实际私钥。具体来讲，在侧信道攻击恢复泄漏的准确率略小于100\%的情况下，使用多次尝试$S$的方法所消耗的时间会随着准确率的减小而成指数级增长，推导过程如\propositionref{prop:expotime}所示。\figureref{fig:expotime}展示了侧信道攻击恢复泄漏的准确率略小于100\%的情况下多次尝试$S$的方法在理论上的技术效果，其中橙色实线表示恢复实际私钥的时间的期望，蓝色虚线表示使用指数函数可以对时间期望的下限做一个很好的估计，不同线型的绿色虚线表示攻击所能容忍的不同程度时间消耗（一小时、一天、一个月）。进一步分析可以知道，如果要求使用数学方法分别在一个月、一天、一小时内恢复实际私钥，那么通过侧信道攻击所恢复的签名中的随机数泄漏的准确率分别需要达到97.12\%、98.22\%、99.27\%。
 
-	本研究的攻击点是ECDSA签名操作中数乘实现（\algorithmref{alg:improvesignscalar}）中$\leakedmultiplier_i$的泄漏，侧信道攻击最终目标是恢复足够多可利用\footnote{足够多、可利用的具体标准取决于求解算法$\mathcal S$。对于本文使用的求解算法$S$，足够多指使用75条有可利用泄漏的签名构造方程，可利用指签名中的随机数泄漏连续4比特。}的签名中的一次性随机数$\nonce$的泄漏的情况下，提高恢复的泄漏准确率。侧信道攻击恢复随机数泄漏的准确率越高，求解实际私钥所需要调用$S$的次数就越少，攻击时间也就越少。侧信道攻击恢复随机数泄漏越多，求解出实际私钥的可能性就越大。
-	
-	\section{智能卡ECDSA算法实现侧信道分析难点}
 	本研究采集数据的参数如\tableref{tab:acquisitionpara}所示。
 	
 	\begin{table}[!h]
@@ -32,7 +15,7 @@
 		\begin{tabular}{ll}
 			\hline
 			操作 & ECDSA签名\\
-			输入 & 固定消息$m$,(随机选择的)固定私钥$d$\\
+			输入 & 固定消息$m$,(随机选择的)固定私钥$\sk$\\
 			操作次数（能量迹条数） & 5000\\
 			一次数乘时间 & 约50ms\\
 			采样率 & 5GHz\\
@@ -44,29 +27,151 @@
 			\hline
 		\end{tabular}
 	\end{table}
+
+	令$n_s=30$表示本研究所采集到一条迹所包含信息泄漏所对应的的迭代次数。算法实现总共有128次迭代，但因为采集条件受限只能对连续$n_s$次迭代的信息泄漏进行采集，为了方便处理，实际数据都是采集了前$n_s$次迭代的结果。
+	
+	本研究严格区分这几个概念：敏感信息、信息泄漏、信息泄漏估计值、敏感信息估计值、可利用的敏感信息估计值、被利用的敏感信息估计值。
+	
+	每条签名中，一次性随机数$\nonce$、一次性随机数的某个比特$\nonce_i$、一次性随机数编码形式中的一个码元$\tilde \nonce_i$（\algorithmref{alg:improvesignscalar}中的$\tilde\nonce_i$）都是敏感信息。攻击者不能知道敏感信息真实值，只能使用侧信道攻击或其他方法间接地估计。
+	
+	因为签名算法每次执行时这些敏感信息几乎不同，这导致算法某些步骤或数值不同，而这种不同可以在电磁迹上得以体现。\algorithmref{alg:improvesignscalar}中$\leakedmultiplier_i$是由敏感信息$\tilde\nonce_i$和随机数共同决定，$\leakedmultiplier_i$受$\tilde\nonce_i$影响，$\leakedmultiplier_i$是信息泄漏。攻击者不能知道信息泄漏的真实值。依据敏感信息和信息泄漏之间的关系，可以得到两个推论，如\corollaryref{cor:highbitinfo}和\corollaryref{cor:lowbitinfo}所示。\textbf{为了方便表述，我们将对应于$\nonce_i=0$的电磁迹称为正例，对应于$\nonce_i=1$的电磁迹称为反例。}
+	
+	攻击者获取电磁迹后，可以尝试使用侧信道攻击恢复其中的信息泄漏。因为这种恢复不能保证100\%成功，所以需要将它和信息泄漏加以区分。我们将攻击者恢复的信息泄漏称为信息泄漏估计值，记为$\hat \leakedmultiplier_i$。
+	
+	在此之后，攻击者可以依据信息泄漏估计值进一步计算敏感信息泄漏的估计值，我们将其称为敏感信息估计值。因为$\nonce,\nonce_i,\tilde \nonce_i$都是敏感信息，所以对它们各自的估计值$\hat \nonce,\hat\nonce_i,\hat{\tilde \nonce}_i$都是敏感信息估计值。本研究主要对$\hat\nonce_i$进行相关的分析。具体来说，攻击者可以预先根据\corollaryref{cor:highbitinfo}和\corollaryref{cor:lowbitinfo}总结出如何根据信息泄漏估计值计算敏感信息泄漏的估计值的表格，如\apptableref{apptab:infoonsymbol}所示，每次依据信息泄漏估计值查表即可。\textbf{攻击者不知道敏感信息，因此只能暂且假设没有反例被错误预测为正例。}
+	
+	得到敏感信息估计值后，攻击者需要从中过滤出对于求解算法$\mathcal S$的可利用的敏感信息估计值。这是因为虽然有的信息泄漏带有信息但是将它交给$S$构造方程并求解反而会导致求解时间增加、求解成功率降低。对于本文使用的求解算法$S$，连续4比特$\hat \nonce_i,0\le i<n_s$的敏感信息估计值就是可利用的敏感信息估计值。
+	
+	被求解算法利用的可利用的敏感信息估计值称为被利用的敏感信息估计值。求解算法$\mathcal S$会选择一定数量\footnote{假如可利用的敏感信息估计值一定都等于真实值，那么对求解速度和求解成功率没有影响，但这种情况较难发生。如果可利用的敏感信息估计值有可能出错，那么选择越多签名就越可能含有错误，一旦有错误就会求解失败。}的签名及其可利用的敏感信息泄漏估计值构造方程并尝试求解私钥$\sk$，因此即使某些敏感信息估计值是可利用的也不会被利用。
+
+	\begin{corollary}\label{cor:highbitinfo}
+		如果$\leakedmultiplier_i=1$，那么$\nonce_i=0$。
+	\end{corollary}
+	\begin{proof}
+		证明逆否命题即可。如果$\nonce_i\neq0$，那么$\nonce_i=1$，$\tilde \nonce_i=2$或$\tilde \nonce_i=3$。当$\tilde \nonce_i=2,\leakedmultiplier_i=2\neq1$。当$\tilde \nonce_i=3,\leakedmultiplier_i=3\neq1$。因此，如果$\nonce_i\neq0$，$\leakedmultiplier_i\neq1$。
+	\end{proof}
+
+	\begin{corollary}\label{cor:lowbitinfo}
+		如果$\leakedmultiplier_i=2$，那么$\nonce_{i+129}=0$。
+	\end{corollary}
+	\begin{proof}
+		证明逆否命题即可。如果$\nonce_{i+129}\neq0$，那么$\nonce_{i+129}=1$，$\tilde \nonce_i=1$或$\tilde \nonce_i=3$。当$\tilde \nonce_i=1,\leakedmultiplier_i=1\neq2$。当$\tilde \nonce_i=3,\leakedmultiplier_i=3\neq2$。因此，如果$\nonce_{i+129}\neq0$，$\leakedmultiplier_i\neq2$。
+	\end{proof}
+	
+	\begin{example}\label{ex:rightwrongright}
+		假设对于第1337条签名中数乘算法第23、24、25、26次迭代，\algorithmref{alg:improvesignscalar}中的$\tilde\nonce_i$数值分别为$\tilde\nonce_{23}=0,\tilde\nonce_{24}=0,\tilde\nonce_{25}=1,\tilde\nonce_{26}=3$（即$\nonce_{23}=0,\nonce_{24}=0,\nonce_{25}=0,\nonce_{26}=1,\nonce_{152}=0,\nonce_{153}=0,\nonce_{154}=1,\nonce_{155}=1$）。进一步假设第23、24次迭代的随机数（\algorithmref{alg:improvesignscalar}第8行）数值分别是2、1。据此，我们可以知道电磁迹中分别包含$\leakedmultiplier_{23}=2,\leakedmultiplier_{24}=1,\leakedmultiplier_{25}=1,\leakedmultiplier_{26}=3$的信息泄漏。进一步假设攻击者通过侧信道攻击计算出了信息泄漏估计值$\hat\leakedmultiplier_{23}=1,\hat\leakedmultiplier_{24}=1,\hat\leakedmultiplier_{25}=1,\hat\leakedmultiplier_{26}=1$。尽管我们知道攻击者对$\leakedmultiplier_{23},\leakedmultiplier_{26}$做出了错误的估计，但是对于攻击者本人，他因为不知道$\leakedmultiplier_{26}$真实值而不知道已经出错，只能暂且假设估计值都是正确的。攻击者根据\apptableref{apptab:infoonsymbol}，由信息泄漏估计值推算某些敏感信息估计值$\hat\nonce_{23}=0,\hat\nonce_{24}=0,\hat\nonce_{25}=0,\hat\nonce_{26}=0$。进一步发现$\hat\nonce_{23},\hat\nonce_{24},\hat\nonce_{25},\hat\nonce_{26}$是连续4比特的，所以它们是可利用的敏感信息估计值。再进一步假设攻击者在某次构造方程时选择了第1337条签名（和其他一些电磁迹）及其可利用的敏感信息泄漏估计值参与调用本研究使用的求解算法$S$构造方程并求解，那么第1337条签名的$\hat\nonce_{23},\hat\nonce_{24},\hat\nonce_{25},\hat\nonce_{26}$就是被利用的敏感信息的估计值。我们知道第1337条签名中对$\nonce_{26}$估计错误会导致求解失败，但对于攻击者而言他只知道错误存在而不知道错误来自于哪一（几）处被利用的敏感信息的估计值的错误，也无法知道错误具体个数。如果攻击者在某次构造方程时没有选择了第1337条签名及其可利用的敏感信息泄漏估计值参与调用本研究使用的求解算法$S$构造方程并求解，那么第1337条签名的$\hat\nonce_{23},\hat\nonce_{24},\hat\nonce_{25},\hat\nonce_{26}$就不是被利用的敏感信息的估计值。
+	\end{example}
+
+	\begin{example}
+		假设对于第2333条签名中数乘算法第17、18、19、20次迭代，\algorithmref{alg:improvesignscalar}中的$\tilde\nonce_i$数值分别为$\tilde\nonce_{17}=1,\tilde\nonce_{18}=1,\tilde\nonce_{19}=1,\tilde\nonce_{20}=1$（即$\nonce_{17}=0,\nonce_{18}=0,\nonce_{19}=0,\nonce_{20}=0,\nonce_{146}=1,\nonce_{147}=1,\nonce_{148}=1,\nonce_{149}=1$）。据此，我们可以知道电磁迹中分别包含$\leakedmultiplier_{17}=1,\leakedmultiplier_{18}=1,\leakedmultiplier_{19}=1,\leakedmultiplier_{20}=1$的信息泄漏。进一步假设攻击者通过侧信道攻击计算出了信息泄漏估计值$\hat\leakedmultiplier_{17}=1,\hat\leakedmultiplier_{18}=2,\hat\leakedmultiplier_{19}=1,\hat\leakedmultiplier_{20}=3$。尽管我们知道攻击者对$\leakedmultiplier_{18},\leakedmultiplier_{20}$做出了错误的估计，但是对于攻击者本人，他因为不知道$\leakedmultiplier_{18},\leakedmultiplier_{20}$真实值而不知道已经出错，只能暂且假设估计值都是正确的。攻击者根据\apptableref{apptab:infoonsymbol}，由信息泄漏估计值推算某些敏感信息估计值$\hat\nonce_{17}=0,\hat\nonce_{147}=0,\hat\nonce_{19}=0,\hat\nonce_{149}=0$，而对于$\nonce_{146},\nonce_{18},\nonce_{148},\nonce_{20}$攻击者既没有足够大（100\%）的把握将它们估计为0，也没有足够大（100\%）的把握将它们估计为0。尽管$\hat\nonce_{17},\hat\nonce_{18},\hat\nonce_{19},\hat\nonce_{20}$是连续4比特，但是其中缺少$\hat\nonce_{18},\hat\nonce_{20}$，所以它不是可利用的敏感信息估计值。因此，它也不可能是被利用的敏感信息估计值。
+	\end{example}
+
+	\begin{example}
+		假设对于第162条签名中数乘算法第6、7、8、9次迭代，\algorithmref{alg:improvesignscalar}中的$\tilde\nonce_i$数值分别为$\tilde\nonce_{6}=2,\tilde\nonce_{7}=2,\tilde\nonce_{8}=2,\tilde\nonce_{9}=2$（即$\nonce_{6}=1,\nonce_{7}=1,\nonce_{8}=1,\nonce_{9}=1,\nonce_{135}=0,\nonce_{136}=0,\nonce_{137}=0,\nonce_{138}=0$）。据此，我们可以知道电磁迹中分别包含$\leakedmultiplier_{6}=2,\leakedmultiplier_{7}=2,\leakedmultiplier_{8}=2,\leakedmultiplier_{9}=2$的信息泄漏。进一步假设攻击者通过侧信道攻击计算出了信息泄漏估计值$\hat\leakedmultiplier_{17}=2,\hat\leakedmultiplier_{18}=2,\hat\leakedmultiplier_{19}=2,\hat\leakedmultiplier_{20}=2$。攻击者根据\apptableref{apptab:infoonsymbol}，由信息泄漏估计值推算某些敏感信息估计值$\hat\nonce_{135}=0,\hat\nonce_{136}=0,\hat\nonce_{137}=0,\hat\nonce_{138}=0$。进一步发现$\hat\nonce_{135},\hat\nonce_{136},\hat\nonce_{137},\hat\nonce_{138}$是连续4比特，它因为其索引不在区间[0,$n_s$)而不可能被本文的求解算法$S$利用，所以它不是可利用的敏感信息估计值。因此，它也不可能是被利用的敏感信息估计值。
+	\end{example}
+
+	本研究严格区分攻击者和分析者，这是因为两者能力范围有所差异。只从攻击者角度看待问题会导致无法获取分析性能所需的必要的信息，只从评估者角度看待问题会导致攻击方法有可能会依赖于只有评估者才能获取的信息，从而不能用于实际攻击。
+
+	对于攻击者，他不知道攻击电磁迹所对应的敏感信息，也不知道信息泄漏。攻击者的攻击路线是：根据电磁迹计算信息泄漏估计值、在假设信息泄漏估计值完全正确的情况下计算敏感信息估计值、从敏感信息估计值中计算求解算法$\mathcal S$可利用的敏感信息估计值、选出对于$\mathcal S$来说足够多的可利用的敏感信息估计值并结合签名本身的一些公开内容构造方程调用$\mathcal S$并求解私钥、验证求解结果。如果攻击者验证出求解结果错误，只能说明攻击路线中恰好遇到“信息泄漏估计值完全正确”不成立的情况且有错误一直保留到了最后阶段，但没有办法进一步确认错误来自于“足够多被利用的信息泄漏估计值”中的哪一处或哪几处。
+
+	对于分析者，它相比于攻击者可以额外知道电磁迹所对应的敏感信息，但是信息泄漏的真实值也不能全部知道（见\tableref{tab:partialknownticonclusion},大约只能知道所有信息泄漏中$\frac34$的比例）。从分析者角度可以依据这个信息计算出攻击者求解结果错误时，错误来自于“足够多被利用的信息泄漏估计值”中的哪一处或哪几处。因为分析者不能全不知道信息泄漏的真实值，所以只能定位一些错误而不是所有错误。例如，在\exampleref{ex:rightwrongright}中，评估者实际上也无法知道第1337条签名中数乘算法第23次迭代的信息泄漏真实值$\leakedmultiplier_{23}=2$与信息泄漏估计值$\hat\leakedmultiplier_{23}=1$是不一致的。
+
+	本研究严格区分这几个概念：成功率（Success Rate）、准确率（Accuracy）、精准率（Precision）。
+	
+	成功率用于描述求解算法$\mathcal S$，$\mathcal S$是一个近似算法因此即使构造的方程不含错误它也不能保证100\%求解成功。因为$\mathcal S$的成功率难以估计且$\mathcal S$并不在本文研究范围内，本研究直接假定$\mathcal S$成功率为100\%。
+	
+	准确率用于描述信息泄漏$\leakedmultiplier_i$的恢复情况。$\leakedmultiplier_i$可能的取值有三种，因此使用DL-SCA预测标签是一个三分类问题。它的混淆矩阵如\tableref{tab:cmatrixt}所示。恢复信息泄漏$\leakedmultiplier_i$准确率的计算方式为$accuracy=\frac{\mathrm{TP}1+\mathrm{TP}2+\mathrm{TP}3}{\mathrm{TP}1+\mathrm{FP}1_2+\mathrm{FP}1_3+\mathrm{FP}2_1+\mathrm{TP}2+\mathrm{FP}2_3+\mathrm{FP}3_1+\mathrm{FP}3_2+\mathrm{TP}3}$，它是深度学习最常用的评价指标。
+
+	精准率用于描述敏感信息$\nonce_i$的恢复情况。$\nonce_i$可能的取值有只有两种，因此使用DL-SCA预测标签是一个二分类问题。它的混淆矩阵如\tableref{tab:cmatrixk}所示。恢复敏感信息$\nonce_i$的精准率的计算方式如\equationref{eq:precision}所示，它适用于不能容忍将反例错误预测为正例的情况。
+
+	\begin{equation}\label{eq:precision}
+		precision=\frac{TP}{TP+FP}
+	\end{equation}
+
+	在侧信道领域，通常使用准确率描述敏感信息恢复情况。恢复敏感信息$\nonce_i$的准确率计算方式为$accuracy=\frac{TP+TN}{TP+FP+FN+TN}$。\textbf{但是}，恢复敏感信息$\nonce_i$的准确率这一指标在对ECDSA实现的侧信道分析研究场景中存在缺陷。本研究只论证其缺陷，不会将恢复敏感信息$\nonce_i$的准确率用作评价指标。
+
+	\begin{table}[!h]
+		\bicaption{\enspace $\leakedmultiplier_i$的混淆矩阵}{\enspace Confusion matrix of $\leakedmultiplier_i$}
+		\label{tab:cmatrixt}
+		\centering
+		%\footnotesize% fontsize
+		%\setlength{\tabcolsep}{4pt}% column separation
+		%\renewcommand{\arraystretch}{1.2}%row space
+		\begin{tabular}{cc|ccc}
+			\hline
+			\multicolumn{2}{c|}{\multirow{2}{*}{样本数}} & \multicolumn{3}{c}{$\hat\leakedmultiplier_i$的取值（预测结果）} \\
+			%\cline{3-5}
+			\multicolumn{2}{c|}{}& 1 & 2 & 3 \\
+			\hline
+			\multirow{3}{*}{$\leakedmultiplier_i$的取值（真实结果）} & 1 & TP1 & FP1$_2$ & FP1$_3$ \\
+			%\cline{2-5}
+			& 2 & FP2$_1$ & TP2 & FP2$_3$ \\
+			%\cline{2-5}
+			& 3 & FP3$_1$ & FP3$_2$ & TP3 \\
+			\hline
+		\end{tabular}   
+	\end{table}
+
+	\begin{table}[!h]
+		\bicaption{\enspace $\nonce_i$的混淆矩阵}{\enspace Confusion matrix of $\nonce_i$}
+		\label{tab:cmatrixk}
+		\centering
+		%\footnotesize% fontsize
+		%\setlength{\tabcolsep}{4pt}% column separation
+		%\renewcommand{\arraystretch}{1.2}%row space
+		\begin{tabular}{cc|cc}
+			\hline
+			\multicolumn{2}{c|}{\multirow{2}{*}{样本数}} & \multicolumn{2}{c}{$\hat\nonce_i$的取值（预测结果）} \\
+			%\cline{3-5}
+			\multicolumn{2}{c|}{}& 0& 1 \\
+			\hline
+			\multirow{2}{*}{$\nonce_i$的取值（真实结果）} & 0 & TP & FP \\
+			%\cline{2-5}
+			& 1 & FN & TN \\
+			\hline
+		\end{tabular}   
+	\end{table}
+
+	ECDSA签名过程使用的一次性随机数$\nonce$是敏感信息。如果它出现泄漏，那么攻击者有可能使用数学方法恢复私钥$\sk$。随机数$\nonce$泄漏越多，攻击恢复私钥的可能性越大。
+	
+	对于本文研究的ECDSA签名智能卡，不能直接使用侧信道攻击恢复一次性随机数$\nonce$的泄漏。如\algorithmref{alg:improvesignscalar}所示，算法的敏感信息是$\tilde{\nonce}_i,i=0,1,\cdots, 128$，但它不存在泄漏（或泄漏程度小到不能直接利用）。我们注意到$\leakedmultiplier_i$与敏感信息有关（\algorithmref{alg:improvesignscalar}第5行）且它存在可以利用的泄漏，因此可以将攻击点选为$\leakedmultiplier_i$，预测$\leakedmultiplier_i$的估计值$\hat\leakedmultiplier_i$后，可以预测某些$\nonce_i$的估计值$\hat\nonce_i$。
+	
+	\begin{figure}[!h]
+		\begin{center}
+			\includegraphics[width=\textwidth]{expotime}
+			\bicaption{\enspace 敏感信息估计值精准率对攻击时间期望的影响}{\enspace Impact of precision on the expectation of attack time}
+			\label{fig:expotime}
+		\end{center}
+	\end{figure}
+	
+	需要注意的是，求解算法$\mathcal S$要求\textbf{被利用的敏感信息估计值}的准确率是100\%,而没有要求\textbf{可利用的敏感信息估计值}准确率是100\%。又由于\corollaryref{cor:highbitinfo}和\corollaryref{cor:lowbitinfo}，我们可以知道\textbf{可利用的敏感信息估计值}都是被预测为正例的\footnote{三段论。大前提，敏感信息都被预测为正例。小前提，可利用的敏感信息估计值是敏感信息。结论，可利用的敏感信息估计值都被预测为正例。}。既然所有\textbf{可利用的敏感信息估计值}都是被预测为正例的，那么\textbf{可利用的敏感信息估计值}的准确率就是精准率。又由于\textbf{可利用的敏感信息估计值}在\textbf{所有预测为正例的敏感信息估计值}中的分布是随机的，因此\textbf{可利用的敏感信息估计值}的准确率约等于\textbf{所有预测为正例的敏感信息估计值}的准确率，即\textbf{敏感信息估计值}精准率。
+	
+	因此，在敏感信息估计值精准率略小于100\%的情况下，可以多次尝试仅使用部分泄漏并使用$S$求解。如果选取到的部分泄漏恰好没有错误，那么求解算法能求解出实际私钥$\sk$。这样带来的代价是需要消耗更多时间才能恢复实际私钥。具体来讲，在敏感信息估计值精准率略小于100\%的情况下，使用多次尝试$S$的方法所消耗的时间会随着精准率的减小而成指数级增长，推导过程如\propositionref{prop:expotime}所示。\figureref{fig:expotime}展示了敏感信息估计值精准率略小于100\%的情况下多次尝试$S$的方法在理论上的技术效果，其中橙色实线表示恢复实际私钥的时间的期望，蓝色虚线表示使用指数函数可以对时间期望的下限做一个很好的估计，不同线型的绿色虚线表示攻击所能容忍的不同程度时间消耗（一小时、一天、一个月）。进一步分析可以知道，如果要求使用数学方法分别在一个月、一天、一小时内恢复实际私钥，那么通过侧信道攻击所恢复敏感信息估计值精准率分别需要达到97.12\%、98.22\%、99.27\%。
+
+	本研究的攻击点是ECDSA签名操作中数乘实现（\algorithmref{alg:improvesignscalar}）中$\leakedmultiplier_i$的泄漏，侧信道攻击最终目标是恢复足够多可利用\footnote{足够多、可利用的具体标准取决于求解算法$\mathcal S$。对于本文使用的求解算法$S$，足够多指使用75条有可利用泄漏的签名构造方程，可利用指签名中的随机数泄漏连续4比特。}的签名中的一次性随机数$\nonce$的泄漏的情况下，提高敏感信息估计值精准率。侧信道攻击恢复敏感信息估计值精准率越高，求解实际私钥所需要调用$S$的次数就越少，攻击时间也就越少。侧信道攻击恢复随机数泄漏越多，求解出实际私钥的可能性就越大。
+	
+	\section{智能卡ECDSA算法实现侧信道分析难点}\label{sec:hardpoint}
 	
 	侧信道攻击智能卡ECDSA直到恢复实际私钥分为如下多个步骤。其中，步骤一可以通过改进采集环境或采集设备提升采集到的泄漏数量，步骤二通过改进侧信道攻击方法或降低置信度提升恢复的信息泄漏数量，步骤三需要通过更强的数学工具才可能在现有基础（见\apptableref{apptab:infoonsymbol}）上进一步提升恢复敏感信息泄漏的比例，步骤四无法改进，步骤五可以通过使用更好的求解算法加以改进以减少攻击时间。
 	
 	\begin{enumerate}
 		\item [\textbf{步骤一}]采集多条签名以及对应的电磁迹；
-		\item [\textbf{步骤二}]从电磁迹中恢复$\leakedmultiplier_i$的信息泄漏；
-		\item [\textbf{步骤三}]从$\leakedmultiplier_i$的信息泄漏中恢复$\tilde \nonce_i$的敏感信息泄漏；
+		\item [\textbf{步骤二}]从电磁迹中预测信息泄漏$\leakedmultiplier_i$的估计值$\hat \leakedmultiplier_i$；
+		\item [\textbf{步骤三}]从信息泄漏估计值$\hat \leakedmultiplier_i$计算某些敏感信息的估计值$\hat \nonce_i$；
 		\item [\textbf{步骤四}]从签名中过滤出所有有连续4比特泄漏的签名；
 		\item [\textbf{步骤五}]每次随机选择75条签名，利用签名以及其泄漏调用$S$求解直至求解成功。
 	\end{enumerate}
 	
-	对于步骤一，在现有实验条件下（见\tableref{tab:acquisitionpara}）每条签名中数乘实现时长约50ms的电磁迹只能采集10ms，128次迭代只能采集到约30次。对于步骤二，使用自适应数据增强方法提升恢复的信息泄漏数量。步骤三、四、五不在本研究范围内，提升效果的具体方法不予赘述。
+	对于步骤一，在现有实验条件下（见\tableref{tab:acquisitionpara}）每条签名中数乘实现时长约50ms的电磁迹只能采集10ms，128次迭代只能采集到约30次（即$n_s\approx30$）。对于步骤二，使用自适应数据增强方法提升恢复的信息泄漏数量。步骤三、四、五不在本研究范围内，提升效果的具体方法不予赘述。
 	
 	本研究不考虑进一步改进步骤一、三、四、五，这使得使用侧信道分析实现步骤二需要考虑如下难点:
 	
 	\begin{itemize}
 		\item 信息泄漏难以定位；
-		\item 恢复信息泄漏真阳性率要求高\footnote{具体数值由电磁迹条数、电磁迹包含的迭代次数、从信息泄漏中恢复敏感信息泄漏的比例、求解算法$\mathcal S$对可利用敏感信息泄漏的定义、求解算法$\mathcal S$对敏感信息泄漏总量的需求、求解算法$\mathcal S$的运行时间、求解算法$\mathcal S$本身的成功率、可以容忍的攻击的时间消耗等多种因素共同决定}；
+		\item 敏感信息估计值精准率要求高\footnote{具体数值由电磁迹条数、电磁迹包含的迭代次数、从信息泄漏中恢复敏感信息泄漏的比例、求解算法$\mathcal S$对可利用敏感信息泄漏的定义、求解算法$\mathcal S$对敏感信息泄漏总量的需求、求解算法$\mathcal S$的运行时间、求解算法$\mathcal S$本身的成功率、可以容忍的攻击的时间消耗等多种因素共同决定。}；
 	\end{itemize}
 
-	本研究提出了一种基于时间模版的两阶段对齐解决信息泄漏难以定位的问题；本文应用了前一章的自适应数据增强方法提升恢复信息泄漏真阳性率。
-	
-	侧信道攻击需要恢复敏感信息泄漏的准确率高，但是对于以准确率作为评价恢复$\leakedmultiplier_i$信息泄漏效果的指标不合理。从\apptableref{apptab:infoonsymbol}可以看出攻击者只能从$\leakedmultiplier_i$的取值中分析出一次性随机数$\nonce$的某个比特$\nonce_i=0$，而无法分析出$\nonce$的任何一个比特$\nonce_i=1$。因此评价恢复$\leakedmultiplier_i$信息泄漏效果时，只用考虑在$\leakedmultiplier_i=1$时尽可能将$\leakedmultiplier_i$预测为1、在$\leakedmultiplier_i=2$时尽可能将$\leakedmultiplier_i$预测为2，而不用考虑在$\leakedmultiplier_i=3$时尽可能将$\leakedmultiplier_i$预测为3。又由于本研究使用的求解算法$S$不考虑低位的泄漏，因此本研究只考虑在$\leakedmultiplier_i=1$时尽可能将$\leakedmultiplier_i$预测为1。本研究将$\leakedmultiplier_i=1$对应的能量迹称为阳性样本，并将真阳性率作为评价恢复$\leakedmultiplier_i$信息泄漏效果的指标。
+	本研究提出了一种基于时间模版的两阶段对齐解决信息泄漏难以定位的问题；本文应用了前一章的自适应数据增强方法提升敏感信息估计值精准率。
 	
 %	侧信道分析的第一个难点在于，敏感信息是$\tilde{k}_i$没有直接泄漏，这使得从理论上讲不可能从电磁迹泄漏中恢复所有敏感信息。从一条签恢复的回复的敏感信息越少，就需要使用越多签名构造方程才可能求解出私钥。
 %	
@@ -88,8 +193,12 @@
 	
 	
 	\section{智能卡ECDSA算法实现信息泄漏预处理方法研究}
+	%$\forall 0\le i<T,\forall 0\le j<n_s\leakedmultiplier^{(i)}_j$估计值$\hat\leakedmultiplier^{(i)}_j$的泄漏是信息泄漏。$\forall 0\le i<T,\forall 0\le j<n_s,\tilde \nonce^{(i)}_j,\nonce^{(i)}_j,\nonce^{(i)}_{j+129},\mathbb 1_{\leakedmultiplier^{(i)}_j=1}$数值的泄漏是信息泄漏，其中$\mathbb 1$是示性函数，取值范围为0或1，它取1当且仅当下标表示的事件发生。可利用的敏感信息指的是$\tilde \nonce_i,0<i<258$数值的泄漏
 	
-	信息泄漏指的是$t_i$的泄漏。一条签名的电磁迹采样点个数达到$5\cdot10^{7}$，现有的对齐方法无法同时满足高效和准确的需求。电磁迹中每处信息泄漏的POIs少（约50个采样点），使用基于与单处信息泄漏相关系数的静态对齐会因为产生大量假阳性\footnote{原本不是信息泄漏，但是静态对齐显示是信息泄漏。}而无法准确提取POIs。电磁迹中每处信息泄漏之间引入了随机延迟，使用基于与多处信息泄漏相关系数的静态对齐会使得出现大量假阴性\footnote{原本是信息泄漏，但是静态对齐显示不是信息泄漏。}而过滤掉信息泄漏。电磁迹中每处信息泄漏间隔的时间长，使用动态对齐会因为计算量巨大而不能高效提取POIs。
+	%//TODO:
+	侧信道攻击需要预测敏感信息的准确率高，但是对于以准确率作为评价恢复信息泄漏$\leakedmultiplier_i$效果的指标不合理。从\apptableref{apptab:infoonsymbol}可以看出攻击者只能从$\hat\leakedmultiplier_i$的取值中对一次性随机数$\nonce$的某个比特$\nonce_i$做出$\hat\nonce_i=0$的估计，而无法对任意比特做出$\hat\nonce_i=1$的估计。因此评价恢复$\leakedmultiplier_i$信息泄漏效果时，只用考虑在预测$\hat\leakedmultiplier_i=1$的条件下尽可能达成$\leakedmultiplier_i=1$、预测$\hat\leakedmultiplier_i=2$的条件下尽可能达成$\leakedmultiplier_i=2$，而不用考虑在预测$\hat\leakedmultiplier_i=3$的条件下尽可能达成$\leakedmultiplier_i=3$。为了方便，我们用\tableref{tab:cmatrixt}所列举的表项说明这种变化，评价指标由$accuracy=\frac{\mathrm{TP}1+\mathrm{TP}2+\mathrm{TP}3}{\mathrm{TP}1+\mathrm{FP}1_2+\mathrm{FP}1_3+\mathrm{FP}2_1+\mathrm{TP}2+\mathrm{FP}2_3+\mathrm{FP}3_1+\mathrm{FP}3_2+\mathrm{TP}3}$变为$\frac{\mathrm{TP}1+\mathrm{TP}2}{\mathrm{TP}1+\mathrm{FP}1_2+\mathrm{FP}2_1+\mathrm{TP}2+\mathrm{FP}3_1+\mathrm{FP}3_2}$。又由于本研究使用的求解算法$S$不考虑低位的泄漏，因此本研究只考虑在预测$\hat\leakedmultiplier_i=1$的条件下尽可能达成$\leakedmultiplier_i=1$。我们还是用\tableref{tab:cmatrixt}所列举的表项说明这种变化，评价指标由$\frac{\mathrm{TP}1+\mathrm{TP}2}{\mathrm{TP}1+\mathrm{FP}1_2+\mathrm{FP}2_1+\mathrm{TP}2+\mathrm{FP}3_1+\mathrm{FP}3_2}$进一步变为$\frac{\mathrm{TP}1}{\mathrm{TP}1+\mathrm{FP}2_1+\mathrm{FP}3_1}$。根据\corollaryref{cor:highbitinfo}可以知道，\tableref{tab:cmatrixt}所列举的表项表述的公式$\frac{\mathrm{TP}1}{\mathrm{TP}1+\mathrm{FP}2_1+\mathrm{FP}3_1}$实际上就是\tableref{tab:cmatrixk}所列举的表项表述的\equationref{eq:precision}。因此我们将$\frac{\mathrm{TP}1}{\mathrm{TP}1+\mathrm{FP}2_1+\mathrm{FP}3_1}$称为信息泄漏估计值$\hat\leakedmultiplier_i$的精准率，它和敏感信息估计值$\hat\nonce_i$的精准率在数值上是恒等的。
+	
+	信息泄漏指的是$\leakedmultiplier_i$的泄漏。一条签名的电磁迹采样点个数达到$5\cdot10^{7}$，现有的对齐方法无法同时满足高效和准确的需求。电磁迹中每处信息泄漏的POIs少（约50个采样点），使用基于与单处信息泄漏相关系数的静态对齐会因为产生大量假阳性\footnote{原本不是信息泄漏，但是静态对齐显示是信息泄漏。}而无法准确提取POIs。电磁迹中每处信息泄漏之间引入了随机延迟，使用基于与多处信息泄漏相关系数的静态对齐会使得出现大量假阴性\footnote{原本是信息泄漏，但是静态对齐显示不是信息泄漏。}而过滤掉信息泄漏。电磁迹中每处信息泄漏间隔的时间长，使用动态对齐会因为计算量巨大而不能高效提取POIs。
 	
 	本文提出的一种基于时间模版的两阶段对齐可以高效准确地从目标电磁迹中提取POIs。它大致分为如下两个阶段：
 	
@@ -109,7 +218,7 @@
 	
 	本研究从硬件设计中对物理按键去抖动的硬件代码得到启发而设计了去抖动函数。函数通过缓存一段长度的数列实现排除偶然噪声（采样点个数少于$w_a$的方波）的干扰但保留主体波形，它的实现见\algorithmref{alg:antijitter}。它通过检查当前位置数据以及之前的$w_a-1$个数据，综合判断应该如何解析当前状态并记录。去抖动会对数据引入延迟，去抖动后方波的上升沿和下降沿会相比于去抖动前延后$w_a$个采样点，有时需要进行校正。去抖动时间复杂度为$\Theta(N_X)$。
 	
-	\begin{algorithm}[!h]
+	\begin{breakablealgorithm}
 		\caption{去抖动}\label{alg:antijitter}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的01数列
@@ -128,11 +237,11 @@
 			\EndFor
 			\State \Return $\begin{bmatrix}a_0&a_1&\ldots&a_{N_X-1}\end{bmatrix}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
 	本研究从图像处理中的模糊操作得到启发而设计了模糊函数。函数计算窗口大小为$2w_g+1$的二项分布的卷积核，扫描数列中的每个样本，用卷积核确定的邻域内的样本的加权平均数替代当前样本的值，它的实现见\algorithmref{alg:gaussblur}。它作为上一步去抖动函数的补充，进一步排除噪声的干扰并保留主体波形。模糊函数本质上是实现了卷积，为了使得模糊后的数列与输入的数列大小相同，卷积使用了same\footnote{使用文档见\href{https://numpy.org/doc/stable/reference/generated/numpy.convolve.html}{numpy.convolve}。}模式。模糊函数的时间复杂度为$\Theta(w_gN_X)$。
 	
-	\begin{algorithm}[!h]
+	\begin{breakablealgorithm}
 		\caption{模糊}\label{alg:gaussblur}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列（下标范围之外的数值为0）
@@ -151,7 +260,7 @@
 %			\EndFor
 			\State \Return $G$%$\left\{g_0,g_1,\dots,g_{N_X-1}\right\}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
 
 	阶段一中最耗费时间的模糊，如果不进行分块那么$N_X=M$，它的时间复杂度$\Theta(w_gN_X)=\Theta(w_gM)$是难以接受的。分块计算方差后，每条电磁迹长度为$M$的采样点被压缩成了长度为$N_X=\left\lfloor\frac{M}{w_d}\right\rfloor$的数列，模糊的时间复杂度下降为$\Theta(w_gN_X)=\Theta(\frac{w_g}{w_d}M)$。只要$w_g<w_d$，阶段一的时间复杂度就可以由$\Theta\left( w_gM\right) $变为$\Theta(M)+\Theta\left( \frac{M}{w_d}\right) +\Theta\left( \frac{M}{w_d}\right) +\Theta\left( \frac{w_g}{w_d}M\right) +\Theta\left( \frac{M}{w_d}\right) +\Theta\left( \frac{M}{w_d}\right) =\Theta(M)$。对于本研究，$M=5\cdot10^7,w_d=360,w_g=300$。
@@ -159,15 +268,13 @@
 	在阶段一之后，可以完全确定每次迭代的5处信息泄漏都在长度约为1万个采样点的区间内。此时对$n_s$次迭代中包含信息泄漏的电磁迹进行基于与单处信息泄漏相关系数的静态对齐，还是不能保证5处包含信息泄漏的电磁迹会恰好对应相关系数的前五个极值点。
 	
 	\subsection{准确确定信息泄漏位置}\label{subs:phase2}
-	本研究在此基础上改动了两个实现细节以实现阶段二，一个是计算相关系数改为计算协方差，另一个是将取前5个相关系数极值点改为取前$m$个相关系数极值点,枚举其中的5个并逐一使用实现构造的时间模版进行检查。
-	
-	
+	本研究在前一个阶段最后步骤上改动了两个实现细节以实现阶段二，一个是计算相关系数改为计算协方差，另一个是将取前5个相关系数极值点改为取前$m$个相关系数极值点,枚举其中的5个并逐一使用实现构造的时间模版进行检查。
 	
 	计算协方差而不是相关系数的原因是，信息泄漏对应的电磁场变化幅度较大，但是计算相关系数会丢弃这种特征。使用协方差就是在使用相关系数的基础上一并考虑了信息泄漏电磁迹本身的方差，因此使得信息泄漏更容易被区分。除此之外，将相关系数改为计算协方差后，只要模版的所有点的均值为0，计算所有采样点邻域的相关系数就可以直接用卷积实现，这可以减少程序的时间消耗。计算协方差的算法复杂度是$\Theta(w_tN_X)$，其中$w_t$是模板宽度，$N_X$是信息泄漏所在区间的宽度，对于本研究$w_t=30,N_X=18000$。
 	
 	取前$m$个相关系数极值点的实现如\algorithmref{alg:maxpoint}所示，其中函数的输入$\Vector X$应当是计算出的协方差数列，极值点定义中的"邻域"通过阈值$th$加以描述。对于本研究，$th=100,m=9$。算法首先对数列的绝对值进行排序，依次检查第$i$大的绝对值，如果它不在当前所有极值点的邻域内，那么它就是一个新的极值点，把它加入集合$\mathcal M$。最后，假如极值点个数达到需求，程序结束并返回极值点的集合。函数的算法复杂度是$\Theta(N_X\log N_X)$，其中$N_X$是信息泄漏所在区间的宽度，对于本研究$N_X=18000$。
 	
-	\begin{algorithm}[!h]
+	\begin{breakablealgorithm}
 		\caption{前$m$极值点}\label{alg:maxpoint}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列（下标范围之外的数值为0）
@@ -191,14 +298,18 @@
 			\EndFor
 			\State \Return $\mathcal M$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
-	\begin{algorithm}[!h]
+
+	枚举$m$个采样点中所有的5个采样点的组合并逐一使用实现构造的时间模版进行检查的实现如\algorithmref{alg:checkdelta}所示，其中函数的输入$\mathcal M$应当是上一个算法输出的采样点集合，$\mu_{5\times5},\mu_{5\times5}$是预计算的模版，它们刻画了信息泄漏之间的时间的规律，如果极值点之间的距离可以匹配模版，那么我们认为选出的极值点恰好就对应信息泄漏。存在无论如何枚举$m$个极值点中的5个都不能匹配模版的问题（算法返回空集），因为这种情况发生的概率很小，我们直接丢弃当前迭代所对应的电磁迹，认为这一次迭代不存在泄漏。函数的算法复杂度是$\Theta\left( \begin{pmatrix}m\\5\end{pmatrix}\begin{pmatrix}5\\2\end{pmatrix}\right) =\Theta(m^5)$。
+	
+	\begin{breakablealgorithm}
 		\caption{模版检查}\label{alg:checkdelta}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\mathcal M$:$m$个采样点位置的集合
 			\Statex \textbf{输入:} $\mu_{5\times5}$:预计算的模版，极值点的差的均值
 			\Statex \textbf{输入:} $\sigma_{5\times5}$:预计算的模版，极值点的差的标准差
+			\Statex \textbf{输出:} $\mathcal A$:最先匹配的极值点组合
 			\For{$\mathcal A\subset M$}
 			\If {$\left\vert\mathcal A\right\vert=5$}
 			\State $\{a_0,a_1,a_2,a_3,a_4\}=\mathcal A,a_0<a_1<a_2<a_3<a_4$
@@ -207,11 +318,9 @@
 			\EndIf
 			\EndIf
 			\EndFor
-			\State \Return $\{\}$
+			\State \Return $\phi$
 		\end{algorithmic}
-	\end{algorithm}
-
-	枚举$m$个采样点中所有的5个采样点的组合并逐一使用实现构造的时间模版进行检查的实现如\algorithmref{alg:checkdelta}所示，其中函数的输入$\mathcal M$应当是上一个算法输出的采样点集合，$\mu_{5\times5},\mu_{5\times5}$是预计算的模版，它们刻画了信息泄漏之间的时间的规律，如果极值点之间的距离可以匹配模版，那么我们认为选出的极值点恰好就对应信息泄漏。存在无论如何枚举$m$个极值点中的5个都不能匹配模版的问题（算法返回空集），因为这种情况发生的概率很小，我们直接丢弃当前迭代所对应的电磁迹，认为这一次迭代不存在泄漏。函数的算法复杂度是$\Theta\left( \begin{pmatrix}m\\5\end{pmatrix}\begin{pmatrix}5\\2\end{pmatrix}\right) =\Theta(m^5)$。
+	\end{breakablealgorithm}
 	\subsection{智能卡ECDSA算法实现信息泄漏预处理方法的实证研究}
 	
 	在初步验证所提方法（见\ref{subs:phase1},\ref{subs:phase2}）有效性的基础上，将新提出的方法应用于一款双界面智能卡ECDSA算法实现分析场景中。
@@ -260,7 +369,7 @@
 		\end{center}
 	\end{figure}
 
-	到目前为止，我们可以准确划分出每次迭代，并找出其所对应的电磁迹的泄漏范围，但是还是不能准确确定泄漏位置。\figureref{fig:onetrsleak}绘制了所采集到的一条电磁迹在人工标注的泄漏范围内的波形图，其中五处浅蓝色条带是人工标注的信息泄漏位置。我们期望在阶段二之后可以类似地找到信息泄漏位置。
+	到目前为止，我们可以准确划分出每次迭代，并找出其所对应的电磁迹的泄漏范围\footnote{本文将一次迭代所对应的电磁迹称为电磁子迹（Subtrace），这么命名的原因是它实际上就是电磁迹的一部分。}，但是还是不能准确确定泄漏位置。\figureref{fig:onetrsleak}绘制了所采集到的一条电磁迹在人工标注的泄漏范围内的波形图，其中五处浅蓝色条带是人工标注的信息泄漏位置。我们期望在阶段二之后可以类似地找到信息泄漏位置。
 	
 	使用简单的统计信息难以找到信息泄漏位置。为了解决这个问题，我们使用更复杂的数学工具分析采样点之间内在的联系。我们构造了一个模版，计算模版与所有模版所确定的采样点的邻域各自的协方差作为统计指标用于后续分析。\figureref{fig:rhovscov}展示了使用同一个模版所计算出的协方差与相关系数。从图中可以看到人工标注的信息泄漏位置与相关系数曲线的峰值恰好对应，但是难以和相关系数曲线峰值对应。例如，人工标注的第四处信息泄漏，在协方差曲线的对应位置有显著的峰值，但是在相关系数曲线中对应位置没有特征使得此位置可以从其他假阳性中区分出来。
 	
@@ -385,14 +494,163 @@
 
 	总的来说，进行阶段二之后我们可以成功提取包含信息泄漏的电磁迹且能通过TVLA检测出存在信息泄漏。经过阶段一和阶段二，提取出包含信息泄漏的电磁迹后，还需要从中恢复信息泄漏才能完成对智能卡ECDSA实现的侧信道分析整个流程。
 	\section{自适应数据增强方法在ECDSA算法实现分析中的应用}
+	\subsection{ECDSA实现数据集}
+	本研究在\tableref{tab:acquisitionpara}所示的采集条件下采集了数据集。但是由于针对ECDSA的侧信道攻击方法与针对AES等分组密码算法的测信道攻击方法有较大差异，因此需要对数据集进行处理才能将更好地适配DL-SCA模型。
+	
+	除此之外，从\tableref{tab:partialknownticonclusion}可以看出，在$T_a$条电磁迹共约$T_an_s$次迭代所对应的电磁子迹中，即使是评估者也只能知道比例约为$\frac34$的信息泄漏$\leakedmultiplier_i$真实值，对于剩下的电磁子迹，攻击者不知道信息泄漏真实值，因此也无法判断它们哪些是正例，那些是反例。为了排除潜在的系统误差，我们也需要对数据集进行处理。
+	
+	\begin{breakablealgorithm}
+		\caption{有效电磁子迹提取}\label{alg:filter}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $L$:$T_a$条各包含$n_s$次迭代的信息泄漏的电磁迹
+			\Statex \textbf{输入:} $\sk$:ECDSA私钥
+			\Statex \textbf{输入:} $q$:椭圆曲线的阶
+			\Statex \textbf{输入:} $P$:$T_a$组ECDSA签名消息的哈希值和签名
+			\Statex \textbf{输出:} $L^{out}$:过滤出的电磁子迹
+			\Statex \textbf{输出:} $Label^{out}$:过滤出的电磁子迹对应的敏感中间值
+			\Statex \textbf{输出:} $cnt$:过滤出的电磁子迹条数
+			\State $L^{out}:=\left[ [],[],[],[],[]\right] $\Comment{五组电磁子迹，对应于五处泄漏位置}
+			\State $Label^{out}:=[]$
+			\State $counter:=0$
+			\For {$i=0,\dots,T_a-1$}
+				\State $r:=p^{(i)}.r$\Comment{第$i$组ECDSA签名}
+				\State $s:=p^{(i)}.s$\Comment{第$i$组ECDSA签名}
+				\State $hsh:=p^{(i)}.hsh$\Comment{第$i$组ECDSA签名消息的哈希值}
+				\State $\nonce:=s^{-1}(hsh+r\sk)\bmod q$
+				\State 计算$\nonce$长度为129的编码形式$\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_i,\dots, \tilde{\nonce}_{128}\right\}$
+				\For{$j=1,\dots,n_s$}
+					\If {$\tilde{\nonce}_j>0$}
+						\State 确定第$(j-1)$次迭代对应的信息泄漏范围
+						\State 确定第$(j-1)$次迭代对应的信息泄漏位置$\mathcal A$
+						\If {$\mathcal A\neq\phi$}
+							\State $\{a_0,a_1,a_2,a_3,a_4\}=\mathcal A,a_0<a_1<a_2<a_3<a_4$
+							\State 从位置$a_0$提取电磁迹，加入到$L_0^{out}$中
+							\State 从位置$a_1$提取电磁迹，加入到$L_1^{out}$中
+							\State 从位置$a_2$提取电磁迹，加入到$L_2^{out}$中
+							\State 从位置$a_3$提取电磁迹，加入到$L_3^{out}$中
+							\State 从位置$a_4$提取电磁迹，加入到$L_4^{out}$中
+							\State 将$\tilde{\nonce}_j$加入到$Label^{out}$中
+							\State $cnt:=cnt+1$
+						\Else
+							\State continue
+						\EndIf
+					\Else
+						\State continue
+					\EndIf
+				\EndFor
+			\EndFor
+		\end{algorithmic}
+	\end{breakablealgorithm}
+
+	\algorithmref{alg:filter}给出了数据集构造的总体流程，它从电磁迹中提取包含信息泄漏的电磁子迹，并处理好了相应的标签以用于深度学习。只要信息泄漏位置可以准确确定，使用这种方法就能避免构造出的数据集有不对齐的问题。在5000条电磁迹中，提取出了$cnt\approx100000$次迭代所对应的电磁子迹作为数据集，即$L_0^{out}$中有$cnt$条电磁子迹、$L_1^{out}$中有$cnt$条电磁子迹……这意味着ECDSA实现有多处操作与信息泄漏$\leakedmultiplier_i$有关\footnote{具体关系因为缺少相关资料而无法证实也无法证伪。本研究的猜测是，硬件从外存中取出数据到寄存器时，因为数据过大（数据为两个256比特的数，但通用寄存器位宽相对较小，比如64比特），需要执行多个周期，因此地址线的数据会在多个时刻都有泄漏。}。使用任何一组可以获得的效果是类似的，而实验发现在仅使用一组电磁子迹的情况下使用$L_1^{out}$可以获得最优的结果，因此后续只列举利用$L_1^{out}$和$Label^{out}$进行建模和攻击的结果。
+	
+	我们进一步将$cnt\approx100000$个样本拆分为训练集、验证集和测试集，大小分别设置为10000、5000、5000。本研究中训练集设置的相对较少有两个原因，一个是训练DL-SCA模型的数据增强后的训练集而数据增强后的训练集会比数据增强前更大，另一个原因是这样可以使得自适应数据增强对DL-SCA提升的效果更明显。
 	\subsection{实验设置}
 	\subsubsection{主控制器设置}
+	这部分设置与\ref{subss:controllersettings}几乎相同。在使用猜测熵收敛速度作为攻击代价时，模拟退火的目标是最小化\equationref{eq:mycost}中的$convrate$。但是在使用信息泄漏估计值精准率（见\ref{subss:ecdsaevaluation}）作为攻击代价时，模拟退火的目标是最大化\equationref{eq:precision}中的$precision$。两个优化目标相反，因此需要对代码做细微地调整。
 	\subsubsection{数据增强单元设置}
-	\subsubsection{攻击评估单元设置}
+	这部分设置与\ref{subss:cdasettings}一致。
 	\subsubsection{基于深度学习的侧信道攻击模型设置}
+	DL-SCA模型选择了与\tableref{tab:cnnhyperpara}中攻击ASCAD（N=50）数据集的网络几乎相同的网络超参数，来说明应用了自适应数据增强方法的框架有效是因为多个组件共同作用而不是某一个组间使得DL-SCA性能大大提升。网络超参数基本相同，但训练轮次从50减到了20，这是通过深度学习验证阶段发现的针对ECDSA电磁子迹的一个优化点。
+	\subsubsection{攻击评估单元设置}\label{subss:ecdsaevaluation}
+	在本研究中了，使用信息泄漏估计值精准率作为攻击代价。因为信息泄漏估计值的精准率恒等于敏感信息估计值的精准率，因此它可以依据\equationref{eq:precision}进行计算。
+	
+	使用现有的深度神经网络对ECDSA算法实现进行侧信道攻击时，我们不能保证深度神经网络的对电磁迹子所对应的信息泄漏预测结果是100\%准确的，因此也不能保证对敏感信息泄漏也可能含有错误。某些特定的错误\footnote{实际上是对于$\leakedmultiplier_i=1$（$\nonce_i=0$）的弃真错误。}并不会对本文使用的求解算法$S$的效率和正确性产生影响，另一些错误\footnote{实际上是对于$\leakedmultiplier_i=1$（$\nonce_i=0$）的取伪错误。}会使得求解算法$S$求解错误。
+	
+	在\ref{sec:vulnerable}中已经说明了侧信道攻击只用恢复一次性随机数$\nonce$的高比特，指出哪些位置对应的$\nonce_i=0$即可。这可以表述为对于每条电磁子迹的预测结果，独立地执行如\equationref{eq:determindewhich}所示的假设检验。我们可以容忍一定数量的弃真错误但是不能容忍取伪错误。为了减少取伪错误，我们可以增大显著性水平。增大显著性水平会导致弃真错误相应增多，但它在不超过阈值的情况下不会对本文使用的求解算法$S$的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。
+	
+	\begin{equation}
+		\begin{cases}
+			\mathrm H_0:\nonce_i=0\\
+			\mathrm H_{1}:\nonce_i=1
+		\end{cases}
+		\label{eq:determindewhich}
+	\end{equation}
+	
+	从实现的角度来说，增大显著性水平就是在对某条电磁子迹的信息泄漏进行预测时，预测为$\nonce_i=0$的要求更为严格。
+	
+	\begin{example}
+		对于某条实际信息泄漏为$\leakedmultiplier_i=1$的电磁子迹$\Vector l$，神经网络预测出的概率向量是这样的形式$\begin{bmatrix}\hat\theta&1-\hat\theta\end{bmatrix}=\begin{bmatrix}0.9&0.1\end{bmatrix}$，这表示神经网络根据学到的知识判断出电磁子迹对应的信息泄漏$\leakedmultiplier_i=1$（即敏感信息泄漏$\nonce_i=0$）的概率是$\leakedmultiplier_i\neq 1$（即敏感信息泄漏$\nonce_i=1$）的概率的9倍。假设检验中需要根据参数$\theta$的估计值$\hat\theta$来决定是否接受原假设$\mathrm H_0$。当显著性水平$\alpha=0.01$，进一步假设参数$\theta$的0.99置信区间为[0.3,1]，$\hat\theta$位于这个区间内，接受原假设$\mathrm H_0$，结论正确。当显著性水平$\alpha=0.8$，进一步假设参数$\theta$的0.2置信区间为[0.96,1]，$\hat\theta$位于这个区间外，拒绝原假设$\mathrm H_0$，接受备择假设$\mathrm H_1$，发生弃真错误。
+	\end{example}
+	
+	我们需要一个指标来评价预测结果中含有的会影响求解算法$S$正确性的错误数量。在侧信道攻击、数理统计领域都没有符合需求的指标，因此参考了机器学习中的精准率的定义，定义了信息泄漏估计值精准率作为评价指标。%我们定义了一个新的指标，我们将其称为有效预测准确率。有效预测准确率的定义为所有接受原假设的预测结果中结论正确的比例。
 	\subsection{自适应数据增强方法在ECDSA算法实现分析中的实证研究}
+
+	\expsettings
+
+	在已知算法数据的情况下，本文研究的ECDSA实现中，一次性随机数各个比特之间、每次签名使用的一次性随机数之间都不是互相独立的，这是因为一次性随机数（敏感中间值）和算法密钥、算法数据存在关系$s\nonce\equiv hsh+r\sk\pmod q$。但是相比于AES算法中敏感中间值和算法密钥、算法数据的关系有所不同，这使得攻击结果的评价指标应当调整。
+	
+	以AES-128无防护软件实现为例，算法的完整敏感中间值实际上如\equationref{eq:fullimtermidiate}所示。我们注意到敏感中间值可以拆分成互不影响的16个部分，算法数据和算法密钥也可以类似地进行拆分。这样一来恢复AES-128完整密钥的复杂度可以由$\Theta(2^{128})$降低为$16\Theta(2^8\mathrm{Const.})$，其中$\mathrm{Const.}$表示一个常数。这意味着攻击者将求解算法密钥的问题转化为16个求解子密钥的子问题，可以进行16次互相独立的攻击分别恢复子密钥从而恢复完整算法密钥。实际上针对AES-128的侧信道攻击通常也是这么做的。
+	
+	\begin{equation}
+		\begin{cases}
+			y=y_0||y_1||y_2||y_3||\dots||y_{15}\\
+			p=p_0||p_1||p_2||p_3||\dots||p_{15}||c_{0}||c_1||\dots||c_{15}\\
+			k=k_0||k_1||k_2||k_3||\dots||k_{15}\\
+			y_0=\mathrm{Sbox}[p_0\oplus k_0]\\
+			y_1=\mathrm{Sbox}[p_1\oplus k_2]\\
+			y_2=\mathrm{Sbox}[p_2\oplus k_1]\\
+			\vdots\\
+			y_{15}=\mathrm{Sbox}[p_{15}\oplus k_{15}]\\
+		\end{cases}\label{eq:fullimtermidiate}
+	\end{equation}
+
+	\noindent 其中，$y$是完整敏感中间值，$y_0,y_1,\dots,y_{15}$分别是敏感中间值的特定位置的字节。同理，$p$是算法数据，$p_0,p_1,\dots,p_{15}$分别是算法输入的特定位置的字节，$c_0,c_1,\dots,c_{15}$分别是算法输出的特定位置的字节，$k$是算法密钥，$k_0,k_1,\dots,k_{15}$是算法密钥的特定位置的字节，因此也被称为子密钥。
+	
+	但是在ECDSA中情况变得不同。将算法密钥拆分成互不影响的多个子密钥，依次回复子密钥并最终恢复算法密钥是不可能实现的\footnote{因为无法将敏感中间值或算法密钥拆分成互不影响的多个部分，所以问题无法拆分为子问题。}。在这种情况下，多条电磁子迹对应的敏感信息是有关的但仅凭侧信道攻击是无法利用的，因此在DL-SCA时我们暂且假设每条电磁子迹对应的敏感信息是互相独立的。
+	
+	在这种假设下，无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，只能使用\equationref{eq:1tracek}独立地对每条电磁子迹所对应的信息泄漏进行估计。由于无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，猜测熵、成功条数已经不适用于评估最终结果。我们使用精准率作为评价指标，如\figureref{fig:mydlscatestecdsa}所示。
+	
+	\begin{figure}[!h]
+		\centering
+		\begin{tikzpicture}[node distance=45pt, auto]
+			% 定义节点样式
+			\tikzstyle{reg} = [rectangle, draw,text centered]
+			\tikzstyle{block} = [draw, rounded corners,align=center]
+			\tikzstyle{data} = [draw, trapezium, trapezium left angle=70, trapezium right angle=110,align=center]
+			\tikzstyle{arrow} = [thick,->,>=stealth]
+			
+			% 绘制节点
+			\node [reg] (hyperparareg) {超参数寄存器};
+			\node [block,below of =hyperparareg] (trained) {深度神经网络};
+			\node [reg, left=70pt of trained] (parareg) {参数寄存器};
+			\node [data, below of=trained] (dataset) {数据集};
+			\node [block, right=50pt of dataset] (valacc) {机器学习\\指标计算器};
+			
+			%\node [block, below of=valacc, xshift=2cm] (testacc) {测试集准确率计算器};
+			
+			% 绘制箭头
+			\draw [arrow] (dataset) -- node[right] {测试数据} (trained);
+			\draw [arrow] (dataset) -- node[pos=0.5,below] {测试标签} (valacc);
+			%\draw [arrow] (dataset) -- node[above] {测试数据} (pretrained);
+			\draw [arrow] (trained) -| node[above] {测试数据的预测结果} (valacc);
+			\draw [arrow] (hyperparareg) -- node[right]{网络超参数}(trained);
+			\draw [arrow] (parareg) -- node[above]{神经元参数}(trained);
+			\draw [arrow] (valacc) --node[midway, above] {精准率$\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}$} ++(0:110pt);
+			\draw [arrow] (valacc) --node[midway, below] {$\frac{\mathrm{TP}1}{\mathrm{TP}1+\mathrm{FP}2_1+\mathrm{FP}3_1}$} ++(0:110pt);
+		\end{tikzpicture}
+		\bicaption{\enspace 攻击ECDSA的深度学习测试阶段}{\enspace Deep learning test phase for SCA on ECDSA}
+		\label{fig:mydlscatestecdsa}
+	\end{figure}
 	\subsubsection{自适应数据增强方法的技术效果}
 	\subsubsection{无数据增强的技术效果}
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\twof\textwidth}
+			\includegraphics[width=\textwidth]{ecdsanodaloss}
+			\caption{负对数交叉熵损失}
+			\label{fig:ecdsanodaloss}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\twof\textwidth}
+			\includegraphics[width=\textwidth]{ecdsanodaprecision}
+			\caption{敏感信息估计值精准率}
+			\label{fig:ecdsanodaprecision}
+		\end{subfigure}
+		\\
+		\bicaption{\enspace 无数据增强的DL-SCA训练和验证结果}{\enspace Training and validation results of DL-SCA without DA}
+		\label{fig:ecdsanoda}
+	\end{figure}
 	\subsection{讨论与分析}
 	总表对比结果。
 }

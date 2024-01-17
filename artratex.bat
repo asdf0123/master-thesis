@@ -58,5 +58,5 @@ copy Tmp\%FileName%.pdf .
 echo ------------------------------------------------
 echo %CompileName%  %FLAGS% %FileName%.tex finished...
 echo ------------------------------------------------
-"C:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\Acrobat.exe" /A "page=11" ./%FileName%.pdf 
-@rem "C:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\Acrobat.exe" /n /A "page=11" %FileName%.pdf 
+@rem "C:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\Acrobat.exe" /A "page=11" ./%FileName%.pdf 
+"C:\Program Files (x86)\Adobe\Acrobat DC\Acrobat\Acrobat.exe" /n /A "page=11" %FileName%.pdf 

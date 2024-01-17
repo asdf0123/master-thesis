@@ -1,5 +1,3 @@
-
-\usetikzlibrary{graphs, positioning, quotes, shapes.geometric}
 \chapter{预备知识}\label{chap:preliminary}{
 	\section{侧信道攻击}
 	密码硬件单元在运行过程中会产生多种不同物理形式的信息泄漏，如能量消耗、电磁辐射、执行时间、声音等。对于密码硬件单元的一次运行过程，攻击者可以对信息泄漏进行采样，获得信息泄漏的一个样本。攻击者可以令密码硬件单元多次运行，从而可以获得信息泄漏的多个样本，并把他们结合起来得到信息泄漏总体\footnote{客观存在的、在同一性质基础上结合起来的许多个别单位的整体。}$L$，它可以被描述为\equationref{eq:trace}的形式\footnote{本文使用数字或公式表述的次序从第0开始计数。有额外说明的情况除外。}。
@@ -7,10 +5,10 @@
 	\begin{equation}
 	L=L_{T\times M}
 	=\begin{bmatrix}
-		\Vector {l^{(0)}}\\
-		\Vector {l^{(1)}}\\
+		\Vector {l}^{(0)}\\
+		\Vector {l}^{(1)}\\
 		\vdots\\
-		\Vector {l^{(T-1)}}
+		\Vector {l}^{(T-1)}
 	\end{bmatrix}
 	=\begin{bmatrix}
 		l^{(0)}_0&l^{(0)}_1&l^{(0)}_2&\ldots&l^{(0)}_{M-1}\\
@@ -21,7 +19,7 @@
 	\end{bmatrix}\label{eq:trace}
 	\end{equation}
 	
-	\noindent 其中$l_i$（$0\le i<T$）表示一个信息泄漏样本\footnote{本文中也将其称为一条迹（Trace）。}，$T$表示信息泄漏样本量，$M$表示信息泄漏分量个数。如果攻击者获取的信息泄漏是能量消耗的形式，那么$L$也称为能量迹，$l_i$称为一条能量迹，$T$称为能量迹条数，$M$表示采集能量迹时设定的采样点个数；如果攻击者获取的信息泄漏是电磁场强度的形式，那么$L$也称为电磁迹，$l_i$称为一条电磁迹，$T$称为电磁迹条数，$M$表示采集电磁迹时设定的采样点个数，以此类推。密码硬件单元每次运行时，攻击者既对信息泄漏进行采样并记录，也对算法数据（明文和密文、签名消息的哈希值和消息签名等）的值、算法密钥的值进行记录。%我们把攻击者记录的算法数据、算法密钥总体记为$P,K$，其中$T$表示值的个数。
+	\noindent 其中$\Vector l^{(i)}$（$0\le i<T$）表示一个信息泄漏样本\footnote{本文中也将其称为一条迹（Trace）。}，$T$表示信息泄漏样本量，$M$表示信息泄漏分量个数。如果攻击者获取的信息泄漏是能量消耗的形式，那么$L$也称为能量迹，$\Vector l^{(i)}$称为一条能量迹，$T$称为能量迹条数，$M$表示采集能量迹时设定的采样点个数；如果攻击者获取的信息泄漏是电磁场强度的形式，那么$L$也称为电磁迹，$\Vector l^{(i)}$称为一条电磁迹，$T$称为电磁迹条数，$M$表示采集电磁迹时设定的采样点个数，以此类推。密码硬件单元每次运行时，攻击者既对信息泄漏进行采样并记录，也对算法数据（明文和密文、签名消息的哈希值和消息签名等）的值、算法密钥的值进行记录。%我们把攻击者记录的算法数据、算法密钥总体记为$P,K$，其中$T$表示值的个数。
 	
 	使用$T$条迹和对应的算法数据恢复算法密钥的过程就是侧信道攻击。攻击者可能会使用额外的信息（算法实现的细节、被攻击的密码硬件单元的物理特性）或更适合的工具，使得信息泄漏模型对信息泄漏刻画更精确，从而更准确更高效地恢复算法的密钥。
 	
@@ -63,15 +61,15 @@
 	\noindent 其中，固定的常数$\omega$受密码设备本身和算法实现的影响，$e$为随机噪声，$\mu$为噪声本底值，$\sigma$为噪声标准差，$y$为敏感中间值，$p$为算法数据的值，$k$为算法密钥的值，$g$为敏感中间值的计算函数，它通常由被攻击的密码算法步骤选定，$h$为敏感中间值的信息泄漏转换函数，它通常由被攻击的密码设备类型决定，常用的转换函数有汉明重量函数$\mathrm {HW}(\cdot)$、汉明距离函数$\mathrm {HD}(\cdot,\cdot)$和最高有效位函数$\mathrm {MSB}(\cdot)$。敏感中间值$y$由函数$g$使用算法数据的值$p$和算法密钥的值$k$计算得出，因此它也可以看做一个随机变量的样本值，我们将这个随机变量记为$Y:\mathcal \Omega\rightarrow \mathcal Y$。随机变量$Y$的取值范围$\mathcal Y$取决于敏感中间值计算方式。
 	
 	\begin{example}\label{ex:aessw}
-		在攻击AES-120加密算法软件实现主密钥第0字节时，通常选定$h(y)=\mathrm{HW}(y), y=g(p,k)=Sbox[p_0\oplus k_0]$，其中$p_0$表示明文第0字节（它是算法输入的一部分）,$k_0$表示主密钥第0字节。$\mathcal Y=\mathbb F_2^8$。
+		在攻击AES-128加密算法软件实现主密钥第0字节时，通常选定$h(y)=\mathrm{HW}(y), y=g(p,k)=\mathrm{Sbox}[p_0\oplus k_0]$，其中$p_0$表示明文第0字节（它是算法输入的一部分）,$k_0$表示主密钥第0字节。$\mathcal Y=\mathbb F_2^8$。
 	\end{example}
 
 	\begin{example}
-		在攻击AES-128加密算法硬件实现第10轮轮密钥第7字节时，通常选定$h(y)=\mathrm{HD}(y,c_7), y=g(p,k)=Sbox^{-1}[c_{11}\oplus k_{7}]$，其中$c_7,c_{11}$分别表示密文第7、11字节（它们是算法输出的一部分），$k_7$表示第10轮轮密钥第7字节。$\mathcal Y=\mathbb F_2^8$。
+		在攻击AES-128加密算法硬件实现第10轮轮密钥第7字节时，通常选定$h(y)=\mathrm{HD}(y,c_7), y=g(p,k)=\mathrm{Sbox^{-1}}[c_{11}\oplus k_{7}]$，其中$c_7,c_{11}$分别表示密文第7、11字节（它们是算法输出的一部分），$k_7$表示第10轮轮密钥第7字节。$\mathcal Y=\mathbb F_2^8$。
 	\end{example}
 
 	\begin{example}\label{ex:ecdsa}
-		在攻击本文研究的双界面智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{s^{-1}(hsh+rd)\bmod q}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{s^{-1}(H(m_0)+rd)\bmod q}{2^{127-27}}\right\rfloor\bmod 2\right) $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$d$是算法密钥。$\mathcal Y=\{1,2,3\}$。
+		在攻击本文研究的双界面智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{127-27}}\right\rfloor\bmod 2\right) $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$\sk$是算法密钥。$\mathcal Y=\{1,2,3\}$。
 	\end{example}
 	\subsection{模板类侧信道攻击}
 	
@@ -220,7 +218,11 @@
 	成功条数\citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道攻击在
 	攻击阶段的时间消耗\footnote{采集迹、使用迹进行攻击的时间都和迹的条数成正比。}。成功条数计算方式为$T^*=\min\limits_{0<t\le T_a}\left\lbrace t:GE_t(k^*)=0 \right\rbrace $，其中$k^*$表示正确的（子）密钥。如果攻击不成功，那么成功条数无意义。在\exampleref{ex:badge}中，根据已有数据只能推算出$T^*\le100$。
 	\subsubsection{成功率}
-	成功率定义为多次攻击互相独立的情况下，成功恢复（子）密钥的次数与攻击次数的比值。在\exampleref{ex:badge}中，成功率为0.2。它直观地反映侧信道攻击在多大程度上能恢复密钥。成功率和攻击时间通常是负相关的，但它不能直接反映攻击时间。
+	恢复（子）密钥的成功率定义为多次攻击互相独立的情况下，成功恢复（子）密钥的次数与攻击次数的比值。在\exampleref{ex:badge}中，成功率为0.2。它直观地反映侧信道攻击在多大程度上能恢复密钥。成功率和攻击时间通常是负相关的，但它不能直接反映攻击时间。
+	
+	成功率适用范围比准确率更大。准确率是机器学习方面的指标，它定义为所有样本中预测正确的概率。如果不同迹对应的中间值互相独立，攻击者只能使用一条迹恢复（子）密钥，准确率等价于成功率。如果不同迹对应的中间值不是互相独立的\footnote{对于AES-128算法，如果两次算法密钥不是互相独立的（如设置为相同的密钥值）且明文已知，那么以第1轮第0字节的Sbox输出$\mathrm{Sbox}[p_0\oplus k_0]$作为中间值$y$时，中间值不是互相独立的。}，准确率会因为忽略迹之间的关联性而不能准确评估模型性能。Picek等\citep{Picek19}指出准确率等标准的机器学习度量指标在侧信道攻击中效果不佳。这是因为它只能为测试数据集中的每个样本提供独立的标签预测信息。
+	
+	
 	%猜测熵、成功率、猜测熵收敛速度(研究内容1)、真阳性率(研究内容2)
 	\section{数据增强}
 	
@@ -242,7 +244,7 @@
 	Picek等\citep{Picek19}于2019年首次提出用SMOTE（见\algorithmref{alg:smotepolulate}）解决样本不平衡的问题，这使得使用敏感中间值的汉明重量作为训练标签时，基于深度学习的侧信道攻击的技术效果有所提升。SMOTE的核心是：特征空间上邻近的点其特征都是相似的。SMOTE并不是在数据空间上进行采样，而是在特征空间中进行采样，所以它的准确率会高于传统的采样方式。SMOTE有两个可变的参数$n,C$，它们分别描述了寻找最近的迹的数目以及一条迹所需要合成的新的迹的数目。对于SMOTE实现，调用一次数据增强实现可以合成多条新的迹，这使得构造训练集只需要调用一次数据增强实现。
 	
 %	Won等\citep{Won20}在Picek等\citep{Picek19}工作基础上，系统地研究了SMOTE及其多种变体\citep{Kovcs19}实现数据增强的技术效果，并发现SMOTE、CURE\_SMOTE、ASMOBD、MCT和MOT2LD相对来说有优良的技术效果。
-%	Luo等\citep{Luo21}首次提出在基于深度学习的侧信道攻击中利用混淆（Mixup）技术实现数据增强，以扩大训练集，提供攻击成功率。该方法的核心思想是每次随机选取两条迹，并以一定的比例插值生成新的迹。与此同时，训练标签也需要重新生成，新的训练标签应当是迹所对应标签的one-hot编码进行同样比例插值的结果。训练过程只采用插值合成的新的训练数据和训练标签，不使用混淆前的训练数据和训练标签。
+	Luo等\citep{Luo21}首次提出在基于深度学习的侧信道攻击中利用混淆（Mixup）技术实现数据增强，以扩大训练集，提供攻击成功率。该方法的核心思想是每次随机选取两条迹，并以一定的比例插值生成新的迹。与此同时，训练标签也需要重新生成，新的训练标签应当是迹所对应标签的one-hot编码进行同样比例插值的结果。训练过程只采用插值合成的新的训练数据和训练标签，不使用混淆前的训练数据和训练标签。
 %	
 %	Mukhtar等\citep{Mukhtar22}于2022年提出了一种基于条件生成对抗网络和连体网络的数据增强方法，从而提高了攻击能力。在分组和公钥密码算法实现的泄漏数据集上的定量分析显示，此方法可以生成逼真的含有信息泄漏的迹，使用数据增强后的迹用于训练可以完成攻击（而不进行数据增强就不能完成攻击）。
 	\subsection{图像识别领域数据增强}
@@ -252,10 +254,10 @@
 	\begin{figure}[!h]
 		\begin{center}
 			\begin{tikzpicture}[node distance=25pt]
-			\node[draw, rounded corners,align=center] at(4,1.5) (step2)  {数据增强策略S};
-			\node[draw, rounded corners,align=center] at(2,3) (step1)  {控制器(RNN)};
+			\node[draw, rounded corners,align=center] at(4,1.5) (step2)  {数据增强策略};
+			\node[draw, rounded corners,align=center] at(2,3) (step1)  {控制器};
 			\node[draw, rounded corners,align=center] at(2,0) (step3)  {子网络};
-			\node[draw, rounded corners,align=center] at(0,1.5) (step4)  {验证准确率R};
+			\node[draw, rounded corners,align=center] at(0,1.5) (step4)  {验证准确率};
 			
 			\draw[->] (step1) -| (step2);
 			\draw[->] (step2) |- (step3);
@@ -267,7 +269,7 @@
 		\end{center}
 	\end{figure}
 	
-	Autoaugment\citep{Cubuk19}是一个简单的程序，它将寻找最优数据增强策略问题表述为离散搜索问题，如\figureref{fig:autoaugment}所示，它能自动地改进图像分类的数据增强策略。从图中可以看出一次循环分入如下步骤：搜索算法对数据增强策略S进行采样、使用数据增强策略S训练子网络、子网络对验证集进行预测、反馈验证准确率R以调整控制器。该程序的核心是：数据增强策略S会被用于训练神经网络，神经网络的验证准确率会反过来对控制器进行更新。程序可变的部分是控制器、数据增强策略搜索空间、子网络。搜索出最佳数据增强策略后，多次对原始图像执行数据增强策略即可获得训练集。
+	Autoaugment\citep{Cubuk19}是一个简单的程序，它将寻找最优数据增强策略问题表述为离散搜索问题，如\figureref{fig:autoaugment}所示，它能自动地改进图像分类的数据增强策略。从图中可以看出一次循环分入如下步骤：搜索算法对数据增强策略S进行采样、使用数据增强策略训练子网络、子网络对验证集进行预测、反馈验证准确率以调整控制器。该程序的核心是：数据增强策略会被用于训练神经网络，神经网络的验证准确率会反过来对控制器进行更新。程序可变的部分是控制器、数据增强策略搜索空间、子网络。搜索出最佳数据增强策略后，多次对原始图像执行数据增强策略即可获得训练集。
 	
 	
 	\section{模拟退火}
@@ -277,7 +279,7 @@
 	
 	算法的基本思想是，从一个初始解开始，通过一系列的状态转移来搜索解空间。在搜索过程中，模拟退火算法会接受一定概率上的劣解，以避免陷入局部最优解。随着搜索的进行，算法会逐渐降低温度（控制接受劣解的概率），使得在初始阶段更容易接受劣解，而在后续阶段更倾向于接受更好的解\citep{Steinbrunn1997}。这种温度的降低过程类似于物质退火过程中的冷却。
 	
-	模拟退火算法的关键在于状态转移的策略。一般来说，它包括生成邻域解、计算能量差和接受概率等步骤。邻域解的生成可以通过扰动当前解来实现，能量差用于衡量解的质量，接受概率则基于能量差和当前温度计算得出。通过不断迭代搜索和状态转移，模拟退火算法可以在解空间中进行全局搜索，并最终找到一个较优的解。算法伪代码如\algorithmref{alg:sa}所示。
+	模拟退火算法的关键在于状态转移的策略。一般来说，它包括生成邻域解、计算能量差和接受概率等步骤。邻域解的生成可以通过扰动当前解来实现，能量差用于衡量解的质量，接受概率则基于能量差和当前温度计算得出。通过不断迭代搜索和状态转移，模拟退火算法可以在解空间中进行全局搜索，并最终找到一个较优的解使得对应的能量函数取极小值。算法伪代码如\algorithmref{alg:sa}所示。
 	
 	\begin{algorithm}[!h]
 		\caption{模拟退火算法}\label{alg:sa}
@@ -288,7 +290,10 @@
 			\Statex \textbf{输入:} $n$:迭代次数
 			\Statex \textbf{输入:} $Energy(\cdot)$能量函数，用于计算解对应的能量值
 			\Statex \textbf{输出:} $minstate$:（近似）最优解
-			\State $cost := Energy(state),mincost:=cost,minstate:=state,temp\gets inittemp$
+			\State $cost := Energy(state)$
+			\State $mincost:=cost$
+			\State $minstate:=state$
+			\State $temp:=inittemp$
 			\For{$i = 0, \dots, n-1$}
 				\Repeat
 					\State 对$state$进行扰动得到$newstate$\Comment{扰动当前解，生成邻域解}
@@ -297,8 +302,8 @@
 						\State $state:= newstate$
 						\State $cost:= newcost$
 					\Else
-						\State $p\gets U(0,1)$
-						\If{$p\le e^{-\frac{cost-newcost}{temp}}$}\Comment{计算能量差和接受概率}
+						\State $p\gets U(0,1)$\Comment{从均匀分布中采样}
+						\If{$p\le e^{\frac{cost-newcost}{temp}}$}\Comment{计算能量差和接受概率}
 							\State $state:= newstate$
 							\State$cost:= newcost$
 						\EndIf
@@ -385,7 +390,7 @@
 			\Statex \textbf{输入:} $\multiplier$
 			\Statex \textbf{输入:} $cl$:目标编码的长度
 			\Statex \textbf{输出:} $\left\{\tilde{\multiplier}_0,\tilde{\multiplier}_1,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$:$\multiplier$的长度为$cl$的编码形式
-			\State 计算$k$的二进制表示$\sum\limits_{i=0}^{2cl-1}\multiplier_i2^{2cl-i-1}=\multiplier$
+			\State 计算$\multiplier$的二进制表示$\sum\limits_{i=0}^{2cl-1}\multiplier_i2^{2cl-i-1}=\multiplier$
 			\For{$i = 0, \dots, cl-1$}
 			\State $\tilde \multiplier_i:=2\multiplier_i+\multiplier_{i+cl}$
 			\EndFor
@@ -502,5 +507,6 @@
 	
 	$S$对泄漏的准确率也有严格要求。这是因为一旦构造方程的泄漏存在错误（侧信道攻击恢复的数据与实际数据不一致），那么方程会错误，求解出的私钥与实际私钥$\sk$一定不符。
 	\section{本章小结}
+	本章介绍了开展针对一类具有ECDSA实现的双界面商用智能卡的侧信道分析方法研究所需的背景知识，主要包括侧信道攻击、数据增强、模拟退火和椭圆曲线数字签名算法。本章介绍的知识帮助读者理解论文的主要观点和结果。
 }
 %"C:/Users/Administrator/Desktop/_毕业论文/context/附件4 中国科学院大学学位论文LaTeX模板2023.7.20/artratex.bat"

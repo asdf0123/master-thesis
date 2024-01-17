@@ -2,7 +2,7 @@
 /picturegeneration
 /Tmp
 Thesis.*
-
+token.txt
 
 
 !.gitignore
@@ -10,6 +10,6 @@ Thesis.*
 !Biblio/ref.bib
 !picturegeneration/genpic.py
 !picturegeneration/testtikz/tmp.tex
-!Style
-!Img
-!Tex
+!/Style
+!/Img
+!/Tex

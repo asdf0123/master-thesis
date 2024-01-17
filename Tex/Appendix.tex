@@ -12,6 +12,7 @@
 \setcounter{chapter}{0}
 \setcounter{section}{0}
 \chapter{附录中的公式}\label{chap:app1}{
+	\setcounter{app_fig}{1}
 	\begin{proposition}\label{prop:ECDSA-authentication}
 		如果$(r,s)$是签名者对消息$m_0$的签名，那么$R.x=r$。 
 	\end{proposition}
@@ -44,7 +45,6 @@
 	\begin{proof}
 		令错误率$q=1-p$，构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特泄漏（即可利用的泄漏有$r$比特），执行一次求解算法消耗的时间为$u$。
 		
-		
 		使用侧信道攻击恢复的泄漏没有错误这一事件对于每个泄漏比特是互相独立的，因此对于任意一条构造签名的能量迹，恢复的泄漏都没有错误的概率为$p_r=p^r$
 	
 		能量迹恢复的泄漏没有错误这一事件对于每条能量迹是互相独立的，因此对于构造签名的所有能量迹，恢复的泄漏都没有错误的概率为\begin{align*}
@@ -53,7 +53,7 @@
 			&=p^s
 		\end{align*}
 	
-		利用签名构造方程并求解算法恢复实际私钥是伯努利实验。因此如果构造签名的所有能量迹恢复的泄漏都没有错误时求解算法一定可以求解出实际私钥，那么使用多次尝试构造方程并求解直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
+		利用签名构造方程并求解算法恢复实际私钥是伯努利实验。因此如果构造方程的所有能量迹恢复的泄漏都没有错误时求解算法一定可以求解出实际私钥，那么使用多次尝试构造方程并求解直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
 		
 		因此，恢复实际私钥的时间是$u\xi$。结合$\xi\sim G(p_s)$，可以推算\begin{align*}
 			E(u\xi)&=uE(\xi)\\
@@ -72,7 +72,118 @@
 	\end{proof}
 	当求解算法确定后，执行一次求解算法消耗的时间$u$以及构造方程所需的可利用的泄漏总量$s$保持不变。对于本文使用的求解算法，$r=4,s=4\times75=300,u=400$秒。%构造方程所需的可利用的泄漏总量会因为ECDSA的位数而有所不同。对于256位ECDSA，$s$理论上的下界是256，实际攻击中，在$r=4$的情况下。
 	
-	又由于推导过程中假设了“构造签名的所有能量迹恢复的泄漏没有错误时求解算法一定可以求解出实际私钥”，在实际攻击中，恢复实际私钥的时间的期望可能比理论值更大。
+	又由于推导过程中假设了“构造方程的所有能量迹恢复的泄漏没有错误时求解算法一定可以求解出实际私钥”，在实际攻击中，恢复实际私钥的时间的期望可能比理论值更大。
+	
+	\begin{proposition}\label{prop:highalpha}
+		对于$T_a$条电磁迹，每条电磁迹中包含$n_s$次迭代的情况，总共有$T_an_s$条电磁子迹，它们会包含总共$T_an_s$比特的一次性随机数$\nonce$的高比特泄漏。如果被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹数与所有电磁子迹数比值为$p_{pred1}$，对于被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹敏感信息泄漏$\tilde \nonce_i$恢复准确率都为100\%，构造方程所有敏感信息泄漏没有错误时求解算法$S$一定可以求解出实际私钥，那么只要$\epsilon=T_ag_{n_s,4}-75\ge0$，就有超过$1-\frac{\epsilon+75}{\epsilon^2}$的概率\footnote{实际上二项分布的概率密度函数可以用正则化不完全$Beta$函数表示，这个概率的精确值为$I_{\pi_{n_s}(4)}(75+1,T_a-75)=(75+1)\begin{pmatrix}T_a\\75\end{pmatrix}\int_0^{\pi_{n_s}(4)}t^{75}(1-t)^{T_a-75-1}\mathrm dt$}恢复私钥。其中，$\pi_{i}(j)$满足\equationref{eq:recursion}描述的递推关系。
+		\begin{equation}\label{eq:recursion}
+			\pi_{i}(j)=\begin{cases}
+				1,i=0,j=0\\
+				0,i=0,j>0\\
+				(1-p_{pred1})\sum\limits_{k=0}^{3}\pi_{i-1}(k),i>0,j=0\\
+				p_{pred1}\pi_{i-1}(j-1),i>0,0<j<4\\
+				\pi_{i-1,j}+p_{pred1}\pi_{i-1}(j-1),i>0,j=4
+			\end{cases},i=0\\
+		\end{equation}
+	\end{proposition}
+	\begin{proof}
+	实际上$\Vector{\pi_i}$的物理含义是概率分布，$\pi_i(j)$表示服从概率分布$\Vector\pi_i$的随机变量$X_i$取值为$j$的概率。假设$\Vector X=(X_n,n\ge0)$是马尔科夫链，状态空间为$\mathcal E=\left\lbrace 0,1,2,3,4\right\rbrace $，转移概率矩阵为$$P=\begin{bmatrix}
+	1-p_{pred1}&p_{pred1}&0&0&0\\
+	1-p_{pred1}&0&p_{pred1}&0&0\\
+	1-p_{pred1}&0&0&p_{pred1}&0\\
+	1-p_{pred1}&0&0&0&p_{pred1}\\
+	0&0&0&0&1
+	\end{bmatrix},$$初始分布为$\Vector\pi_0=\begin{bmatrix}
+	1&0&0&0&0
+	\end{bmatrix}$。转移概率矩阵$P$所对应的有向图为\appfigureref{appfig:pdag}。
+	
+	\begin{appfig}[!h]
+		\centering
+		\begin{tikzpicture}[scale=0.2]
+			\tikzstyle{every node}+=[inner sep=0pt]
+			\draw [black] (25,-25) circle (3);
+			\draw (25,-25) node {$0$};
+			\draw [black] (5,-5) circle (3);
+			\draw (5,-5) node {$1$};
+			\draw [black] (25,-5) circle (3);
+			\draw (25,-5) node {$2$};
+			\draw [black] (45,-5) circle (3);
+			\draw (45,-5) node {$3$};
+			\draw [black] (45,-25) circle (3);
+			\draw (45,-25) node {$4$};
+			\draw [black] (26.323,-27.68) arc (54:-234:2.25);
+			\draw (25,-32.25) node [below] {$1-p_{pred1}$};
+			\fill [black] (23.68,-27.68) -- (22.8,-28.03) -- (23.61,-28.62);
+			\draw [black] (8,-5) -- (22,-5);
+			\fill [black] (22,-5) -- (21.2,-4.5) -- (21.2,-5.5);
+			\draw (15,-4.5) node [above] {$p_{pred1}$};
+			\draw [black] (28,-5) -- (42,-5);
+			\fill [black] (42,-5) -- (41.2,-4.5) -- (41.2,-5.5);
+			\draw (35,-4.5) node [above] {$p_{pred1}$};
+			\draw [black] (45,-8) -- (45,-22);
+			\fill [black] (45,-22) -- (45.5,-21.2) -- (44.5,-21.2);
+			\draw (45.5,-15) node [right] {$p_{pred1}$};
+			\draw [black] (22.013,-25.237) arc (-90.41225:-179.58775:17.375);
+			\fill [black] (4.76,-7.99) -- (4.27,-8.79) -- (5.27,-8.78);
+			\draw (8.83,-20.62) node [below] {$p_{pred1}$};
+			\draw [black] (7.12,-7.12) -- (22.88,-22.88);
+			\fill [black] (22.88,-22.88) -- (22.67,-21.96) -- (21.96,-22.67);
+			\draw (17.02,-13.00) node [above] {$1-p_{pred1}$};
+			\draw [black] (25,-8) -- (25,-22);
+			\fill [black] (25,-22) -- (25.5,-21.2) -- (24.5,-21.2);
+			\draw (25.5,-13) node [right] {$1-p_{pred1}$};
+			\draw [black] (42.88,-7.12) -- (27.12,-22.88);
+			\fill [black] (27.12,-22.88) -- (28.04,-22.67) -- (27.33,-21.96);
+			\draw (32,-20) node [right] {$1-p_{pred1}$};
+			\draw [black] (46.323,-27.68) arc (54:-234:2.25);
+			\draw (45,-32.25) node [below] {$1$};
+			\fill [black] (43.68,-27.68) -- (42.8,-28.03) -- (43.61,-28.62);
+		\end{tikzpicture}
+		\bicaption{\enspace 矩阵$P$所对应的有向图}{\enspace Corresponding directed acyclic graph of matrix $P$}
+		
+		\label{appfig:pdag}
+		\stepcounter{app_fig}
+	\end{appfig}
+	
+	状态空间$\mathcal E$的每个状态有如下定义：
+	
+	\begin{enumerate}
+		\item [0] 没有足够的把握认为当前泄漏的敏感信息$\nonce_i=0$；
+		\item [1] 有足够的把握认为当前泄漏的敏感信息$\nonce_i=0$，但没有足够的把握认为上一次泄漏的敏感信息$\nonce_{i-1}=0$；
+		\item [2] 有足够的把握认为上一次和当前泄漏的敏感信息$\nonce_{i-1}=\nonce_i=0$，但没有足够的把握认为上上一次泄漏的敏感信息$\nonce_{i-2}=0$；
+		\item [3] 有足够的把握认为上上一次、上一次和当前泄漏的敏感信息$\nonce_{i-2}=\nonce_{i-1}=\nonce_i=0$，但没有足够的把握认为上上上一次泄漏的敏感信息$\nonce_{i-3}=0$；
+		\item [4] $\exists 3\le k\le i$，有足够的把握认为从到$k$为止的连续4比特敏感信息都为0，即$\nonce_{k-3}=\nonce_{k-2}=\nonce_{k-1}=\nonce_{k-0}=0$。
+	\end{enumerate}
+
+	容易验证，从采集的（含有一次性随机数$\nonce$共$n_s$个高比特泄漏的）一条迹中恢复出（对于本研究使用的求解算法$S$）可利用（连续4比特）的敏感信息泄漏的概率就是$\pi_{n_s}(4)$。$\Vector \pi_{n_s}$可以通过时间复杂度$\Theta(5n_s)$的递推公式直接计算，也可以利用$\Vector \pi_{n_s}=\Vector \pi_0 P^{n_s}$并结合矩阵快速幂以$\Theta(5^3\log n_s)$的复杂度进行计算。
+		
+	%实际上$\pi_{i}(j)$的物理含义某种概率，在$j<4$时它表示对于随机的一条迹，预测$\nonce_{i-j+1},\nonce_{i-j+2},\dots,\nonce_{i}$同时为0的概率，在$j=4$时它表示根据预测结果$\nonce_0,\nonce_1,\dots,\nonce_i$中存在至少连续4比特都被预测为0的概率。
+	
+	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本研究使用的求解算法$S$）可利用的敏感信息泄漏的概率。
+	显然$T_a$条电磁迹中可以恢复出可利用的敏感信息泄漏的迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。我们只有在$75\le\xi$的情况下才能成功构造方程并调用求解算法$S$求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}。
+	
+	容易知道该二项分布的均值的方差$\mathbb E\xi=T_ag_{n_s,4}=\epsilon+75,\mathbb D\xi=T_ag_{n_s,4}(1-\pi_{n_s}(4))\le T_ag_{n_s,4}=\epsilon+75$。
+	
+	通过放缩可以知道\begin{align*}
+		\Pr\left[75\le\xi\right]&\ge\Pr\left[75<\xi\right]\\
+		&\ge\Pr\left[75<\xi<75+2\epsilon\right]\\
+		&=\Pr\left[\vert \xi-(75+\epsilon)\vert<\epsilon\right]\\
+		&=\Pr\left[\vert \xi-\mathbb E\xi\vert<\epsilon\right]\\
+		&=1-\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]
+	\end{align*}
+	
+	结合切比雪夫不等式$\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]\le \frac{\mathbb D\xi}{\epsilon^2}$可以知道
+	
+	\begin{align*}
+		\Pr\left[75\le\xi\right]&\ge1-\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]\\
+		&\ge 1-\frac{\mathbb D\xi}{\epsilon^2}\\
+		%&=1-\frac{T_ag_{n_s,4}(1-\pi_{n_s}(4))}{\epsilon^2}\\
+		&\ge1-\frac{\epsilon+75}{\epsilon^2}
+	\end{align*}
+
+	\end{proof}
+	对于本研究，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred1}\approx0.18354$。这就是说，在前提假设都成立的情况下，对于本研究采集的5000条电磁迹，虽然它含有约150000比特的可利用的敏感信息泄漏，但只要我们可以指出其中27531比特对应的敏感中间值$\nonce_i=0$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
+		
 
 对公式的引用如，公式\eqref{eq:appedns}
 \begin{equation} \label{eq:appedns}
@@ -126,15 +237,15 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 		\footnotesize% fontsize
 		\begin{tabular}{cc|ccc|c}
 			\hline
-			$\leakedmultiplier_i$可能的取值$u$&$\Pr[\leakedmultiplier_i=u]$&$\tilde \nonce_i$可能的取值$v$&$v$的二进制形式&$\Pr[\tilde \nonce_i=v|t_i=u]$&能确定的敏感信息泄漏\\
+			$\hat\leakedmultiplier_i$可能的取值$u$&$\Pr[\hat\leakedmultiplier_i=u]$&$\hat{\tilde \nonce}_i$可能的取值$v$&$v$的二进制形式&$\Pr[\hat{\tilde \nonce}_i=v|\hat\leakedmultiplier_i=u]$&能确定的敏感信息估计值\\
 			\hline
 			\hline
-			\multirow{4}*{1}&\multirow{4}*{3/8}&0&00&1/3&\multirow{4}*{$\nonce_i=0$}\\
+			\multirow{4}*{1}&\multirow{4}*{3/8}&0&00&1/3&\multirow{4}*{$\hat\nonce_i=0$}\\
 			\cdashline{3-5} &&1&01&2/3&\\
 			\cdashline{3-5} &&2&10&0&\\
 			\cdashline{3-5} &&3&11&0&\\
 			\hline
-			\multirow{4}*{2}&\multirow{4}*{5/16}&0&00&1/5&\multirow{4}*{$\nonce_{i+129}=0$}\\
+			\multirow{4}*{2}&\multirow{4}*{5/16}&0&00&1/5&\multirow{4}*{$\hat\nonce_{i+129}=0$}\\
 			\cdashline{3-5} &&1&01&0&\\
 			\cdashline{3-5} &&2&10&4/5&\\
 			\cdashline{3-5} &&3&11&0&\\
@@ -146,7 +257,93 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\hline
 		\end{tabular}
 	\end{apptab}
-
+	
+	\begin{appfig}[!htb]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adadpav4}
+			\caption{DPA v4}
+			\label{fig:adadpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaaeshd}
+			\caption{AES\_HD}
+			\label{fig:adaaeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaaesrd}
+			\caption{AES\_RD}
+			\label{fig:adaaesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:adaascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:adaascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:adaascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 使用自适应数据增强方法时基于深度学习的侧信道攻击的正确密钥猜测熵}{\enspace GE of DL-SCA with adaptive DA method}
+		\label{appfig:adadlsca}
+		\stepcounter{app_fig}
+	\end{appfig}
+	
+	\begin{appfig}[!htb]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/origindpav4}
+			\caption{DPA v4}
+			\label{fig:origindpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originaeshd}
+			\caption{AES\_HD}
+			\label{fig:originaeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originaesrd}
+			\caption{AES\_RD}
+			\label{fig:originaesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:originascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:originascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:originascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 无数据增强时基于深度学习的侧信道攻击的正确密钥猜测熵}{\enspace GE of DL-SCA without DA}
+		\label{appfig:origindlsca}
+		\stepcounter{app_fig}
+	\end{appfig}
+	
 	\begin{appfig}[!htb]
 		\centering
 		\begin{subfigure}[b]{\trif\textwidth}
@@ -293,6 +490,7 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 		\label{appfig:deltaall}
 		\stepcounter{app_fig}
 	\end{appfig}
+	
 
 附表测试
 
@@ -746,7 +944,7 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 \chapter{附录中的算法}{
 \setcounter{algorithm}{0}
 	
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{位移变形}\label{alg:SH}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条迹
@@ -757,9 +955,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\State $\Vector{l^\prime}:=\Vector {l^{(i)}}[j:j+M^\prime]$\Comment{获取索引从$j$到$j+M^\prime$的切片}
 			\State \Return $\Vector{l^\prime}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{添加删除变形}\label{alg:AR}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条迹
@@ -776,9 +974,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\State $\Vector{l^\prime}=\begin{bmatrix} {l^\prime}_{a_0} & {l^\prime}_{a_1} & \ldots&{l^\prime}_{a_{M-1}} \end{bmatrix}$
 			\State \Return $\Vector{l^\prime}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{循环位移变形}\label{alg:RO}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的迹
@@ -795,10 +993,10 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndFor
 			\State \Return $L^{agmt}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
-	\begin{algorithm}
-		\caption{SMOTE生成样本}\label{alg:smotepolulate}
+	\begin{breakablealgorithm}
+		\caption{合成少数类过采样法}\label{alg:smotepolulate}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的迹
 			\Statex \textbf{输入:} $\mathcal I_y$:对应中间值为$y$迹的索引
@@ -826,9 +1024,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndFor
 			\State \Return $L^{agmt}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{验签操作的数乘算法}\label{alg:verifyscalar}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\left\{\tilde{\multiplier}_0,\tilde{\multiplier}_1,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$:数乘倍数$\multiplier$的长度为$cl$的编码形式
@@ -849,9 +1047,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndFor
 			\State \Return $S$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{签名操作的数乘算法}\label{alg:signscalar}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_i,\dots, \tilde{\nonce}_{128}\right\}$:一次性随机数$\nonce$的长度为129的编码形式
@@ -875,9 +1073,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndIf
 			\State \Return S
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{分块计算方差}\label{alg:calcvar}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector{l_i}$:采样点个数为$M$的电磁迹
@@ -888,9 +1086,9 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndFor
 			\State \Return $\left\{d_0,d_1,\dots,d_{\left\lfloor\frac{M}{w_d}\right\rfloor-1}\right\}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 	
-	\begin{algorithm}
+	\begin{breakablealgorithm}
 		\caption{量化}\label{alg:quantize}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
@@ -905,5 +1103,5 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\EndFor
 			\State \Return $\left\{q_0,q_1,\dots,q_{N_X-1}\right\}$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 }
