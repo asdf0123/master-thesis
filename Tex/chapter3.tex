@@ -575,7 +575,8 @@
 					\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
 					\hline
 					\hline
-					\shortstack{训练数据\\预处理}      &归一化        &无&\shortstack{标准差标准化\\极差标准化}&\shortstack{标准差标准化\\极差标准化}&\shortstack{标准差标准化\\极差标准化}&无&无\\
+					\multirow{2}{*}{\shortstack{训练数据\\预处理}}      &\multirow{2}{*}{归一化}        &\multirow{2}{*}{无}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{无}&\multirow{2}{*}{无}\\
+					&&&&&&&\\
 					\hline
 					\multirow{1}{*}{输入层}           &输入尺寸       &3500        &1250       &4000         &700                &700                &700               \\
 					\hline               
@@ -640,14 +641,120 @@
 	这些特点使得正确密钥猜测熵收速度提供了更全面、准确的视角来观察和评估侧信道攻击结果，并与已有的评价指标正确密钥猜测熵相匹配。
 	
 	\subsection{参数验证}
-	//TODO:
-	为了验证主控制器所选择的迭代次数的有效性，我们进行了实验并分析了搜索过程的迭代收敛曲线，如图7所示。针对不同数据集，在相同的迭代次数下使用模拟退火机制来搜索有效的数据增强策略参数。经过实验发现，随着迭代次数的增加，代价逐渐降低并趋于稳定，这说明对于现有的数据集，将迭代次数设定为227可以使得主控制器搜索出稳定的结果。
-	其中，图7 a）展示了对AES\_RD数据集的搜索结果，攻击代价趋于稳定，在实际应用自适应数据增强方法时可以不改变或略微增加迭代次数和降低退火速度来优化结果。而对于其他数据集，如图7 b）- f）所示，在较早的阶段就达到较好的解并保持稳定，表明搜索快速收敛且找到了较优解。因此，在实际应用自适应数据增强方法时可以减小迭代次数和提高退火速度以节省时间，并在攻击效果不受影响的前提下进行优化。
-	通过使用组合式数据增强增广出的数据，网络对泄漏特征的刻画愈加准确。这反映了随着模拟退火机制进行，数据增强策略参数而不断改进。实验结果与理论相符，搜索机制是有效的
+	本研究使用框架搜索了所研究数据集的最佳数据增强策略参数。针对一个数据集的搜索会迭代227次，因此可以绘制出227条猜测熵曲线，如\appfigureref{appfig:ge3d}所示。为了验证主控制器所选择的迭代次数的有效性，我们从猜测熵曲线中提取正确密钥猜测熵收敛速度这一信息并绘制它随迭代次数变化的图像，如\figureref{fig:convrateit}所示。
+	\begin{figure}[!htbp]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convratedpav4}
+			\caption{DPA v4}
+			\label{fig:convratedpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convrateaeshd}
+			\caption{AES\_HD}
+			\label{fig:convrateaeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convrateaesrd}
+			\caption{AES\_RD}
+			\label{fig:convrateaesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convrateascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:convrateascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convrateascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:convrateascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{convrateascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:convrateascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 深度学习训练过程}{\enspace Deep learning training process}
+		\label{fig:convrateit}
+	\end{figure}
 	
-	\subsection{自适应数据增强方法在AES算法实现分析中的实证研究}
+	从图中可以看出，随着迭代次数的增加，正确密钥猜测熵收敛速度的数值逐渐降低并趋于稳定，正确密钥猜测熵收敛得越来越快并几乎达到一个稳定的收敛速度，这说明对于现有的数据集，将迭代次数设定为227可以使得主控制器搜索出稳定的结果。从\figureref{fig:convratedpav4},\figureref{fig:convrateaeshd},\figureref{fig:convrateascad0},\figureref{fig:convrateascad50}和\figureref{fig:convrateascad100}中可以看出，在搜索DPA v4、AES\_HD、ASCADf（N=0）、ASCADf（N=50）和ASCADf（N=100）数据集的最优数据增强策略参数时，正确密钥猜测熵收敛速度曲线在较早的阶段就达到了较好的解并保持稳定，表明正确密钥猜测熵收敛速度的数值快速收敛且很可能找到了最优解。因此，在实际应用自适应数据增强方法时可以减小迭代次数和提高退火速度以节省时间，并在攻击效果不受影响的前提下进行优化。\figureref{fig:convrateaesrd}展示了对AES\_RD数据集的搜索结果，正确密钥猜测熵收敛速度随着迭代次数增加趋于稳定但与其他图像相比还不够稳定，在实际应用自适应数据增强方法时可以不改变或略微增加迭代次数和降低退火速度来优化结果。
 	
-	\expsettings
+	这反映了随着模拟退火机制进行，数据增强策略参数而不断改进，网络对泄漏特征的刻画愈加准确。实验结果与理论相符，搜索机制是有效的。
+	
+	\begin{table}[!h]
+		\bicaption{\enspace 搜索到的最优数据增强策略参数}{\enspace Searched DA policy parameters}
+		\label{tab:paras}
+		\centering
+		%\footnotesize% fontsize
+		%\setlength{\tabcolsep}{4pt}% column separation
+		%\renewcommand{\arraystretch}{1.2}%row space
+		\small 
+		\begin{tabular}{cc|cccccc}
+			\hline
+			\multicolumn{2}{c|}{\multirow{2}{*}{参数数值}} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
+			%\cline{3-5}
+			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
+			\hline
+			\multirow{6}{*}{数据增强策略参数}
+			&$p_{ro}$&0.676&0.720&0.762&0.161&0.749&0.621\\
+			&$m_{ro}$&137&9&1&6&76&55\\
+			&$p_{an}$&0.144&0.156&0.579&0.0761&0.444&0.774\\
+			&$m_{an}$&   0&0.0523&0.345&0.522&0.0790&0.530\\
+			&$p_{os}$&0.706&0.617&0.879&0.0579&0.0669&0.147\\
+			&$m_{os}$&$10^{-5}$&0.399&0.0795&7.753&4.015&10\\
+			\hline
+			
+		\end{tabular}   
+	\end{table}
+
+	本研究使用框架搜索到的所研究数据集的最佳数据增强策略参数如\tableref{tab:paras}所示。我们在此基础上在不同的实验条件下使用最佳数据增强策略参数对训练集进行数据增强，并在训练DL-SCA模型之后使用相同的测试集进行攻击验证。我们尝试了1倍、5倍、10倍、20倍四种增广倍数，以及在线增广、离线增广两种增广实现方式，实验结果如所示。在线增广方式指每次迭代轮次都重新增广训练集用作深度神经网络的训练数据，离线增广方式指增广一次训练数据并用于之后深度神经网络每个迭代轮次。
+	
+	不同实验条件下基于深度学习的侧信道攻击的性能如\figureref{tab:expcond}所示。根据实验结果可以看出，对于相同的增广倍数，不同的增广方式对应的成功条数变化几乎一致。增广倍数为10倍比增广倍数为5倍、20倍的成功条数都少。
+	
+	增广倍数10倍是一种比较合理的选择：继续增加可能造成过拟合反而使得神经网络效果因为过拟合下降，如果减小会因为无法提供足够的多样性反而使得DL-SCA效果下降。使用离线数据增广方式也是一种比较合理的选择：不同增广方式效果类似，而离线数据增强可以节省计算资源和存储空间。
+	\begin{table}[!h]
+		\bicaption{\enspace 不同实验条件下基于深度学习的侧信道攻击的性能}{\enspace Performance of DL-SCA under different experimental conditions}
+		\label{tab:expcond}
+		\centering
+		\footnotesize% fontsize
+		%\setlength{\tabcolsep}{4pt}% column separation
+		%\renewcommand{\arraystretch}{1.2}%row space
+		\begin{tabular}{ccc|cccccc}
+			\hline
+			\multirow{2}{*}{性能指标}&\multirow{2}{*}{增广倍数}&\multirow{2}{*}{增广方式} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
+			%\cline{3-5}
+			\multicolumn{3}{c|}{}&&&&N=0 & N=50 & N=100 \\
+			\hline
+			\multirow{2}{*}{\shortstack{数据增强前\\训练集大小}}&&&\multirow{2}{*}{4000}&\multirow{2}{*}{45000}&\multirow{2}{*}{20000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}\\
+			&&&&&&&&\\
+			\multirow{8}{*}{成功条数}
+			&\multirow{2}{*}{1}  
+			&在线增广&11&1358&9&>300&>400&>400\\
+			&&离线增广&9&891&5&239&>400&>400\\
+			&\multirow{2}{*}{5}  
+			&在线增广&6&959&4&>300&273&>400\\
+			&&离线增广&7&1011&3&228&289&>400\\
+			&\multirow{2}{*}{10}  
+			&在线增广&6&880&3&197&305&288\\
+			&&离线增广&5&860&4&244&156&354\\
+			&\multirow{2}{*}{20}  
+			&在线增广&5&898&3&206&193&382\\
+			&&离线增广&5&985&3&217&232&310\\
+			\hline
+			
+		\end{tabular}   
+	\end{table}
+	
+	\subsection{自适应数据增强方法在AES算法实现分析中的实证研究}\label{subs:realexp}
+	
+	本文方法进行实证研究过程中，使用的机器配置如下：处理器型号为Intel(R) Xeon(R) CPU E5-2667 v4 @ 3.20GHz，内存大小252GB，操作系统版本为CentOS release 6.6 (Final)。本文方法使用Python（版本为3.6.2）作为编程语言进行实现，其中DL-SCA模型通过Keras\footnote{资料来源：\href{https://pypi.org/project/keras}{keras}。}开源框架进行实现。
 
 	基于深度学习的侧信道攻击的攻击阶段与深度学习中的测试阶段有一定相似之处但并不完全相同。如\figureref{fig:dltestphase}和\figureref{fig:mydlscatest}所示，在深度学习训练出的模型对测试数据进行预测之后，还需要组合多条迹的信息进一步对算法密钥进行估计，从而计算侧信道领域的评价指标以评估侧信道攻击效果，在本研究中，使用成功条数作为指标评估DL-SCA的效果，成功条数越小，那么DL-SCA效果越好。
 
@@ -752,7 +859,7 @@
 	自适应数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，使得DL-SCA模型对信息泄漏的刻画更准确，从而减少成功条数。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）、ASCADf（N=100）五个数据集上使得成功条数相比于无数据增强减少23\%、25\%、24\%、58\%以及5\%，在AES\_RD数据集上使得成功条数与无数据增强相当。
 	\subsubsection{其他数据增强方法的技术效果}
 
-	使用其他文献中的方法进行数据增强，最终进行DL-SCA的结果如\tableref{tab:othermtd}所示。在\tableref{tab:othermtd}中，“文献\normalcite{Cagli17}”表示本研究复现的\citet{Cagli17}位移变形和添加删除变形的数据增强方法，这是因为原文并无DPA v4、AES\_HD、AES\_RD和ASCADf数据集上的实验结果。“文献\normalcite{Kim19}”表示本研究复现的\citet{Kim19}添加高斯白噪声的数据增强方法，这是因为复现时使用的网络模型由于论文原本使用的网络模型，复现论文方法的实验结果优于论文所汇报的实验结果。“文献\normalcite{Won20}”表示\citet{Won20}使用合成少数类过采样法及其变体的数据增强方法。“文献\normalcite{Luo21}”表示\citet{Luo21}使用混淆技术的数据增强方法。“文献\normalcite{Mukhtar22}”表示\citet{Mukhtar22}基于条件生成对抗网络和连体网络的数据增强方法。
+	使用其他文献中的方法进行数据增强，最终进行DL-SCA的结果如\tableref{tab:othermtd}所示。在\tableref{tab:othermtd}中，“文献\normalcite{Cagli17}”表示本研究复现的\citet{Cagli17}位移变形和添加删除变形的数据增强方法，这是因为原文并无DPA v4、AES\_HD、AES\_RD和ASCADf数据集上的实验结果。“文献\normalcite{Kim19}”表示本研究复现的\citet{Kim19}添加高斯白噪声的数据增强方法，这是因为复现时使用的网络模型优于论文原本使用的网络模型，复现论文方法的实验结果优于论文所汇报的实验结果。“文献\normalcite{Won20}”表示\citet{Won20}使用合成少数类过采样法及其变体的数据增强方法，表项直接使用论文所汇报的实验结果。“文献\normalcite{Luo21}”表示\citet{Luo21}使用混淆技术的数据增强方法，表项直接使用论文所汇报的实验结果。“文献\normalcite{Mukhtar22}”表示\citet{Mukhtar22}基于条件生成对抗网络和连体网络的数据增强方法，表项直接使用论文所汇报的实验结果。
 
 	\begin{table}[!h]
 		\bicaption{\enspace 使用其他数据增强方法时基于深度学习的侧信道攻击的性能}{\enspace Performance of DL-SCA with other DA method}
@@ -797,9 +904,7 @@
 
 	自适应数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，有较大的可能使得DL-SCA模型对信息泄漏的刻画更准确，从而减少成功条数。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）四个数据集上使得成功条数相比于已知最好的数据增强方法分别减少24\%、40\%、10\%、43\%，在AES\_RD数据集上使得成功条数与已知最好的数据增强方法相当，在ASCADf（N=100）数据集上使得成功条数相比于已知最好的数据增强方法增加了52\%。
 	\subsection{讨论与分析}
-	{\color{\dupc}
-		针对样本数量不足的实际场景，本研究提出一种面向基于深度学习的侧信道攻击的自适应数据增强方法。该方法能够自适应地搜索数据增强策略参数，在样本数量有限的基础上，增广出新的样本，进而提升基于深度学习的侧信道攻击效果，降低对能量迹的需求。
-
-
-	}
+	自适应数据增强方法能够自适应地搜索数据增强策略参数，在样本数量有限的基础上，增广出新的样本，进而提升基于深度学习的侧信道攻击效果，降低对能量迹的需求。
+	\section{本章小结}
+	本研究提出一种面向基于深度学习的侧信道攻击的自适应数据增强方法，提升了原始DL-SCA在样本数量不足场景中的技术效果。我们通过对应于多种攻击难度的AES算法实现的数据集对新提出的自适应数据增强方法进行了验证。实验结果表明，与无数据增强或目前已知的数据增强方法相比，自适应数据增强方法可以使得成功条数减少。
 }

@@ -173,7 +173,7 @@
 
 	本研究提出了一种基于时间模版的两阶段对齐解决信息泄漏难以定位的问题；本文应用了前一章的自适应数据增强方法提升敏感信息估计值精准率。
 	
-%	侧信道分析的第一个难点在于，敏感信息是$\tilde{k}_i$没有直接泄漏，这使得从理论上讲不可能从电磁迹泄漏中恢复所有敏感信息。从一条签恢复的回复的敏感信息越少，就需要使用越多签名构造方程才可能求解出私钥。
+%	侧信道分析的第一个难点在于，敏感信息是$\tilde{k}_i$没有直接泄漏，这使得从理论上讲不可能从电磁迹泄漏中恢复所有敏感信息。从一条签恢复的恢复的敏感信息越少，就需要使用越多签名构造方程才可能求解出私钥。
 %	
 %	
 %	即使以100\%的成功率恢复所有泄漏的$t_i$，也会因无法分辨泄漏来自于算法的哪个分支（\algorithmref{alg:improvesignscalar}第5、8行），从而在理论上不能完全恢复$\tilde k_i$的信息，进而不能恢复随机数$k$的所有泄漏\footnote{因为$\left\{\tilde{k}_0,\tilde{k}_1,\dots,\tilde{k}_i,\dots, \tilde{k}_{l-1}\right\}$是$k$的编码形式，所以恢复某些$\tilde k_i$的比特等价于恢复随机数$k$的等量比特。因为$(k_0k_1k_3\dots k_{257})_2$是$k$的二进制表示，所以恢复某些$k_i$也等价于恢复随机数$k$的等量比特。}。\tableref{tab:infoonsymbol}总结了从$t_i$中所恢复的$\tilde k_i$和$k$的信息。从\tableref{tab:infoonsymbol}中可以归纳出这样的结论：
@@ -576,7 +576,7 @@
 	我们需要一个指标来评价预测结果中含有的会影响求解算法$S$正确性的错误数量。在侧信道攻击、数理统计领域都没有符合需求的指标，因此参考了机器学习中的精准率的定义，定义了信息泄漏估计值精准率作为评价指标。%我们定义了一个新的指标，我们将其称为有效预测准确率。有效预测准确率的定义为所有接受原假设的预测结果中结论正确的比例。
 	\subsection{自适应数据增强方法在ECDSA算法实现分析中的实证研究}
 
-	\expsettings
+	本文方法进行实证研究过程中，使用的机器配置与\ref{subs:realexp}的机器配置完全一致。
 
 	在已知算法数据的情况下，本文研究的ECDSA实现中，一次性随机数各个比特之间、每次签名使用的一次性随机数之间都不是互相独立的，这是因为一次性随机数（敏感中间值）和算法密钥、算法数据存在关系$s\nonce\equiv hsh+r\sk\pmod q$。但是相比于AES算法中敏感中间值和算法密钥、算法数据的关系有所不同，这使得攻击结果的评价指标应当调整。
 	
@@ -597,9 +597,9 @@
 
 	\noindent 其中，$y$是完整敏感中间值，$y_0,y_1,\dots,y_{15}$分别是敏感中间值的特定位置的字节。同理，$p$是算法数据，$p_0,p_1,\dots,p_{15}$分别是算法输入的特定位置的字节，$c_0,c_1,\dots,c_{15}$分别是算法输出的特定位置的字节，$k$是算法密钥，$k_0,k_1,\dots,k_{15}$是算法密钥的特定位置的字节，因此也被称为子密钥。
 	
-	但是在ECDSA中情况变得不同。将算法密钥拆分成互不影响的多个子密钥，依次回复子密钥并最终恢复算法密钥是不可能实现的\footnote{因为无法将敏感中间值或算法密钥拆分成互不影响的多个部分，所以问题无法拆分为子问题。}。在这种情况下，多条电磁子迹对应的敏感信息是有关的但仅凭侧信道攻击是无法利用的，因此在DL-SCA时我们暂且假设每条电磁子迹对应的敏感信息是互相独立的。
+	但是在ECDSA中情况变得不同。将算法密钥拆分成互不影响的多个子密钥，依次恢复子密钥并最终恢复算法密钥是不可能实现的\footnote{因为无法将敏感中间值或算法密钥拆分成互不影响的多个部分，所以问题无法拆分为子问题。}。在这种情况下，多条电磁子迹对应的敏感信息是有关的但仅凭侧信道攻击是无法利用的，因此在DL-SCA时我们暂且假设每条电磁子迹对应的敏感信息是互相独立的。
 	
-	在这种假设下，无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，只能使用\equationref{eq:1tracek}独立地对每条电磁子迹所对应的信息泄漏进行估计。由于无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，猜测熵、成功条数已经不适用于评估最终结果。我们使用精准率作为评价指标，如\figureref{fig:mydlscatestecdsa}所示。
+	在这种假设下，无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，也无法应用\equationref{eq:1tracek}只使用单条迹的信息来恢复算法密钥，只能使用\equationref{eq:1tracey}独立地对每条电磁子迹所对应的信息泄漏进行估计。由于无法应用\equationref{eq:ttracek}来组合多条迹的信息完成攻击，猜测熵、成功条数已经不适用于评估最终结果。由于无法应用\equationref{eq:1tracek}只使用单条迹的信息来恢复算法密钥，恢复算法密钥的成功率已经不适用于评估最终结果。我们使用精准率作为评价指标，如\figureref{fig:mydlscatestecdsa}所示。
 	
 	\begin{figure}[!h]
 		\centering
@@ -633,7 +633,25 @@
 		\label{fig:mydlscatestecdsa}
 	\end{figure}
 	\subsubsection{自适应数据增强方法的技术效果}
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\twof\textwidth}
+			\includegraphics[width=\textwidth]{ecdsaadaloss}
+			\caption{负对数交叉熵损失}
+			\label{fig:ecdsaadaloss}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\twof\textwidth}
+			\includegraphics[width=\textwidth]{ecdsaadaprecision}
+			\caption{敏感信息估计值精准率}
+			\label{fig:ecdsaadaprecision}
+		\end{subfigure}
+		\\
+		\bicaption{\enspace 采用自适应数据增强方法的DL-SCA训练和验证结果}{\enspace Training and validation results of DL-SCA with adaptive DA}
+		\label{fig:ecdsaada}
+	\end{figure}
 	\subsubsection{无数据增强的技术效果}
+	
 	\begin{figure}[!h]
 		\centering
 		\begin{subfigure}[b]{\twof\textwidth}

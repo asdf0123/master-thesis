@@ -40,7 +40,7 @@
 	\end{proof}
 		
 	\begin{proposition}\label{prop:expotime}
-		如果泄漏准确率$p$略小于100\%，恢复实际私钥的时间的期望会随着准确率$p$的下降而乘指数级增长。
+		如果被利用敏感信息估计值精准率$p$略小于100\%，恢复实际私钥的时间的期望会随着精准率$p$的下降而乘指数级增长。
 	\end{proposition}
 	\begin{proof}
 		令错误率$q=1-p$，构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特泄漏（即可利用的泄漏有$r$比特），执行一次求解算法消耗的时间为$u$。
@@ -230,14 +230,14 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 	
 	
 	\begin{apptab}[!htb]
-		\bicaption{\enspace 无噪声的敏感信息$t_i$泄漏场景下恢复的码元的信息}{\enspace Information on Scalar Symbol from Noise Free Sensitive Leakage}
+		\bicaption{\enspace 无噪声的敏感信息$\leakedmultiplier_i$泄漏场景下恢复的码元的信息}{\enspace Information on Scalar Symbol from Noise Free Sensitive Leakage}
 		\stepcounter{app_tab}
 		\label{apptab:infoonsymbol}
 		\centering
 		\footnotesize% fontsize
 		\begin{tabular}{cc|ccc|c}
 			\hline
-			$\hat\leakedmultiplier_i$可能的取值$u$&$\Pr[\hat\leakedmultiplier_i=u]$&$\hat{\tilde \nonce}_i$可能的取值$v$&$v$的二进制形式&$\Pr[\hat{\tilde \nonce}_i=v|\hat\leakedmultiplier_i=u]$&能确定的敏感信息估计值\\
+			$\hat\leakedmultiplier_i$可能的取值$u$&$\Pr[\hat\leakedmultiplier_i=u]$&${\tilde \nonce}_i$可能的取值$v$&$v$的二进制形式&$\Pr[{\tilde \nonce}_i=v|\hat\leakedmultiplier_i=u]$&能确定的敏感信息估计值\\
 			\hline
 			\hline
 			\multirow{4}*{1}&\multirow{4}*{3/8}&0&00&1/3&\multirow{4}*{$\hat\nonce_i=0$}\\
@@ -257,6 +257,50 @@ tensor: $\Tensor{\sigma, T, a, F, n}$, unittensor: $\unitTensor{\sigma, T, a, F,
 			\hline
 		\end{tabular}
 	\end{apptab}
+	
+	
+	\begin{appfig}[!htb]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3ddpav4}
+			\caption{DPA v4}
+			\label{fig:ge3ddpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3daeshd}
+			\caption{AES\_HD}
+			\label{fig:ge3daeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3daesrd}
+			\caption{AES\_RD}
+			\label{fig:ge3daesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:ge3dascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:ge3dascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:ge3dascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 所有迭代过程正确密钥猜测熵曲线}{\enspace GE curves of correct key for all iterations}
+		\label{appfig:ge3d}
+		\stepcounter{app_fig}
+	\end{appfig}
 	
 	\begin{appfig}[!htb]
 		\centering
