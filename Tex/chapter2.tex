@@ -1,5 +1,8 @@
 \chapter{预备知识}\label{chap:preliminary}{
-	\section{侧信道攻击}
+	本章对侧信道分析、数据增强、模拟退火、椭圆曲线数字签名算法进行介绍，具体内容安排如下：
+	
+	\secref{sec:sca}介绍侧信道分析的基本原理以及相关方法，包括模板类侧信道分析（传统模板攻击和DL-SCA）和侧信道分析常见量化技术指标。\secref{sec:da}介绍了侧信道分析领域和图像识别领域的数据增强方法。\secref{sec:sa}介绍了模拟退火算法的基本思想。\secref{sec:ecdsa}介绍了椭圆曲线数字签名算法的基础原理并提供具体案例。
+	\section{侧信道分析}\label{sec:sca}
 	密码硬件单元在运行过程中会产生多种不同物理形式的信息泄漏，如能量消耗、电磁辐射、执行时间、声音等。对于密码硬件单元的一次运行过程，攻击者可以对信息泄漏进行采样，获得信息泄漏的一个样本。攻击者可以令密码硬件单元多次运行，从而可以获得信息泄漏的多个样本，并把他们结合起来得到信息泄漏总体\footnote{客观存在的、在同一性质基础上结合起来的许多个别单位的整体。}$L$，它可以被描述为\equationref{eq:trace}的形式\footnote{本文使用数字或公式表述的次序从第0开始计数。有额外说明的情况除外。}。
 	
 	\begin{equation}
@@ -21,7 +24,7 @@
 	
 	\noindent 其中$\Vector l^{(i)}$（$0\le i<T$）表示一个信息泄漏样本\footnote{本文中也将其称为一条迹（Trace）。}，$T$表示信息泄漏样本量，$M$表示信息泄漏分量个数。如果攻击者获取的信息泄漏是能量消耗的形式，那么$L$也称为能量迹，$\Vector l^{(i)}$称为一条能量迹，$T$称为能量迹条数，$M$表示采集能量迹时设定的采样点个数；如果攻击者获取的信息泄漏是电磁场强度的形式，那么$L$也称为电磁迹，$\Vector l^{(i)}$称为一条电磁迹，$T$称为电磁迹条数，$M$表示采集电磁迹时设定的采样点个数，以此类推。密码硬件单元每次运行时，攻击者既对信息泄漏进行采样并记录，也对算法数据（明文和密文、签名消息的哈希值和消息签名等）的值、算法密钥的值进行记录。%我们把攻击者记录的算法数据、算法密钥总体记为$P,K$，其中$T$表示值的个数。
 	
-	使用$T$条迹和对应的算法数据恢复算法密钥的过程就是侧信道攻击。攻击者可能会使用额外的信息（算法实现的细节、被攻击的密码硬件单元的物理特性）或更适合的工具，使得信息泄漏模型对信息泄漏刻画更精确，从而更准确更高效地恢复算法的密钥。
+	使用$T$条迹和对应的算法数据恢复算法密钥的过程就是侧信道分析。攻击者可能会使用额外的信息（算法实现的细节、被攻击的密码硬件单元的物理特性）或更适合的工具，使得信息泄漏模型对信息泄漏刻画更精确，从而更准确更高效地恢复算法的密钥。
 	
 	\subsection{信息泄漏模型}
 	
@@ -42,13 +45,13 @@
 	\end{example}
 	
 	\begin{example}
-		如果一个密码硬件单元实现了ECDSA签名算法（具体参数见\ref{subs:ECDSAscheme}），Hash函数选为sha1\citep{FIPS180-4}，每次密码硬件单元执行过程中使用示波器采集10000个采样点的能量消耗，示波器有无穷大的位宽保存采样点，那么$U=\mathbb R$是实数集，$\mathcal L=U^{10000}$。$\mathcal K=Z_q$，这表示签名私钥一定是模$q$整数环上的元素。$\mathcal P=\{0,1,\dots,2^{160}-1\}\times Z_q\times Z_q$，这表示消息的sha1杂凑值长度为160比特、签名算法输出的签名对$(r,s)$中$r,s$都是模$q$整数环上的元素。
+		如果一个密码硬件单元实现了ECDSA签名算法（具体参数见\secref{sec:ecdsa}），Hash函数选为sha1\citep{FIPS180-4}，每次密码硬件单元执行过程中使用示波器采集10000个采样点的能量消耗，示波器有无穷大的位宽保存采样点，那么$U=\mathbb R$是实数集，$\mathcal L=U^{10000}$。$\mathcal K=Z_q$，这表示签名私钥一定是模$q$整数环上的元素。$\mathcal P=\{0,1,\dots,2^{160}-1\}\times Z_q\times Z_q$，这表示消息的sha1杂凑值长度为160比特、签名算法输出的签名对$(r,s)$中$r,s$都是模$q$整数环上的元素。
 	\end{example}
 	
 	
 	本文使用小写字母表示对应的随机变量的样本值，即$\Vector l,p,k$分别表示$\Vector L,P,K$的样本值。如果出现需要表明这些样本值来自于哪一次采样结果的情况，我们使用带括号的数字上标对其进行区分。也就是说，采集到的迹$\Vector {l^{(0)}}, \Vector {l^{(1)}}, \dots, \Vector {l^{(T-1)}}$是信息泄漏$\Vector L$的$T$个样本值。攻击者记录到的多个算法密钥的值$k^{(0)}, k^{(1)}, \dots, k^{(T-1)}$是算法密钥$K$的$T$个样本值，攻击者记录到的多个算法数据的值$p^{(0)}, p^{(1)}, \dots, p^{(T-1)}$是算法数据$P$的$T$个样本值。
 	
-	密码设备的信息泄漏$\Vector L$依赖于设备正在处理的数据\footnote{这种数据的值称为中间值。}，而敏感数据由算法数据和算法密钥计算得出。因此密码硬件单元的信息泄漏在某些时刻会受到算法密钥和算法输入的影响，如\equationref{eq:leakagedetail}所示。
+	密码设备的信息泄漏$\Vector L$依赖于设备正在处理的数据\footnote{这种数据的值称为中间值。}，而敏感数据由算法数据和算法密钥计算得出，它总会在某个时刻被设备处理。因此密码硬件单元的信息泄漏在某些时刻会受到算法密钥和算法输入的影响，如\equationref{eq:leakagedetail}所示。
 	
 	\begin{equation}
 		\begin{cases}
@@ -69,15 +72,15 @@
 	\end{example}
 
 	\begin{example}\label{ex:ecdsa}
-		在攻击本文研究的双界面智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{127-27}}\right\rfloor\bmod 2\right) $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$\sk$是算法密钥。$\mathcal Y=\{1,2,3\}$。
+		在攻击本文研究的双界面商用智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{127-27}}\right\rfloor\bmod 2\right) $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$\sk$是算法密钥。$\mathcal Y=\{0,1,2,3\}$。
 	\end{example}
-	\subsection{模板类侧信道攻击}
+	\subsection{模板类侧信道分析}
 	
-	侧信道攻击可以分为非模版类侧信道攻击和模板类侧信道攻击。在非模板类侧信道攻击中，差分能量攻击\citep{KocherJJ99, Messerges00, BevanK02}和相关能量攻击\citep{Brier04}是最基本也是最常用的攻击方法。差分能量攻击对密钥$k$的值进行猜测，使用敏感中间值$y$划分能量迹，计算能量迹之间的差异来确定密钥；相关能量分析对密钥$k$的值进行猜测，结合信息泄漏转换函数$h$和敏感中间值$y$估计理论上的能量消耗，计算能量迹与估计的能量消耗之间的相关系数来确定密钥。
+	侧信道分析可以分为非模版类侧信道分析和模板类侧信道分析。在非模板类侧信道分析中，差分能量分析\citep{KocherJJ99, Messerges00, BevanK02}和相关能量分析\citep{Brier04}是最基本也是最常用的攻击方法。差分能量分析对密钥$k$的值进行猜测，使用敏感中间值$y$划分能量迹，计算能量迹之间的差异来确定密钥；相关能量分析对密钥$k$的值进行猜测，结合信息泄漏转换函数$h$和敏感中间值$y$估计理论上的能量消耗，计算能量迹与估计的能量消耗之间的相关系数来确定密钥。
 	
-	模板类侧信道攻击使用模版对常数$\omega$、信息泄漏转换函数$h$以及噪声$e$进行描述，使得对信息泄漏的刻画比非模板类侧信道攻击更精确。模板类侧信道攻击的优势在于，它有可能仅使用信息泄漏的一个样本并结合算法输入的值恢复算法密钥的值。模板类侧信道攻击分为建模和攻击两个阶段，建模阶段对迹的特征进行刻画，第二个阶段利用该特征进行攻击\citep{Mangard07}。
+	模板类侧信道分析会使用模版对常数$\omega$、信息泄漏转换函数$h$以及噪声$e$进行描述，使得对信息泄漏的刻画比非模板类侧信道分析更精确。模板类侧信道分析的优势在于，它有可能仅使用信息泄漏的一个样本并结合算法输入的值恢复算法密钥的值。模板类侧信道分析分为建模和攻击两个阶段，建模阶段对迹的特征进行刻画，第二个阶段利用该特征进行攻击\citep{Mangard07}。
 	
-	模板类侧信道攻击分为两个阶段，为了区分两个阶段使用的数据，我们使用下标$t,a$进行区分。在建模阶段，攻击者可以根据$T_t$条迹以及对应的算法密钥、算法数据进行建模；在攻击阶段，攻击者采集$T_a$条迹和对应的算法数据，使用全部或者其中的一部分恢复算法密钥。
+	模板类侧信道分析分为两个阶段，为了区分两个阶段使用的数据，我们使用下标$t,a$进行区分。在建模阶段，攻击者可以根据$T_t$条迹以及对应的算法密钥、算法数据进行建模；在攻击阶段，攻击者采集$T_a$条迹和对应的算法数据，使用全部或者其中的一部分恢复算法密钥。
 	
 	在建模阶段，攻击者可以对迹的特征进行刻画，这意味着攻击者可以确定出某个或某些操作的模版。例如，攻击者可以拥有一台与被攻击设备类型相同的设备，并且该设备完全由攻击者控制。攻击者可以让设备多次运行，每次运行前设定不同的算法输入、算法密钥，记录对应的迹（如能量迹、电磁迹）和算法输出。对特定敏感中间值构建模版是常见的构建策略，攻击者可以在不对敏感中间值的信息泄漏转换函数$h$做任何假设的情况下，根据算法数据的值$p$和算法密钥的值$k$计算敏感中间值$y$，把对应相同中间值的迹分为一组，并对每一组构造模版。
 	
@@ -104,10 +107,10 @@
 	\end{example}
 
 	\begin{example}
-		在\exampleref{ex:ecdsa}中，找不到合理的子密钥划分使得函数$g$有单射性质，尽管知道了关于算法密钥$d$的信息但是还是不能恢复它任何一个比特的数值。结合数学方法，我们可以利用多处关于算法密钥的信息来恢复完整的算法密钥，见\ref{subs:infoforlattice}。
+		在\exampleref{ex:ecdsa}中，找不到合理的子密钥划分使得函数$g$有单射性质，尽管知道了关于算法密钥$d$的信息但是还是不能恢复它任何一个比特的数值。结合数学方法，我们可以利用多处关于算法密钥的敏感信息泄漏来恢复完整的算法密钥，见\subsref{subs:infoforlattice}。
 	\end{example}
 	
-	如果被攻击设备的算法密钥没有使用次数限制或次数限制足够大，那么攻击者可以从令被攻击设备运行$T_a$次\footnote{具体次数受算法密钥次数、攻击者所能接受的攻击时间共同决定。例如，对于AES-128加密算法无防护软件实现，有可能仅使用一条能量迹就恢复算法密钥，那么此时令$T_a=1$已经足够完成攻击。对于本文研究的双界面智能卡ECDSA实现，理想情况下采集十万条能量迹有助于减少利用信息泄漏恢复实际私钥的时间，但是受采集时间限制只能令$T_a=5000$。}并获取多条迹和对应的算法数据的值，在这之后选取一些能量迹进行攻击并综合估计（子）密钥的值$\hat k$，如\equationref{eq:ttracek}所示。
+	如果被攻击设备的算法密钥没有使用次数限制或次数限制足够大，那么攻击者可以从令被攻击设备运行$T_a$次\footnote{具体次数受算法密钥次数、攻击者所能接受的攻击时间共同决定。例如，对于AES-128加密算法无防护软件实现，有可能仅使用一条能量迹就恢复算法密钥，那么此时令$T_a=1$已经足够完成攻击。对于本文研究的双界面商用智能卡ECDSA实现，理想情况下采集十万条能量迹有助于减少利用信息泄漏恢复实际私钥的时间，但是受采集时间限制只能令$T_a=5000$。}并获取多条迹和对应的算法数据的值，在这之后选取一些能量迹进行攻击并综合估计（子）密钥的值$\hat k$，如\equationref{eq:ttracek}所示。
 	
 	\begin{equation}\label{eq:ttracek}
 		\begin{cases}
@@ -125,10 +128,10 @@
 	\end{example}
 	%假如攻击者希望综合前$t$（$t\le T_a$）条迹的信息，他能每一条迹$\Vector{l_i},0\le i<t$和对每种中间值猜测都能计算其得分$d_1^{(i)}(y)$。假如$g_p^{-1}$存在，攻击者可以这么估计密钥$\hat k$
 	
-	按照构造模板的工具对模板类侧信道攻击进行划分，可以大致分为传统模板攻击和基于深度学习的侧信道攻击。
+	按照构造模板的工具对模板类侧信道分析进行划分，可以大致分为传统模板攻击和DL-SCA。
 	\subsubsection{传统模板攻击}
 	
-	在传统模板攻击中，使用多元正态分布构造模版、刻画迹的特征。模板类侧信道攻击中量化迹和每一个模版的匹配程度的方法是计算条件概率的对数值。
+	在传统模板攻击中，使用多元正态分布构造模版、刻画迹的特征。模板类侧信道分析中量化迹和每一个模版的匹配程度的方法是计算条件概率的对数值。
 	
 	构建一个中间值$y$所对应的模版，就是使用所有中间值都是$y$的迹对均值向量和协方差矩阵$\Vector {\mu_y},\Sigma_y$进行估计。这两个参数的含义是，在中间值为$y$的条件下，信息泄漏$\Vector L$应当服从均值为$\Vector {\mu_y}$协方差为$\Sigma_y$的多元正态分布，其条件概率密度函数如\equationref{eq:f(b|a)}所示。
 	
@@ -145,13 +148,14 @@
 	\end{equation}
 	
 	量化迹和每一个模版的匹配程度使用公式$d_1(y)=\log \mathrm{Pr}\left[Y=y|\Vector L=\Vector l \right]$。
-	\subsubsection{基于深度学习的侧信道攻击}
-	在基于深度学习的侧信道攻击中，使用深度神经网络构造模版、刻画迹的特征。模板类侧信道攻击中量化迹和每一个模版的匹配程度的方法是使用模型的预测结果。
+	\subsubsection{深度学习侧信道分析}
+	在DL-SCA中，使用深度神经网络构造模版、刻画迹的特征。模板类侧信道分析中量化迹和每一个模版的匹配程度的方法是使用模型的预测结果。
 	
 	使用深度神经网络构造模版，首先要构造训练集。训练集由两部分构成，训练数据是信息泄漏样本总体$L_{T_t\times M}$，训练标签是敏感中间值总体$y^{(0)},y^{(1)},\dots,y^{(T_t-1)}$。将训练集输入深度神经网络后就得到了训练好的模型。
 	
 	模型可以对输入的迹$\Vector l$进行预测，输出一个概率向量$\Vector \pi$。向量的分量$\pi_y$表示模型预测迹$\Vector l$对应于中间值$y$的概率。量化迹和每一个模版的匹配程度使用公式$d_1(y)=\log \pi_y$。
 	\subsection{侧信道评估指标}
+	为了度量侧信道分析在不同应用场景的技术效果，需要使用某种指标进行量化评估。分析人员可以在完成侧信道分析之后，依据评估指标的计算结果量化密码设备的物理安全性，甚至比较不同密码设备物理安全性的差异。
 	\subsubsection{测试向量泄漏评估}
 	比攻击算法实现略微简单一点的需求是检测算法实现是否存在信息泄漏。在侧信道分析中，测试向量泄漏评估\citep{Goodwill2011,Becker2013,ISO/IEC17825}（Test Vector Leakage Assessment，TVLA）是对采集到的电磁迹中每一个采样点进行单变量检测以判断该组电磁迹是否存在信息泄漏的检测框架。对于第$j$个采样点，泄漏检测的零假设为“$\mathrm H_0:$第$j$个采样点不存在信息泄漏”，备择假设为“$\mathrm H_1:$第$j$个采样点存在信息泄漏”。如果原假设$\mathrm H_0$成立，那么第$j$个采样点的电磁场幅度应该是某种随机噪声的样本值，因此可以这么表述原假设和备择假设:
 	
@@ -159,7 +163,7 @@
 	
 	当单变量检测的统计量被观测到的概率低于显著性水平$\alpha$时\footnote{显著性水平$\alpha$可以任意选择。在侧信道分析中，显著性水平通常设置为$10^{-5}$。}，我们拒绝原假设$\mathrm H_0$，接受备择假设$\mathrm H_1$，即有超过$(1-\alpha)$的把握认为第$j$个采样点存在信息泄漏。
 	
-	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的$t_i$的值进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l_{0,j},l_{1,j},\dots l_{T-1,j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
+	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的敏感信息泄漏$\nonce^{(i)}_j,i=0,1,\dots T,j=0,1,\dots,127$的值进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l_{0,j},l_{1,j},\dots l_{T-1,j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
 	
 	\begin{equation}\label{eq:calct}
 		v_j=\frac{\overline {x_{A,j}}-\overline{x_{B,j}}}{\sqrt{\frac{s_{A,j}^2}{n_A}+\frac{s_{B,j}^2}{n_B}}}
@@ -182,12 +186,12 @@
 	统计量阈值$th_j$与显著性水平$\alpha$有对应关系，因此可以通过T分布的累积分布函数计算得到$th_j=F_T^{-1}\left( 1-\frac\alpha2,f_j\right) $。在侧信道分析中，通常选取$\alpha=10^{-5}$，当样本总量足够大（超过50），自由度一般较大（$f_j>50$），用$\Phi(\cdot)$近似$F_T(\cdot,f_j)$时可以算出$th_j=4.417\approx4.5$。
 	
 	\subsubsection{猜测熵}
-	猜测熵（Guessing Entropy，GE）由Standaert等\citep{Standaert09}提出。正确密钥猜测熵是针对分组密码算法的侧信道攻击中使用广泛的度量评估指标，它能够反映将侧信道攻击与穷举密钥结合使用时进行攻击的复杂度。
+	猜测熵（Guessing Entropy，GE）由Standaert等\citep{Standaert09}提出。正确密钥猜测熵是针对分组密码算法的侧信道分析中使用广泛的度量评估指标，它能够反映将侧信道攻击与穷举密钥结合使用时进行攻击的复杂度。
 	
 	猜测熵是一种依赖于攻击方法的评估指标。攻击者需要使用某种方法，选定攻击所使用的能量迹条数$t$，对分组密码算法的一个（子）密钥进行多次互相独立的攻击，记录每次攻击中某个（子）密钥值$k$得分$d_t(k)$在所有密钥得分中的排名$r_t(k)$，最后取排名的均值$\mathbb E\left(r_t(k) \right) $作为该密钥值$k$的猜测熵$GE_{t}(k)$。排名的计算方式是$r_t(k)=\left\vert\left\lbrace j\in\mathcal K|d_t(j)>d_t(k)\right\rbrace  \right\vert $，其中$\vert\cdot\vert$表示集合中元素的个数。
 	
 	\begin{example}\label{ex:badge}
-		在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。5次攻击所计算出的密钥得分如下表所示。
+		假设在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。进一步假设5次攻击所计算出的密钥得分如下表所示。
 		
 		\begin{table*}[!h]
 			\caption{密钥得分示例}
@@ -219,19 +223,19 @@
 		为了方便解读，不妨假设未列举出来的其他密钥值的得分都小于0.5。观察表格容易知道，在5次攻击中，密钥值204的得分在所有得分的排名中分别位于第三位\footnote{本文使用汉字表述的次序从第一开始计数，有额外说明的情况除外。}、第一位、第四位、第二位、第四位。因此在每次使用100条能量迹进行传统模板攻击时，密钥值204的猜测熵为$GE_{100}(204)=\frac15$(2+ 0+ 3+ 1+ 3)= 1.8。同理可以算出其他每种密钥值的猜测熵，如密钥值140的猜测熵为$GE_{100}(140)=\frac15$(0+ 4+ 1+ 3+ 0)= 1.6，密钥值205的猜测熵为$GE_{100}(205)=\frac15$(4+ 1+ 4+ 4+ 1)= 2.8。因为正确密钥是204，所以正确密钥猜测熵是1.8。
 	\end{example}
 	\subsubsection{成功条数}
-	成功条数\citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道攻击在
+	成功条数\citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道分析在
 	攻击阶段的时间消耗\footnote{采集迹、使用迹进行攻击的时间都和迹的条数成正比。}。成功条数计算方式为$T^*=\min\limits_{0<t\le T_a}\left\lbrace t:GE_t(k^*)=0 \right\rbrace $，其中$k^*$表示正确的（子）密钥。如果攻击不成功，那么成功条数无意义。在\exampleref{ex:badge}中，根据已有数据只能推算出$T^*\le100$。
 	\subsubsection{成功率}
-	恢复（子）密钥的成功率定义为多次攻击互相独立的情况下，成功恢复（子）密钥的次数与攻击次数的比值。在\exampleref{ex:badge}中，成功率为0.2。它直观地反映侧信道攻击在多大程度上能恢复密钥。成功率和攻击时间通常是负相关的，但它不能直接反映攻击时间。
+	恢复（子）密钥的成功率定义为多次攻击互相独立的情况下，成功恢复（子）密钥的次数与攻击次数的比值。在\exampleref{ex:badge}中，成功率为0.2。它直观地反映侧信道分析在多大程度上能恢复密钥。成功率和攻击时间通常是负相关的，但它不能直接反映攻击时间。
 	
-	成功率适用范围比准确率更大。准确率是机器学习方面的指标，它定义为所有样本中预测正确的概率。如果不同迹对应的中间值互相独立，攻击者只能使用一条迹恢复（子）密钥，准确率等价于成功率。如果不同迹对应的中间值不是互相独立的\footnote{对于AES-128算法，如果两次算法密钥不是互相独立的（如设置为相同的密钥值）且明文已知，那么以第1轮第0字节的Sbox输出$\mathrm{Sbox}[p_0\oplus k_0]$作为中间值$y$时，中间值不是互相独立的。}，准确率会因为忽略迹之间的关联性而不能准确评估模型性能。Picek等\citep{Picek19}指出准确率等标准的机器学习度量指标在侧信道攻击中效果不佳。这是因为它只能为测试数据集中的每个样本提供独立的标签预测信息。
+	成功率适用范围比准确率更大。准确率是机器学习方面的指标，它定义为所有样本中预测正确的概率。如果不同迹对应的中间值互相独立，攻击者只能使用一条迹恢复（子）密钥，准确率等价于成功率。如果不同迹对应的中间值不是互相独立的\footnote{对于AES-128算法，如果两次算法密钥不是互相独立的（如设置为相同的密钥值）且明文已知，那么以第1轮第0字节的Sbox输出$\mathrm{Sbox}[p_0\oplus k_0]$作为中间值$y$时，中间值不是互相独立的。}，准确率会因为忽略迹之间的关联性而不能准确评估模型性能。Picek等\citep{Picek19}指出准确率等标准的机器学习度量指标在侧信道分析中效果不佳。这是因为它只能为测试数据集中的每个样本提供独立的标签预测信息。
 	
 	
 	%猜测熵、成功率、猜测熵收敛速度(研究内容1)、真阳性率(研究内容2)
-	\section{数据增强}
+	\section{数据增强}\label{sec:da}
 	
-	\subsection{侧信道攻击领域数据增强}
-	数据增强方法可以提高DL-SCA的攻击效果。
+	\subsection{侧信道分析领域数据增强}
+	数据增强方法可以提高DL-SCA技术效果。
 	
 	Cagli等\citep{Cagli17}在2017年提出了一种数据增强方法，通过使用位移变形（见\algorithmref{alg:SH}）和添加删除变形（见\algorithmref{alg:AR}），分别模拟随机延迟和时钟抖动的技术效果进而合成新的迹，以提升原始DL-SCA技术效果。位移变形有两个可变的参数$lb,rb$\footnote{因为深度神经网络输入尺寸是个定值且深度神经网络不接受输入尺寸以外的数据，因此$M^\prime$必须恰好等于深度神经网络输入尺寸，$M^\prime$不是可变参数。}，它们分别描述了可能被截取的迹的起始采样点的下界和上界。添加删除变形有一个可变的参数$R$，它描述了时钟抖动的剧烈程度。对于Cagli等的数据增强方法实现，调用一次数据增强实现只能合成一条新的迹，为了构造训练集需要调用多次数据增强实现。
 	
@@ -245,10 +249,10 @@
 	
 	\noindent 其中，$L_{batch}$表示训练数据$L$分批后的张量\footnote{在深度神经网络训练之前，训练数据会执行分批操作，它会由二维（两个维度分别表示迹的条数、一条迹的采样点个数）矩阵变成了三维（三个维度分别表示批次数、一个批次的迹的条数、一条迹采样点个数）的张量。分批操作的输入和输出有对应关系，他们是相同数据的不同表现形式。}，$BN_0$表示批归一化函数，$\Psi$表示一个每个元素互相独立且都服从正态分布的噪声张量。
 	
-	Picek等\citep{Picek19}于2019年首次提出用SMOTE（见\algorithmref{alg:smotepolulate}）解决样本不平衡的问题，这使得使用敏感中间值的汉明重量作为训练标签时，基于深度学习的侧信道攻击的技术效果有所提升。SMOTE的核心是：特征空间上邻近的点其特征都是相似的。SMOTE并不是在数据空间上进行采样，而是在特征空间中进行采样，所以它的准确率会高于传统的采样方式。SMOTE有两个可变的参数$n,C$，它们分别描述了寻找最近的迹的数目以及一条迹所需要合成的新的迹的数目。对于SMOTE实现，调用一次数据增强实现可以合成多条新的迹，这使得构造训练集只需要调用一次数据增强实现。
+	Picek等\citep{Picek19}于2019年首次提出用SMOTE（见\algorithmref{alg:smotepolulate}）解决样本不平衡的问题，这使得使用敏感中间值的汉明重量作为训练标签时，DL-SCA的技术效果有所提升。SMOTE的核心是：特征空间上邻近的点其特征都是相似的。SMOTE并不是在数据空间上进行采样，而是在特征空间中进行采样，所以它的准确率会高于传统的采样方式。SMOTE有两个可变的参数$n,C$，它们分别描述了寻找最近的迹的数目以及一条迹所需要合成的新的迹的数目。对于SMOTE实现，调用一次数据增强实现可以合成多条新的迹，这使得构造训练集只需要调用一次数据增强实现。
 	
 %	Won等\citep{Won20}在Picek等\citep{Picek19}工作基础上，系统地研究了SMOTE及其多种变体\citep{Kovcs19}实现数据增强的技术效果，并发现SMOTE、CURE\_SMOTE、ASMOBD、MCT和MOT2LD相对来说有优良的技术效果。
-	Luo等\citep{Luo21}首次提出在基于深度学习的侧信道攻击中利用混淆（Mixup）技术实现数据增强，以扩大训练集，提供攻击成功率。该方法的核心思想是每次随机选取两条迹，并以一定的比例插值生成新的迹。与此同时，训练标签也需要重新生成，新的训练标签应当是迹所对应标签的one-hot编码进行同样比例插值的结果。训练过程只采用插值合成的新的训练数据和训练标签，不使用混淆前的训练数据和训练标签。
+	Luo等\citep{Luo21}首次提出在DL-SCA中利用混淆（Mixup）技术实现数据增强，以扩大训练集，提高攻击成功率。该方法的核心思想是每次随机选取两条迹，并以一定的比例插值生成新的迹。与此同时，训练标签也需要重新生成，新的训练标签应当是迹所对应标签的one-hot编码进行同样比例插值的结果。训练过程只采用插值合成的新的训练数据和训练标签，不使用混淆前的训练数据和训练标签。
 %	
 %	Mukhtar等\citep{Mukhtar22}于2022年提出了一种基于条件生成对抗网络和连体网络的数据增强方法，从而提高了攻击能力。在分组和公钥密码算法实现的泄漏数据集上的定量分析显示，此方法可以生成逼真的含有信息泄漏的迹，使用数据增强后的迹用于训练可以完成攻击（而不进行数据增强就不能完成攻击）。
 	\subsection{图像识别领域数据增强}
@@ -276,7 +280,7 @@
 	Autoaugment\citep{Cubuk19}是一个简单的程序，它将寻找最优数据增强策略问题表述为离散搜索问题，如\figureref{fig:autoaugment}所示，它能自动地改进图像分类的数据增强策略。从图中可以看出一次循环分入如下步骤：搜索算法对数据增强策略S进行采样、使用数据增强策略训练子网络、子网络对验证集进行预测、反馈验证准确率以调整控制器。该程序的核心是：数据增强策略会被用于训练神经网络，神经网络的验证准确率会反过来对控制器进行更新。程序可变的部分是控制器、数据增强策略搜索空间、子网络。搜索出最佳数据增强策略后，多次对原始图像执行数据增强策略即可获得训练集。
 	
 	
-	\section{模拟退火}
+	\section{模拟退火}\label{sec:sa}
 	模拟退火算法（Simulated Annealing）是一种基于模拟物质退火过程的启发式优化算法。它模拟了固体物质在高温下退火冷却过程中的行为，通过随机搜索和概率性接受劣解的策略，寻找全局最优解或接近最优解的近似解。
 	
 	模拟退火算法最初由Metropolis等\citep{Metropolis53}于1953年受到固体物理学中的退火原理的启发提出，并在1983年由Kirkpatrick等\citep{Kirkpatrick83}引入到组合优化领域。在该算法中，优化问题被视为能量最小化的问题，其目标是通过降低系统能量来寻找最优解。
@@ -285,7 +289,7 @@
 	
 	模拟退火算法的关键在于状态转移的策略。一般来说，它包括生成邻域解、计算能量差和接受概率等步骤。邻域解的生成可以通过扰动当前解来实现，能量差用于衡量解的质量，接受概率则基于能量差和当前温度计算得出。通过不断迭代搜索和状态转移，模拟退火算法可以在解空间中进行全局搜索，并最终找到一个较优的解使得对应的能量函数取极小值。算法伪代码如\algorithmref{alg:sa}所示。
 	
-	\begin{algorithm}[!h]
+	\begin{breakablealgorithm}%[!h]
 		\caption{模拟退火算法}\label{alg:sa}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $state$:随机初始解
@@ -306,7 +310,7 @@
 						\State $state:= newstate$
 						\State $cost:= newcost$
 					\Else
-						\State $p\gets U(0,1)$\Comment{从均匀分布中采样}
+						\State $p\stackrel{\$}\gets U(0,1)$\Comment{从均匀分布中采样}
 						\If{$p\le e^{\frac{cost-newcost}{temp}}$}\Comment{计算能量差和接受概率}
 							\State $state:= newstate$
 							\State$cost:= newcost$
@@ -317,18 +321,18 @@
 						\State $mincost:= cost$
 					\EndIf
 				\Until {达到平衡}
-				\State $temp\gets temp\times\gamma,i\gets i+1$\Comment{降低温度}
+				\State $temp\stackrel{\$}\gets temp\times\gamma,i\gets i+1$\Comment{降低温度}
 			\EndFor
 			\State \Return $minstate$
 		\end{algorithmic}
-	\end{algorithm}
+	\end{breakablealgorithm}
 
-	\section{椭圆曲线数字签名算法}
+	\section{椭圆曲线数字签名算法}\label{sec:ecdsa}
 	椭圆曲线数字签名算法（Elliptic Curve Digital Signature Algorithm，ECDSA）是一种基于椭圆曲线密码学的数字签名算法。它被广泛应用于信息安全领域，用于验证数据的完整性和身份认证。
 	
-	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘(Scalar Multiplication)实现方式是基于椭圆曲线上的群运算特性，通过重复应用点加法(Add)和点倍乘(Double)操作，实现椭圆曲线上的点的数乘。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall 0\le i\le q,\forall P\in E, i\cdot P\in E$。
+	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘(Scalar Multiplication)实现方式是基于椭圆曲线上的群运算特性，通过重复应用点加法(Add)和倍点(Double)操作，实现椭圆曲线上的点的数乘。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall i\in\mathbb Z,\forall P\in E, i\cdot P\in E$。
 	
-	\subsection{一种ECDSA实际方案}\label{subs:ECDSAscheme}
+	%\subsection{一种ECDSA实际方案}\label{subs:ECDSAscheme}
 	接下来以SP 800-186\citep{SP800-186}指定的Weierstrass曲线NIST P-256为例，介绍ECDSA的基础原理的相关知识。
 	
 	\textbf{密钥生成}：NIST P-256规定了椭圆曲线$E$和生成元$G\in E$。$q$为曲线$E$的加法阶。
@@ -373,143 +377,143 @@
 	\end{cases}
 	\end{equation}
 	
-	如果$R.x=r$，那么验证者可以确认$(r,s)$是签名者对消息$m_0$的有效签名；否则，签名无效。数字签名可以实现对消息的认证，推导过程如\propositionref{prop:ECDSA-authentication}所示。
+	如果$R.x=r$，那么验证者可以确认$(r,s)$是签名者对消息$m_0$的有效签名；否则签名无效。数字签名可以实现对消息的认证，推导过程如\propositionref{prop:ECDSA-authentication}所示。
 	
-	\subsection{一种ECDSA中的数乘实现}
-	Roche等\citep{Roche21}对使用了SmartMX\citep{p5x}安全微控制器芯片中ECDSA中的数乘实现进行了研究并进行合理的猜想，最终通过数乘实现中敏感随机数的泄漏恢复了使用SmartMX\citep{p5x}的\textit{Google Titan Security Key}\citep{Titan}的私钥。
+%	\subsection{一种ECDSA中的数乘实现}
+%	Roche等\citep{Roche21}对使用了SmartMX\citep{p5x}安全微控制器芯片中ECDSA中的数乘实现进行了研究并进行合理的猜想，最终通过数乘实现中敏感随机数的泄漏恢复了使用SmartMX\citep{p5x}的\textit{Google Titan Security Key}\citep{Titan}的私钥。
+%	
+%	ECDSA的签名操作和验签操作会不可避免地对椭圆曲线上的点进行数乘，如\equationref{eq:sign}中$\nonce\cdot G$、\equationref{eq:prepare-verify}中$u_1\cdot \pk$和$u_2\cdot G$所示。Roche等\citep{Roche21}首先分析了验签操作中的数乘实现的电磁迹，根据预计算时间非常长、乘数是256比特、迭代次数是128、每次点加法之前只有一次点倍乘操作、有的迭代中缺少点加法操作等信息，综合推断验签操作中的数乘算法使用了梳子\citep{Lim94}实现。
+%	
+%	Roche等\citep{Roche21}对梳子方法进行了猜测\footnote{对于第一次数乘，$\multiplier=u_1,P=\pk$；对于第二次数乘，$\multiplier=u_2,P=G$。}:
+%	
+%	\begin{itemize}
+%		\item 使用\algorithmref{alg:encodek}将$\multiplier$转化为长度为$cl=\left\lceil bl/2\right\rceil$的编码形式\footnote{上取整的含义是在$\multiplier$高位补前导0，使得其二进制表示的长度恰好是2的倍数。}，其中$bl$表示$\multiplier$的极小二进制表示的长度，即$2^{bl-1}\le \multiplier<2^{bl}$。
+%		\item 计算$P_1=P,P_2=2^{cl}\cdot P,P_3=\left( 2^{cl}+1\right) \cdot P$。
+%		\item 使用\algorithmref{alg:verifyscalar}计算数乘结果。
+%	\end{itemize}
+%	
+%	\begin{algorithm}
+%		\caption{窗口大小为2的大数编码算法}\label{alg:encodek}
+%		\begin{algorithmic}[1]
+%			\Statex \textbf{输入:} $\multiplier$
+%			\Statex \textbf{输入:} $cl$:目标编码的长度
+%			\Statex \textbf{输出:} $\left\{\tilde{\multiplier}_0,\tilde{\multiplier}_1,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$:$\multiplier$的长度为$cl$的编码形式
+%			\State 计算$\multiplier$的二进制表示$\sum\limits_{i=0}^{2cl-1}\multiplier_i2^{2cl-i-1}=\multiplier$
+%			\For{$i = 0, \dots, cl-1$}
+%			\State $\tilde \multiplier_i:=2\multiplier_i+\multiplier_{i+cl}$
+%			\EndFor
+%			\State \Return $\left\{\tilde{\multiplier}_0,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$
+%		\end{algorithmic}
+%	\end{algorithm}
+%	
+%	在用第二次数乘进行验证的时候，Roche等\citep{Roche21}发现实际情况与第一次数乘略有不同。电磁迹显示第二次数乘没有预计算$P_1,P_2,P_3$。这是因为此时$P$是生成元$G$，无论验签数据是什么它都保持不变，因此只用预计算一次就可以将预计算结果用于后续所有的验签操作。
+%	
+%	为了达到“只用预计算一次”的目的，预计算使用的参数应该对所有数乘倍数$\multiplier$都有用。因此，预计算的$cl$应当设置为一个常数。一个通常的做法是将$cl$设置为所有可能取值的最大值，即$cl=\left\lceil256/2\right\rceil$=128。在这样的假设下，从电磁迹中解析出的迭代序列和预期的迭代序列还是不一致。Roche等\citep{Roche21}发现将$cl$设置为129可以和实际泄漏匹配\footnote{等价于在$\multiplier$高位额外补两个前导0。}。对于第二次数乘梳子方法应该调整为如下形式：
+%	
+%	\begin{itemize}
+%		\item 使用\algorithmref{alg:encodek}将$\multiplier=u_2$转化为长度为129的编码形式。
+%		\item 使用\algorithmref{alg:verifyscalar}计算数乘结果。
+%	\end{itemize}
+%	
+%	验签操作不需要进行防护，因为整个运算过程使用的均为公开数据，不含敏感信息。签名操作需要进行防护，因为运算过程使用的$\nonce,\sk$需要保密。Roche等\citep{Roche21}根据\algorithmref{alg:verifyscalar}，修复其存在时间泄漏的攻击点后，对签名操作的数乘实现的初步猜想如\algorithmref{alg:signscalar}所示，其中$G_0,G_1,G_2,G_3,G_4$是不必重复计算的椭圆曲线$E$上的点，$G_0$可以是椭圆曲线$E$上任意点，$G_1=G,G_2=2^{129}\cdot G,G_3=\left(2^{129}+1 \right) \cdot G,G_4=2^{128}\cdot G$。
+%	
+%	\begin{figure}[!htb]
+%		\centering
+%		\begin{subfigure}[b]{\textwidth}
+%			\includegraphics[width=\textwidth]{titansnr0123}
+%			\caption{$\tilde \nonce_i\in\{0,1,2,3\}$}
+%			\label{fig:titansnr0123}
+%		\end{subfigure}%
+%		\\% line break
+%		\begin{subfigure}[b]{\textwidth}
+%			\includegraphics[width=\textwidth]{titansnr123}
+%			\caption{$\tilde \nonce_i\in\{1,2,3\}$}
+%			\label{fig:titansnr123}
+%		\end{subfigure}
+%		\bicaption{\enspace 信噪比结果}{\enspace SNR Results}
+%		\label{fig:titansnr}
+%	\end{figure}
+%	
+%	\algorithmref{alg:signscalar}只考虑了时间泄漏的防护。即使智能卡签名操作的数乘实现与\algorithmref{alg:signscalar}一致，也存在敏感数据泄漏的情况。Roche等\citep{Roche21}以\algorithmref{alg:signscalar}中的$\tilde \nonce_i$作为敏感中间值，对对齐后的电磁迹进行信噪比分析，实验结果如\figureref{fig:titansnr0123}所示。四类敏感中间值所计算出的SNR最大值为0.53。
+%	
+%	在\algorithmref{alg:signscalar}中$\tilde \multiplier_i\equiv \tilde\nonce_i$，当$\tilde \nonce_i=0$，虚拟的点加法$S+G_{\leakedmultiplier_i}$的被加数和加数实际上可以是任意两个椭圆曲线$E$上的点。Roche等\citep{Roche21}排除了敏感中间值$\tilde \nonce_i=0$时的能量迹重新计算SNR，实验结果如\figureref{fig:titansnr123}所示。三类敏感中间值所计算出的SNR最大值为0.65，相对于之前的信噪比有所提高，这说明对于$\tilde \nonce_i=0$这一类的点加法的电磁迹噪声较大，\algorithmref{alg:signscalar}第8行$\leakedmultiplier_i:=\tilde \nonce_i$很可能是错误的。
+%	
+%	Roche等\citep{Roche21}通过聚类的方法，验证了这样的事实：$\tilde \nonce_i=0$时，有$\frac12$的概率执行$\leakedmultiplier_i:=1$，有$\frac14$的概率执行$\leakedmultiplier_i:=2$，有$\frac14$的概率执行$\leakedmultiplier_i:=3$。Roche等\citep{Roche21}据此提出了更接近真实情况的签名操作的数乘实现的猜想，如\algorithmref{alg:improvesignscalar}所示。其中$G_1=G,G_2=2^{129}\cdot G,G_3=\left(2^{129}+1 \right) \cdot G,G_4=2^{128}\cdot G$。
+%	
+%	\begin{algorithm}
+%		\caption{改进后签名操作的数乘算法}\label{alg:improvesignscalar}
+%		\begin{algorithmic}[1]
+%			\Statex \textbf{输入:} $\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_i,\dots, \tilde{\nonce}_{128}\right\}$:一次性随机数$\nonce$的长度为129的编码形式
+%			\Statex \textbf{输入:} $G_1,G_2,G_3,G_4$:预计算的椭圆曲线$E$上的点
+%			\Statex \textbf{输出:} $\nonce\cdot G$:基点$G$与一次性随机数$\nonce$数乘的结果
+%			\State $S:=G_1$
+%			\For{$i=1,\dots , 128$}
+%			\State $S:=2\cdot S$
+%			\If {$\tilde \nonce_i>0$}
+%			\State $\leakedmultiplier_i:=\tilde \nonce_i$
+%			\State $S:=S+G_{\leakedmultiplier_i}$\Comment{$\leakedmultiplier_i$存在泄漏}
+%			\Else
+%			\State $\leakedmultiplier_i\stackrel{\$}\gets\{1,1,2,3\}$\Comment{引入随机数}
+%			\State $Dummy:=S+G_{\leakedmultiplier_i}$\Comment{$\leakedmultiplier_i$存在泄漏}
+%			\EndIf
+%			\EndFor
+%			\If {$\tilde \nonce_0=0$}
+%			\State $S:=S-G_4$
+%			\Else
+%			\State $Dummy:=S-G_4$
+%			\EndIf
+%			\State \Return $S$
+%		\end{algorithmic}
+%	\end{algorithm}
 	
-	ECDSA的签名操作和验签操作会不可避免地对椭圆曲线上的点进行数乘，如\equationref{eq:sign}中$\nonce\cdot G$、\equationref{eq:prepare-verify}中$u_1\cdot \pk$和$u_2\cdot G$所示。Roche等\citep{Roche21}首先分析了验签操作中的数乘实现的电磁迹，根据预计算时间非常长、乘数是256比特、迭代次数是128、每次点加法之前只有一次点倍乘操作、有的迭代中缺少点加法操作等信息，综合推断验签操作中的数乘算法使用了梳子\citep{Lim94}实现。
-	
-	Roche等\citep{Roche21}对梳子方法进行了猜测\footnote{对于第一次数乘，$\multiplier=u_1,P=\pk$；对于第二次数乘，$\multiplier=u_2,P=G$。}:
-	
-	\begin{itemize}
-		\item 使用\algorithmref{alg:encodek}将$\multiplier$转化为长度为$cl=\left\lceil bl/2\right\rceil$的编码形式\footnote{上取整的含义是在$\multiplier$高位补前导0，使得其二进制表示的长度恰好是2的倍数。}，其中$bl$表示$\multiplier$的极小二进制表示的长度，即$2^{bl-1}\le \multiplier<2^{bl}$。
-		\item 计算$P_1=P,P_2=2^{cl}\cdot P,P_3=\left( 2^{cl}+1\right) \cdot P$。
-		\item 使用\algorithmref{alg:verifyscalar}计算数乘结果。
-	\end{itemize}
-	
-	\begin{algorithm}
-		\caption{窗口大小为2的大数编码算法}\label{alg:encodek}
-		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\multiplier$
-			\Statex \textbf{输入:} $cl$:目标编码的长度
-			\Statex \textbf{输出:} $\left\{\tilde{\multiplier}_0,\tilde{\multiplier}_1,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$:$\multiplier$的长度为$cl$的编码形式
-			\State 计算$\multiplier$的二进制表示$\sum\limits_{i=0}^{2cl-1}\multiplier_i2^{2cl-i-1}=\multiplier$
-			\For{$i = 0, \dots, cl-1$}
-			\State $\tilde \multiplier_i:=2\multiplier_i+\multiplier_{i+cl}$
-			\EndFor
-			\State \Return $\left\{\tilde{\multiplier}_0,\dots,\tilde{\multiplier}_i,\dots, \tilde{\multiplier}_{cl-1}\right\}$
-		\end{algorithmic}
-	\end{algorithm}
-	
-	在用第二次数乘进行验证的时候，Roche等\citep{Roche21}发现实际情况与第一次数乘略有不同。电磁迹显示第二次数乘没有预计算$P_1,P_2,P_3$。这是因为此时$P$是生成元$G$，无论验签数据是什么它都保持不变，因此只用预计算一次就可以将预计算结果用于后续所有的验签操作。
-	
-	为了达到“只用预计算一次”的目的，预计算使用的参数应该对所有数乘倍数$\multiplier$都有用。因此，预计算的$cl$应当设置为一个常数。一个通常的做法是将$cl$设置为所有可能取值的最大值，即$cl=\left\lceil256/2\right\rceil$=128。在这样的假设下，从电磁迹中解析出的迭代序列和预期的迭代序列还是不一致。Roche等\citep{Roche21}发现将$cl$设置为129可以和实际泄漏匹配\footnote{等价于在$\multiplier$高位额外补两个前导0。}。对于第二次数乘梳子方法应该调整为如下形式：
-	
-	\begin{itemize}
-		\item 使用\algorithmref{alg:encodek}将$\multiplier=u_2$转化为长度为129的编码形式。
-		\item 使用\algorithmref{alg:verifyscalar}计算数乘结果。
-	\end{itemize}
-	
-	验签操作不需要进行防护，因为整个运算过程使用的均为公开数据，不含敏感信息。签名操作需要进行防护，因为运算过程使用的$\nonce,\sk$需要保密。Roche等\citep{Roche21}根据\algorithmref{alg:verifyscalar}，修复其存在时间泄漏的攻击点后，对签名操作的数乘实现的初步猜想如\algorithmref{alg:signscalar}所示，其中$G_0,G_1,G_2,G_3,G_4$是不必重复计算的椭圆曲线$E$上的点，$G_0$可以是椭圆曲线$E$上任意点，$G_1=G,G_2=2^{129}\cdot G,G_3=\left(2^{129}+1 \right) \cdot G,G_4=2^{128}\cdot G$。
-	
-	\begin{figure}[!htb]
-		\centering
-		\begin{subfigure}[b]{\textwidth}
-			\includegraphics[width=\textwidth]{titansnr0123}
-			\caption{$\tilde \nonce_i\in\{0,1,2,3\}$}
-			\label{fig:titansnr0123}
-		\end{subfigure}%
-		\\% line break
-		\begin{subfigure}[b]{\textwidth}
-			\includegraphics[width=\textwidth]{titansnr123}
-			\caption{$\tilde \nonce_i\in\{1,2,3\}$}
-			\label{fig:titansnr123}
-		\end{subfigure}
-		\bicaption{\enspace 信噪比结果}{\enspace SNR Results}
-		\label{fig:titansnr}
-	\end{figure}
-	
-	\algorithmref{alg:signscalar}只考虑了时间泄漏的防护。即使智能卡签名操作的数乘实现与\algorithmref{alg:signscalar}一致，也存在敏感数据泄漏的情况。Roche等\citep{Roche21}以\algorithmref{alg:signscalar}中的$\tilde \nonce_i$作为敏感中间值，对对齐后的电磁迹进行信噪比分析，实验结果如\figureref{fig:titansnr0123}所示。四类敏感中间值所计算出的SNR最大值为0.53。
-	
-	在\algorithmref{alg:signscalar}中$\tilde \multiplier_i\equiv \tilde\nonce_i$，当$\tilde \nonce_i=0$，虚拟的点加法$S+G_{\leakedmultiplier_i}$的被加数和加数实际上可以是任意两个椭圆曲线$E$上的点。Roche等\citep{Roche21}排除了敏感中间值$\tilde \nonce_i=0$时的能量迹重新计算SNR，实验结果如\figureref{fig:titansnr123}所示。三类敏感中间值所计算出的SNR最大值为0.65，相对于之前的信噪比有所提高，这说明对于$\tilde \nonce_i=0$这一类的点加法的电磁迹噪声较大，\algorithmref{alg:signscalar}第8行$\leakedmultiplier_i:=\tilde \nonce_i$很可能是错误的。
-	
-	Roche等\citep{Roche21}通过聚类的方法，验证了这样的事实：$\tilde \nonce_i=0$时，有$\frac12$的概率执行$\leakedmultiplier_i:=1$，有$\frac14$的概率执行$\leakedmultiplier_i:=2$，有$\frac14$的概率执行$\leakedmultiplier_i:=3$。Roche等\citep{Roche21}据此提出了更接近真实情况的签名操作的数乘实现的猜想，如\algorithmref{alg:improvesignscalar}所示。其中$G_1=G,G_2=2^{129}\cdot G,G_3=\left(2^{129}+1 \right) \cdot G,G_4=2^{128}\cdot G$。
-	
-	\begin{algorithm}
-		\caption{改进后签名操作的数乘算法}\label{alg:improvesignscalar}
-		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_i,\dots, \tilde{\nonce}_{128}\right\}$:一次性随机数$\nonce$的长度为129的编码形式
-			\Statex \textbf{输入:} $G_1,G_2,G_3,G_4$:预计算的椭圆曲线$E$上的点
-			\Statex \textbf{输出:} $\nonce\cdot G$:基点$G$与一次性随机数$\nonce$数乘的结果
-			\State $S:=G_1$
-			\For{$i=1,\dots , 128$}
-			\State $S:=2\cdot S$
-			\If {$\tilde \nonce_i>0$}
-			\State $\leakedmultiplier_i:=\tilde \nonce_i$
-			\State $S:=S+G_{\leakedmultiplier_i}$\Comment{$\leakedmultiplier_i$存在泄漏}
-			\Else
-			\State $\leakedmultiplier_i\stackrel{\$}\gets\{1,1,2,3\}$\Comment{引入随机数}
-			\State $Dummy:=S+G_{\leakedmultiplier_i}$\Comment{$\leakedmultiplier_i$存在泄漏}
-			\EndIf
-			\EndFor
-			\If {$\tilde \nonce_0=0$}
-			\State $S:=S-G_4$
-			\Else
-			\State $Dummy:=S-G_4$
-			\EndIf
-			\State \Return $S$
-		\end{algorithmic}
-	\end{algorithm}
-	
-	\subsection{随机数部分泄漏的请况下基于格的对ECDSA的攻击}\label{subs:infoforlattice}
-	
-	有大量工作\citep{Howgrave-Graham01,Nguyen02,Nguyen03,Hlavac06,Brumley11,Mulder14,Benger14,Goudarzi16,Fan16,Ryan19,Jancar20,Moghimi20,Weiser20,Micheli20}研究了在随机数泄漏少量比特的情况下攻击ECDSA方案，它们的主要思想是利用签名中的随机数的泄漏构造扩展隐藏数问题\citep{Boneh96}的方程并使用格基规约求解。
-	
-	利用一次性随机数$\nonce$的泄漏求解私钥$\sk$不在本文研究范围内，因此只做大致描述。它求解私钥的流程如\figureref{fig:solver}所示，我们将利用随机数部分泄漏使用基于格的ECDSA攻击抽象为调用一个求解算法，使用$\mathcal S$表示求解算法。
-	
-	\begin{figure}[!htb]
-		\centering
-		\begin{tikzpicture}[node distance=20pt]
-			\node[draw, rounded corners,align=center]  (start)  {运算开始};
-			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,below=of start,align=center](inputleak){输入:用于构造方程的签名及其泄漏};
-			\node[draw, below=of inputleak,align=center] (constructequ)  {构造方程};
-			\node[draw, below=of constructequ,align=center] (solve)  {使用格基规约算法求解};
-			\node[draw, below=of solve,align=center] (calcd)  {根据最短向量求解私钥$\hat \sk$};
-			\node[draw, diamond, aspect=2, below=of calcd,align=center]     (chkd)  {$\hat \sk\cdot G=\pk$?};
-			
-			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,align=center]at ([xshift=-40pt,yshift=-35pt]chkd.south west)(success){输出:"求解成功",$\sk=\hat \sk$};
-			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,align=center]at ([xshift=40pt,yshift=-35pt]chkd.south east)(fail){输出:"求解失败"};
-			\node[draw, rounded corners, below=50pt of chkd,align=center]  (end) {运算结束};
-			
-			\draw[->] (chkd) -|node[midway,very near start,above] {是} (success);
-			\draw[->] (chkd) -|node[midway,very near start,above] {否} (fail);
-			
-			\draw[->] (success) |- (end);
-			\draw[->] (fail) |- (end);
-			\graph{
-				(start)->(inputleak)->(constructequ)->(solve)->(calcd) -> (chkd);
-			};
-		\end{tikzpicture}
-		\bicaption{\enspace 利用随机数部分泄漏使用基于格的ECDSA攻击流程图}{\enspace Flowchart of Lattice-based ECDSA Attacks with Partial Knowledge of the Nonces}
-		\label{fig:solver}	
-	\end{figure}
-	
-	$\mathcal S$是多项式时间复杂度的近似算法。只有构造方程签名中的的随机数泄漏需要同时满足三个限制时，$\mathcal S$才有较大可能在可接受的时间内求解出实际私钥$\sk$。三个限制如下所示。
-	
-	\begin{enumerate}
-		\item 用于构造方程的签名中的随机数泄漏需要可利用;
-		\item 用于构造方程的签名中的随机数泄漏需要足够多;
-		\item 用于构造方程的签名中的随机数泄漏的准确率是100\%。
-	\end{enumerate}
-	
-	本研究所使用的求解算法$\mathcal S$记为$S$。$S$求解时间约为400s。
-	
-	对于$S$，“可利用”指的是，恢复了\textbf{至少4个连续比特}签名中的一次性随机数$\nonce$泄漏以保证求解速度。如果使用没有4个连续比特随机数泄漏的签名构造方程，泄漏利用难度会增大，为了保证求解的正确性需要使用相对更多的签名，这会增加方程的维度从而增加求解时间。
-	
-	对于$S$，“足够多”指的是，需要\textbf{总共300比特}随机数泄漏的签名以构造正定或超定的方程，即需要$300\div 4=75$条有“可利用”随机数泄漏的签名。如果没有足够多的签名，那么构造的方程会欠定，这使得解空间变得非常大，无法求解实际私钥$d$。
-	
-	$S$对泄漏的准确率也有严格要求。这是因为一旦构造方程的泄漏存在错误（侧信道攻击恢复的数据与实际数据不一致），那么方程会错误，求解出的私钥与实际私钥$\sk$一定不符。
+%	\subsection{随机数部分泄漏的请况下基于格的对ECDSA的攻击}\label{subs:infoforlattice}
+%	
+%	有大量工作\citep{Howgrave-Graham01,Nguyen02,Nguyen03,Hlavac06,Brumley11,Mulder14,Benger14,Goudarzi16,Fan16,Ryan19,Jancar20,Moghimi20,Weiser20,Micheli20}研究了在随机数泄漏少量比特的情况下攻击ECDSA方案，它们的主要思想是利用签名中的随机数的泄漏构造扩展隐藏数问题\citep{Boneh96}的方程并使用格基规约求解。
+%	
+%	利用一次性随机数$\nonce$的泄漏求解私钥$\sk$不在本文研究范围内，因此只做大致描述。它求解私钥的流程如\figureref{fig:solver}所示，我们将利用随机数部分泄漏使用基于格的ECDSA攻击抽象为调用一个求解算法，使用$\mathcal S$表示求解算法。
+%	
+%	\begin{figure}[!htb]
+%		\centering
+%		\begin{tikzpicture}[node distance=20pt]
+%			\node[draw, rounded corners,align=center]  (start)  {运算开始};
+%			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,below=of start,align=center](inputleak){输入:用于构造方程的签名及其泄漏};
+%			\node[draw, below=of inputleak,align=center] (constructequ)  {构造方程};
+%			\node[draw, below=of constructequ,align=center] (solve)  {使用格基规约算法求解};
+%			\node[draw, below=of solve,align=center] (calcd)  {根据最短向量求解私钥$\hat \sk$};
+%			\node[draw, diamond, aspect=2, below=of calcd,align=center]     (chkd)  {$\hat \sk\cdot G=\pk$?};
+%			
+%			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,align=center]at ([xshift=-40pt,yshift=-35pt]chkd.south west)(success){输出:"求解成功",$\sk=\hat \sk$};
+%			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,align=center]at ([xshift=40pt,yshift=-35pt]chkd.south east)(fail){输出:"求解失败"};
+%			\node[draw, rounded corners, below=50pt of chkd,align=center]  (end) {运算结束};
+%			
+%			\draw[->] (chkd) -|node[midway,very near start,above] {是} (success);
+%			\draw[->] (chkd) -|node[midway,very near start,above] {否} (fail);
+%			
+%			\draw[->] (success) |- (end);
+%			\draw[->] (fail) |- (end);
+%			\graph{
+%				(start)->(inputleak)->(constructequ)->(solve)->(calcd) -> (chkd);
+%			};
+%		\end{tikzpicture}
+%		\bicaption{\enspace 利用随机数部分泄漏使用基于格的ECDSA攻击流程图}{\enspace Flowchart of Lattice-based ECDSA Attacks with Partial Knowledge of the Nonces}
+%		\label{fig:solver}	
+%	\end{figure}
+%	
+%	$\mathcal S$是多项式时间复杂度的近似算法。只有构造方程签名中的的随机数泄漏需要同时满足三个限制时，$\mathcal S$才有较大可能在可接受的时间内求解出实际私钥$\sk$。三个限制如下所示。
+%	
+%	\begin{enumerate}
+%		\item 用于构造方程的签名中的随机数泄漏需要可利用;
+%		\item 用于构造方程的签名中的随机数泄漏需要足够多;
+%		\item 用于构造方程的签名中的随机数泄漏的准确率是100\%。
+%	\end{enumerate}
+%	
+%	本研究所使用的求解算法$\mathcal S$记为$S$。$S$求解时间约为400s。
+%	
+%	对于$S$，“可利用”指的是，恢复了\textbf{至少4个连续比特}签名中的一次性随机数$\nonce$泄漏以保证求解速度。如果使用没有4个连续比特随机数泄漏的签名构造方程，泄漏利用难度会增大，为了保证求解的正确性需要使用相对更多的签名，这会增加方程的维度从而增加求解时间。
+%	
+%	对于$S$，“足够多”指的是，需要\textbf{总共300比特}随机数泄漏的签名以构造正定或超定的方程，即需要$300\div 4=75$条有“可利用”随机数泄漏的签名。如果没有足够多的签名，那么构造的方程会欠定，这使得解空间变得非常大，无法求解实际私钥$d$。
+%	
+%	$S$对泄漏的准确率也有严格要求。这是因为一旦构造方程的泄漏存在错误（侧信道分析恢复的数据与实际数据不一致），那么方程会错误，求解出的私钥与实际私钥$\sk$一定不符。
 	\section{本章小结}
-	本章介绍了开展针对一类具有ECDSA实现的双界面商用智能卡的侧信道分析方法研究所需的背景知识，主要包括侧信道攻击、数据增强、模拟退火和椭圆曲线数字签名算法。本章介绍的知识为读者提供论文所涉及领域的背景和上下文信息，帮助读者理解论文的主要观点和结果。
+	本章介绍了开展针对一类具有ECDSA实现的双界面商用智能卡的侧信道分析方法研究所需的背景知识，主要包括侧信道分析、数据增强、模拟退火和椭圆曲线数字签名算法。本章介绍的知识为读者提供论文所涉及领域的背景和上下文信息，帮助读者理解论文的主要观点和结果。
 }

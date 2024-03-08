@@ -17,6 +17,11 @@
 \newcommand{\corollaryref}[1]{\corollaryname\ref{#1}}
 \newcommand{\exampleref}[1]{\examplename\ref{#1}}
 
+\newcommand{\chapref}[1]{第\ref{#1}章}
+\newcommand{\secref}[1]{第\ref{#1}节}
+\newcommand{\subsref}[1]{\ref{#1}小节}
+\newcommand{\subssref}[1]{\ref{#1}小小节}
+
 \newcommand{\tabnote}[1]{\fignote{#1}}
 \usetikzlibrary{graphs, positioning, quotes, shapes.geometric,calc}
 \newcommand{\normalcite}[1]{\scalebox{1.3}[1.3]{\raisebox{-0.65ex}{\cite{#1}}}}
@@ -43,13 +48,14 @@
 	}
 
 \makeatother
-\newcommand{\dupc}{blue}
+\newcommand{\dupc}{black}
 \newcommand{\expsettings}{}
 
 \input{Tex/chapter1}
 \input{Tex/chapter2}
 \input{Tex/chapter3}
 \input{Tex/chapter4}
+\input{Tex/chapter5}
 %\input{Tex/Chap_Intro}
 %\input{Tex/Chap_Guide}
 %\input{Tex/Chap_UCAS}

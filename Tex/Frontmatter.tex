@@ -18,18 +18,30 @@
 \setcounter{page}{1}% 开始页码
 \pagenumbering{Roman}% 页码符号
 
-中文摘要、英文摘要、目录、论文正文、参考文献、附录、致谢、攻读学位期间发表的学术论文与其他相关学术成果等均须由另页右页（奇数页）开始。
+%中文摘要、英文摘要、目录、论文正文、参考文献、附录、致谢、攻读学位期间发表的学术论文与其他相关学术成果等均须由另页右页（奇数页）开始。
+双界面商用智能卡因为其灵活性和可靠性成为智能化社会中各种商用安全应用的重要技术，因此对双界面智能卡物理安全性的分析和评估具有重要的现实意义。抵御侧信道分析的能力是密码硬件单元物理安全性的一个重要方面。为了保障分析评估结果的准确性和可靠性，有必要开展对双界面智能卡的侧信道分析方法的研究。深度学习侧信道分析（DL-SCA）是一类强大的侧信道分析方法，但是在对现实中一款双界面智能卡椭圆曲线数字签名算法（ECDSA）实现进行侧信道分析时，还存在量化指标选择不合理、计算量巨大、采集电磁迹消耗的时间长、恢复私钥的理论时间长等问题。如何在现有计算资源、现有存储空间、可接受的攻击时间恢复ECDSA的私钥成为侧信道分析在实际应用中所面临的非常关键的问题。本研究以提升对一类双界面商用智能卡的侧信道分析方法的技术效果为最终目标，从减少攻击成功时所使用的能量迹、电磁迹条数的角度出发，开展两个阶段的侧信道分析研究：以多种AES算法实现为研究目标的通用数据增强方法效果量化研究、以一类双界面商用智能卡上ECDSA实现为研究目标的侧信道分析实证研究。本文主要贡献如下：
 
-\keywords{中国科学院大学，学位论文，模板}% 中文关键词
+\textbf{面向侧信道分析的通用数据增强方法。}本文提出了一种通用数据增强方法，它能用于对DL-SCA的训练样本进行数据增强，提高DL-SCA技术效果。该方法主要由采用模拟退火机制的主控制器、采用组合式数据增强机制的数据增强单元以及提供侧信道攻击代价反馈信号的攻击评估单元三个核心组件构成，其核心思想是采用模拟退火机制依据反馈信号自适应地选择数据增强策略参数。该方法具有通用性和有效性，在AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）三种数据集五个场景下，与未采用数据增强方法的DL-SCA相比，成功条数分别降低21\%、25\%、24\%、48\%以及5\%。
+
+\textbf{基于深度学习的智能卡ECDSA实现的侧信道分析方法。}本文将简单的信号处理方法组合使用达到高效、准确提取兴趣点的目的，据此构造出的数据集使得DL-SCA计算量减小为原来的0.018\%，DL-SCA变得可行。本文利用ECDSA本身的特点对深度学习的的测试阶段进行改进，采用面向深度学习侧信道分析的数据增强方法以及基于假设检验的估计方案使得运用格方法恢复私钥的时间减小到400秒。实际攻击时，从采集电磁迹到恢复ECDSA私钥只用4天，速度相比于改进前提高了$2^{29}$倍以上。
+
+\keywords{侧信道分析，智能卡，深度学习，数据增强}% 中文关键词
+%\keywords{中国科学院大学，学位论文，模板}% 中文关键词
 %-
 %-> 英文摘要
 %-
 \intobmk\chapter*{Abstract}% 显示在书签但不显示在目录
 
-Chinese abstracts, English abstracts, table of contents, the main contents, references, appendix, acknowledgments, author's resume and academic papers published during the degree study and other relevant academic achievements must start with another right page (odd-numbered page).
+%Chinese abstracts, English abstracts, table of contents, the main contents, references, appendix, acknowledgments, author's resume and academic papers published during the degree study and other relevant academic achievements must start with another right page (odd-numbered page).
+Dual-interface commercial smart cards have become an important technology for various security applications in the smart society due to their flexibility and reliability, making the analysis and evaluation of their physical security of great practical significance. The ability to resist side-channel analysis is an important aspect of the physical security of cryptographic devices. To ensure the accuracy and reliability of analysis and evaluation results, it is necessary to conduct research on side-channel analysis methods for dual-interface smart cards. Deep-learning based side-channel analysis (DL-SCA) is a powerful type of side-channel analysis method. However, when this research tries to conduct side-channel analysis on the ECDSA implementation of a real dual-interface smart card,  issues pop out such as unreasonable selection of quantitative indicators, huge computational costs, long time consumption for collecting electromagnetic traces, and theoretically enormous time for recovering the private key. The means to recover the private key of the Elliptic Curve Digital Signature Algorithm (ECDSA) implementation in side-channel analysis is a critical issue faced in practical applications with existing computational resources, storage space, and acceptable attack time. This research aims to improve the technical effectiveness of side-channel analysis methods for a certain type of dual-interface commercial smart cards. From the perspective of reducing the traces used when an attack is successful, this study conducts two side-channel analysis research: a quantitative study of the efficacy of general data augmentation methods targeting various AES algorithm implementations, and an empirical study of side-channel analysis targeting the ECDSA implementation on a certain type of dual-interface smart card. The main contributions of the thesis are as follows:
+
+\textbf{General data augmentation method for side-channel analysis is proposed.} The thesis proposes a general data augmentation method that can be used to augment the training samples of DL-SCA, thereby improving the technical effectiveness of DL-SCA. The method consists of a main controller using a simulated annealing mechanism, a data augmentation unit employing a combined data augmentation mechanism, and an attack evaluation unit providing feedback signals on the cost of side-channel attacks. The core idea is to adaptively select data augmentation strategy parameters based on the simulated annealing mechanism according to feedback signals. This method is versatile and effective. In five scenarios of three datasets, AES\_HD, DPA v4, and ASCADf (N=0/N=50/N=100), compared to DL-SCA without data augmentation, measurements to disclose are reduced by 21\%, 25\%, 24\%, 48\%, and 5\%, respectively.
+
+\textbf{Deep-learning based side-channel analysis method for ECDSA Implementation on a smart card is proposed.} The thesis employs a combination of simple signal processing methods to efficiently and accurately extract points of interest, constructs a dataset that reduces the computational cost of DL-SCA to 0.018\% of the original, making DL-SCA viable. Improvements are made to the testing phase of deep learning using the characteristics of ECDSA itself, adopting data augmentation methods for deep learning side-channel analysis and estimation schemes based on hypothesis testing, reducing the time to recover the private key using lattice methods to 400 seconds. In practical attacks, the time taken from collecting electromagnetic traces till recovering the ECDSA private key is only 4 days, achieving a speed improvement of more than $2^{29}$ times compared to that before the improvements.
     %- the current style, comment all the lines in plain style definition.
 
-\KEYWORDS{University of Chinese Academy of Sciences, Thesis, LaTeX Template}% 英文关键词
+\KEYWORDS{Side-channel Analysis, Smart Card, Deep Learning, Data Augmentation}% 英文关键词
+%\KEYWORDS{University of Chinese Academy of Sciences, Thesis, LaTeX Template}% 英文关键词
 
 \pagestyle{enfrontmatterstyle}%
 \cleardoublepage\pagestyle{frontmatterstyle}%
