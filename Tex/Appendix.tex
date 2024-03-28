@@ -45,7 +45,7 @@
 	\begin{proof}
 		令构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特敏感信息泄漏（即可利用的泄漏有$r$比特），运用一次格基规约时间开销为$u$。
 		
-		使用侧信道攻击恢复的泄漏没有错误这一事件对于每个泄漏比特是互相独立的，因此对于任意一条构造签名的能量迹，恢复的泄漏都没有错误的概率为$p_r=p^r$
+		因为格方法只运用估计为阳性的敏感信息泄漏，所以对格方法而言，所利用的敏感信息泄漏估计的正阳性率就是所利用的敏感信息泄漏估计的准确率。敏感信息泄漏估计准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，恢复的泄漏都准确的概率为$p_r=p^r$。
 	
 		能量迹恢复的泄漏没有错误这一事件对于每条能量迹是互相独立的，因此对于构造签名的所有能量迹，恢复的泄漏都没有错误的概率为\begin{align*}
 			p_s&=p_r^{\frac sr}\\
@@ -53,7 +53,7 @@
 			&=p^s
 		\end{align*}
 	
-		利用签名构造方程并运用格方法求解实际私钥是伯努利实验。因此，如果构造方程的所有能量迹恢复的泄漏都没有假阳性时运用格方法一定可以求解出实际私钥，那么多次尝试构造方程并运用格方法直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
+		利用签名多次构造方程并运用格方法求解实际私钥是伯努利实验。因此，如果构造方程的所有能量迹恢复的泄漏都没有假阳性，那么运用格方法一定可以求解出实际私钥。在这种情况下，多次尝试构造方程并运用格方法直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
 		
 		因此，恢复实际私钥的时间是$u\xi$。结合$\xi\sim G(p_s)$，可以推算\begin{align*}
 			E(u\xi)&=uE(\xi)\\
@@ -165,7 +165,7 @@
 	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本研究使用的求解算法$S$）可利用的敏感信息泄漏的概率。
 	显然$T_a$条电磁迹中可以恢复出可利用的敏感信息泄漏的迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。能成功构造方程并求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}当且仅当$75\le\xi$。
 	
-	容易知道该二项分布的均值的方差$\mathbb E\xi=T_ag_{n_s,4}=\epsilon+75,\mathbb D\xi=T_ag_{n_s,4}(1-\pi_{n_s}(4))\le T_ag_{n_s,4}=\epsilon+75$。
+	容易知道该二项分布的均值的方差$\mathbb E\xi=T_a\pi_{n_s}(4)=\epsilon+75,\mathbb D\xi=T_a\pi_{n_s}(4)(1-\pi_{n_s}(4))\le T_a\pi_{n_s}(4)=\epsilon+75$。
 	
 	通过放缩可以知道\begin{align*}
 		\Pr\left[75\le\xi\right]&\ge\Pr\left[75<\xi\right]\\
@@ -241,7 +241,6 @@
 		\begin{tabular}{cc|ccc|c}
 			\hline
 			$\leakedmultiplier_j$可能的取值$u$&$\Pr[\leakedmultiplier_j=u]$&${\tilde \nonce}_j$可能的取值$v$&$v$的二进制形式&$\Pr[{\tilde \nonce}_j=v|\leakedmultiplier_j=u]$&能完全确定的敏感信息$\nonce_j$估计值\\
-			\hline
 			\hline
 			\multirow{4}*{1}&\multirow{4}*{3/8}&0&00&1/3&\multirow{4}*{$\nonce_j=0$}\\
 			\cdashline{3-5} &&1&01&2/3&\\
@@ -1014,7 +1013,7 @@
 			\For {$r:=0,\dots,R-1$}\Comment{随机$R$个位置添加采样点}
 				\State $j\stackrel{\$}\gets \{0,1,\dots,M+r-1\}$
 				\State $v:=\frac{l^\prime_j+l^\prime_{j+1}}2$
-				\State 在$\Vector {l^{(i)}}$索引为$j$的位置插入值$v$\Comment{向量的分量个数增加}
+				\State 在$\Vector {l}^\prime$索引为$j$的位置插入值$v$\Comment{向量的分量个数增加}
 			\EndFor
 			\State $\mathcal A\stackrel{\$}\gets\left\lbrace \mathcal I\subset \{0,1,\dots,M+R-1\}:\vert\mathcal I\vert=M\right\rbrace $\Comment{随机$M$个位置保留采样点}
 			\State $\{a_0,a_1,\dots,a_{M-1}\}=\mathcal A,a_0<a_1<\dots<a_{M-1}$
@@ -1123,13 +1122,13 @@
 	\end{breakablealgorithm}
 
 	\begin{breakablealgorithm}
-		\caption{分块计算方差}\label{alg:calcvar}
+		\caption{分块方差}\label{alg:calcvar}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\Vector{l_i}$:采样点个数为$M$的电磁迹
+			\Statex \textbf{输入:} $\Vector{l}^{(i)}$:采样点个数为$M$的电磁迹
 			\Statex \textbf{输入:} $w_d$:分块大小
 			\Statex \textbf{输出:} $\Vector D$分块后每块的方差
 			\For {$j:=0\dots\left\lfloor\frac{M}{w_d}\right\rfloor-1$}
-			\State $d_i:=\mathrm{Var}(l_{i,jw_d},l_{i,jw_d+1},\dots,l_{i,jw_d+w_d-1})$
+			\State $d_i:=\mathrm{Var}(l^{(i)}_{jw_d},l^{(i)}_{jw_d+1},\dots,l^{(i)}_{jw_d+w_d-1})$
 			\EndFor
 			\State \Return $\left\{d_0,d_1,\dots,d_{\left\lfloor\frac{M}{w_d}\right\rfloor-1}\right\}$
 		\end{algorithmic}
@@ -1158,7 +1157,7 @@
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的01数列
 			\Statex \textbf{输入:} $w_a$:去抖动窗口大小
 			\Statex \textbf{输出:} $\Vector A$去抖动后的数列
-			\State $s:=0$\Comment{状态需要设置为常数，可以是0，也可以是1}
+			\State $s:=0$\Comment{初始状态需要设置为常数，可以是0，也可以是1}
 			\State $b:=0$
 			\For {$i:=0\dots N_X-1$}
 			\State $b:=(b\cdot2+x_i)\bmod 2^{w_a}$
@@ -1198,9 +1197,9 @@
 	\begin{breakablealgorithm}
 		\caption{前$m$极值点}\label{alg:maxpoint}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列（下标范围之外的数值为0）
+			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
 			\Statex \textbf{输入:} $m$:需要选出的极值点个数
-			\Statex \textbf{输入:} $th$:极值点之间的距离的最小阈值
+			\Statex \textbf{输入:} $th$:可接受的极值点之间的最小距离
 			\Statex \textbf{输出:} $\mathcal M$:前$m$大极值的极值点的集合
 			\For {$i:=0\dots N_X-1$}
 			\State $p_i:=(\vert x_i\vert,i)$\Comment{生成数值、索引对}
@@ -1209,7 +1208,7 @@
 			\State $\mathrm{sort}(Pair)$\Comment{以数值索引对中的数值作为关键字，降序排序}
 			\State $\mathcal M:=\{\}$
 			\For{$i:=0,\dots,N_X$}
-			\State $p^\prime=p_i.second$\Comment{取第二个分量（索引）}
+			\State $p^\prime=Pair[i].second$\Comment{取第二个分量（索引）}
 			\If{$\forall pos\in \mathcal M,\vert pos-p^\prime\vert\ge th$}
 			\State $\mathcal M:=\mathcal M\cup\{p^\prime\}$
 			\If {$\left\vert\mathcal M\right\vert=m$}
@@ -1217,7 +1216,11 @@
 			\EndIf
 			\EndIf
 			\EndFor
+			\If {$\left\vert\mathcal M\right\vert=m$}
 			\State \Return $\mathcal M$
+			\Else
+			\State \Return $\phi$
+			\EndIf
 		\end{algorithmic}
 	\end{breakablealgorithm}
 }

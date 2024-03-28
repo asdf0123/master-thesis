@@ -38,14 +38,14 @@
 		\end{cases}\label{eq:leakagemodel}
 	\end{equation}
 	
-	\noindent 其中，$\Omega$表示样本空间\footnote{一个随机试验中所有可能结果的集合。}，$\mathcal L,\mathcal P,\mathcal K$分别表示信息泄漏$\Vector L$、算法数据$P$和算法密钥$K$的取值范围，$U$取决于采集信息泄漏的方式。\equationref{eq:leakagemodel}的含义是信息泄漏$\Vector L$是一个维度为$M$的随机变量，它的取值范围是$\mathcal L=U^M$，算法数据、算法密钥也是随机变量，它们的取值范围分别是$\mathcal P, \mathcal K$。
+	\noindent 其中，$\Omega$表示样本空间\footnote{一个随机试验中所有可能结果的集合。}，$\mathcal L,\mathcal P,\mathcal K$分别表示信息泄漏$\Vector L$、算法数据$P$和算法密钥$K$的取值范围，$U$取决于采集信息泄漏的方式。\equationref{eq:leakagemodel}的含义是信息泄漏$\Vector L$是一个维度为$M$的随机变量\footnote{需要注意的是，信息泄漏$\Vector L$和信息泄漏总体$L$不同。就符号表示而言，信息泄漏$\Vector L$使用粗体而信息泄漏总体$L$不使用粗体。就物理意义而言，信息泄漏$\Vector L$是随机变量而信息泄漏总体$L$是随机变量多个样本的有序集合。就表示形式而言，信息泄漏$\Vector L$是一个行向量而信息泄漏总体$L$是一个矩阵（其每个行向量表示一条迹）。}，它的取值范围是$\mathcal L=U^M$，算法数据、算法密钥也是随机变量，它们的取值范围分别是$\mathcal P, \mathcal K$。
 	
 	\begin{example}
 		如果一个密码硬件单元实现了AES-128加密算法，每次密码硬件单元加密16字节过程中使用示波器采集100个采样点的能量消耗，示波器使用8比特的位宽保存采样点，采样范围是-16V至16V，那么$U$=\{ -16, -15.875, -15.75, $\dots$, 15.75, 15.875\}是一个有256个元素的集合\footnote{集合中第$i$小的数$u_i$计算方式为$u_i=\frac{32}{2^8}(i-2^{8-1})$。}，$\mathcal L=U^{100}$。$\mathcal K=\left( {\mathbb F_2^8}\right) ^{16}$，这表示AES-128算法的密钥是16个$\mathbb F_2^8$上的元素\footnote{AES-128加密算法在设置密钥、设置明文以及输出密文时以字节形式传输数据，但是内部的运算过程却在模多项式$x^8+x^4+x^3+x+1$的$\mathbb F_2^8$有限域上。这是因为一个字节的值可以和$\mathbb F_2^8$上的元素一一对应，例如字节值b'$\backslash$xcc'对应于$x^7+x^6+x^3+x^2$。本文使用字节以便用文字表述密钥、明文、密文的某些部分，使用$\mathbb F_2^8$以便用公式表述密钥、明文、密文相关概念。}。$\mathcal P=\left( {\mathbb F_2^8}\right) ^{16}\times \left( {\mathbb F_2^8}\right) ^{16}$，这表示AES-128算法的算法输入、输出各是16个$\mathbb F_2^8$上的元素。
 	\end{example}
 	
 	\begin{example}
-		如果一个密码硬件单元实现了ECDSA签名算法（具体参数见\secref{sec:ecdsa}），Hash函数选为sha1\citep{FIPS180-4}，每次密码硬件单元执行过程中使用示波器采集10000个采样点的能量消耗，示波器有无穷大的位宽保存采样点，那么$U=\mathbb R$是实数集，$\mathcal L=U^{10000}$。$\mathcal K=Z_q$，这表示签名私钥一定是模$q$整数环上的元素。$\mathcal P=\{0,1,\dots,2^{160}-1\}\times Z_q\times Z_q$，这表示消息的sha1杂凑值长度为160比特、签名算法输出的签名对$(r,s)$中$r,s$都是模$q$整数环上的元素。
+		如果一个密码硬件单元实现了ECDSA签名算法（具体参数见\secref{sec:ecdsa}），Hash函数选为sha1\citep{FIPS180-4}，每次密码硬件单元执行过程中使用示波器采集10000个采样点的能量消耗，示波器有无穷大的位宽保存采样点，那么$U=\mathbb R$是实数集，$\mathcal L=U^{10000}$。$\mathcal K=Z_q$，这表示签名私钥一定是模$q$整数环上的元素。$\mathcal P=\{0,1\}^{160}\times Z_q\times Z_q$，这表示消息的sha1杂凑值长度为160比特、签名算法输出的签名对$(r,s)$中$r,s$都是模$q$整数环上的元素。
 	\end{example}
 	
 	
@@ -72,25 +72,25 @@
 	\end{example}
 
 	\begin{example}\label{ex:ecdsa}
-		在攻击本文研究的双界面商用智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{s^{-1}(hsh+r\sk)\bmod q}{2^{127-27}}\right\rfloor\bmod 2\right) $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$\sk$是算法密钥。$\mathcal Y=\{0,1,2,3\}$。
+		在攻击本文研究的双界面商用智能卡中ECDSA实现的数乘算法（见\algorithmref{alg:improvesignscalar}）的第27次迭代时，会选定$h(y)=\mathrm{MSB}(y), y=g(p,k)=2\left( \left\lfloor \frac{\nonce}{2^{256-27}}\right\rfloor \bmod 2\right)+\left( \left\lfloor \frac{\nonce}{2^{127-27}}\right\rfloor\bmod 2\right),\nonce=s^{-1}(hsh+r\sk)\bmod q $，其中$hsh$是算法输入，$r,s$是算法输出（他们都是算法数据），$q$是签名算法公开的固定参数，$\sk$是算法密钥。$\mathcal Y=\{0,1,2,3\}$。
 	\end{example}
 	\subsection{模板类侧信道分析}
 	
-	侧信道分析可以分为非模版类侧信道分析和模板类侧信道分析。在非模板类侧信道分析中，差分能量分析\citep{KocherJJ99, Messerges00, BevanK02}和相关能量分析\citep{Brier04}是最基本也是最常用的攻击方法。差分能量分析对密钥$k$的值进行猜测，使用敏感中间值$y$划分能量迹，计算能量迹之间的差异来确定密钥；相关能量分析对密钥$k$的值进行猜测，结合信息泄漏转换函数$h$和敏感中间值$y$估计理论上的能量消耗，计算能量迹与估计的能量消耗之间的相关系数来确定密钥。
+	侧信道分析可以分为非模板类侧信道分析和模板类侧信道分析。在非模板类侧信道分析中，差分能量分析\citep{KocherJJ99, Messerges00, BevanK02}和相关能量分析\citep{Brier04}是最基本也是最常用的攻击方法。差分能量分析对密钥$k$的值进行猜测，使用敏感中间值$y$划分能量迹，计算能量迹之间的差异来确定密钥；相关能量分析对密钥$k$的值进行猜测，结合信息泄漏转换函数$h$和敏感中间值$y$估计理论上的能量消耗，计算能量迹与估计的能量消耗之间的相关系数来确定密钥。
 	
-	模板类侧信道分析会使用模版对常数$\omega$、信息泄漏转换函数$h$以及噪声$e$进行描述，使得对信息泄漏的刻画比非模板类侧信道分析更精确。模板类侧信道分析的优势在于，它有可能仅使用信息泄漏的一个样本并结合算法输入的值恢复算法密钥的值。模板类侧信道分析分为建模和攻击两个阶段，建模阶段对迹的特征进行刻画，第二个阶段利用该特征进行攻击\citep{Mangard07}。
+	模板类侧信道分析会使用模板对常数$\omega$、信息泄漏转换函数$h$以及噪声$e$进行描述，使得对信息泄漏的刻画比非模板类侧信道分析更精确。模板类侧信道分析的优势在于，它有可能仅使用信息泄漏的一个样本并结合算法输入的值恢复算法密钥的值。模板类侧信道分析分为建模和攻击两个阶段，建模阶段对迹的特征进行刻画，第二个阶段利用该特征进行攻击\citep{Mangard07}。
 	
 	模板类侧信道分析分为两个阶段，为了区分两个阶段使用的数据，我们使用下标$t,a$进行区分。在建模阶段，攻击者可以根据$T_t$条迹以及对应的算法密钥、算法数据进行建模；在攻击阶段，攻击者采集$T_a$条迹和对应的算法数据，使用全部或者其中的一部分恢复算法密钥。
 	
-	在建模阶段，攻击者可以对迹的特征进行刻画，这意味着攻击者可以确定出某个或某些操作的模版。例如，攻击者可以拥有一台与被攻击设备类型相同的设备，并且该设备完全由攻击者控制。攻击者可以让设备多次运行，每次运行前设定不同的算法输入、算法密钥，记录对应的迹（如能量迹、电磁迹）和算法输出。对特定敏感中间值构建模版是常见的构建策略，攻击者可以在不对敏感中间值的信息泄漏转换函数$h$做任何假设的情况下，根据算法数据的值$p$和算法密钥的值$k$计算敏感中间值$y$，把对应相同中间值的迹分为一组，并对每一组构造模版。
+	在建模阶段，攻击者可以对迹的特征进行刻画，这意味着攻击者可以确定出某个或某些操作的模板。例如，攻击者可以拥有一台与被攻击设备类型相同的设备，并且该设备完全由攻击者控制。攻击者可以让设备多次运行，每次运行前设定不同的算法输入、算法密钥，记录对应的迹（如能量迹、电磁迹）和算法输出。对特定敏感中间值构建模板是常见的构建策略，攻击者可以在不对敏感中间值的信息泄漏转换函数$h$做任何假设的情况下，根据算法数据的值$p$和算法密钥的值$k$计算敏感中间值$y$，把对应相同中间值的迹分为一组，并对每一组构造模板。
 	
-	在攻击阶段，攻击者可以利用特征从被攻击设备获得的迹来确定密钥。对于一条迹$\Vector l\in \Vector L_{T_a\times M}$，攻击者可以检查迹和每一个中间值$y\in\mathcal Y$所对应模版的匹配程度$d_1(y)$（下标1表示仅使用一条迹计算匹配程度），这种匹配程度可以量化，其具体计算方法取决于构造模板的工具。依据极大似然原理，正确模版理论上应该与最高的匹配程度相对应\citep{Kay1998}。攻击者选取最高匹配程度所对应的敏感中间值作为实际敏感中间值的估计$\hat y$，如\equationref{eq:1tracey}所示。
+	在攻击阶段，攻击者可以利用特征从被攻击设备获得的迹来确定密钥。对于一条迹$\Vector l\in L_{T_a\times M}$，攻击者可以检查迹和每一个中间值$y\in\mathcal Y$所对应模板的匹配程度$d_1(y)$（下标1表示仅使用一条迹计算匹配程度），这种匹配程度可以量化，其具体计算方法取决于构造模板的工具。依据极大似然原理，正确模板理论上应该与最高的匹配程度相对应\citep{Kay1998}。攻击者选取最高匹配程度所对应的敏感中间值作为实际敏感中间值的估计$\hat y$，如\equationref{eq:1tracey}所示。
 	
 	\begin{equation}\label{eq:1tracey}
 		\hat y=\mathop{\mathrm{argmax}}\limits_{y\in\mathcal Y}\left\lbrace d_1(y)\right\rbrace
 	\end{equation}
 	
-	在算法数据给定的情况下，算法密钥和敏感中间值有对应关系。如果在算法输入不变的情况下，对于不同的算法(子)密钥的值，函数$g$计算出的敏感中间值一定不同\footnote{单射。}，那么迹和中间值$y$所对应的模版的匹配程度$d_1$和（子）密钥的值关联起来，如\equationref{eq:gsup-1}所示，本文将$\tilde d_1(k)$称为密钥值$k$的得分。在此基础上，攻击者得到算法（子）密钥的值的估计，如\equationref{eq:1tracek}所示。
+	在算法数据给定的情况下，算法密钥和敏感中间值有对应关系。如果在算法输入不变的情况下，对于不同的算法(子)密钥的值，函数$g$计算出的敏感中间值一定不同\footnote{单射。}，那么迹和中间值$y$所对应的模板的匹配程度$d_1$可以与迹和（子）密钥值所对应的模板的匹配程度关联起来，如\equationref{eq:gsup-1}所示，本文将$\tilde d_1(k)$称为密钥值$k$的得分。在此基础上，攻击者得到算法（子）密钥值的估计，如\equationref{eq:1tracek}所示。
 	
 	\begin{equation}\label{eq:gsup-1}
 		\tilde d_1(k)=d_1\left(g(p,k) \right)=d_1(y)
@@ -110,7 +110,7 @@
 		在\exampleref{ex:ecdsa}中，找不到合理的子密钥划分使得函数$g$有单射性质，尽管知道了关于算法密钥$d$的信息但是还是不能恢复它任何一个比特的数值。结合数学方法，我们可以利用多处关于算法密钥的敏感信息泄漏来恢复完整的算法密钥，见\subsref{subs:infoforlattice}。
 	\end{example}
 	
-	如果被攻击设备的算法密钥没有使用次数限制或次数限制足够大，那么攻击者可以从令被攻击设备运行$T_a$次\footnote{具体次数受算法密钥次数、攻击者所能接受的攻击时间共同决定。例如，对于AES-128加密算法无防护软件实现，有可能仅使用一条能量迹就恢复算法密钥，那么此时令$T_a=1$已经足够完成攻击。对于本文研究的双界面商用智能卡ECDSA实现，理想情况下采集十万条能量迹有助于减少利用信息泄漏恢复实际私钥的时间，但是受采集时间限制只能令$T_a=5000$。}并获取多条迹和对应的算法数据的值，在这之后选取一些能量迹进行攻击并综合估计（子）密钥的值$\hat k$，如\equationref{eq:ttracek}所示。
+	如果被攻击设备的算法密钥没有使用次数限制或次数限制足够大，那么攻击者可以从令被攻击设备运行$T_a$次\footnote{具体次数受算法密钥使用次数、算法实现执行速度、攻击者所能接受的攻击时间共同决定。例如，对于AES-128加密算法无防护软件实现，有可能仅使用一条能量迹就恢复算法密钥，那么此时令$T_a=1$已经足够完成攻击。对于本文研究的双界面商用智能卡ECDSA实现，理想情况下采集十万条能量迹有助于减少利用信息泄漏恢复实际私钥的时间，但是受采集时间限制只能令$T_a=5000$。}并获取多条迹和对应的算法数据的值，在这之后选取一些能量迹进行攻击并综合估计（子）密钥的值$\hat k$，如\equationref{eq:ttracek}所示。
 	
 	\begin{equation}\label{eq:ttracek}
 		\begin{cases}
@@ -124,46 +124,48 @@
 	\noindent 其中,元素个数为$t$的集合$\mathcal I$描述了攻击者从采集到的$T_a$条迹中选取哪些迹用于实际攻击。
 	
 	\begin{example}
-		在\exampleref{ex:aessw}中，假设攻击者采集了100条能量迹，那么他可以组合不超过100条能量迹所提供的信息。进一步假设攻击者组合后50条能量迹的信息。对于第$i$条($50\le i<100$)能量迹能量迹$\Vector {l^{(i)}}$，攻击者可以计算迹和特定中间值所对应模版的匹配程度，并据此算出匹配程度和主密钥第0字节的值的对应关系。接着他组合这些信息推断子密钥$\hat k_0=\mathop{\mathrm{argmax}}\limits_{k_0\in\mathbb F_2^8}\left\lbrace \sum\limits_{i=50}^{99}d_1^{(i)}\left( Sbox[p^{(i)}_0\oplus k_0]\right)\right\rbrace $。
+		在\exampleref{ex:aessw}中，假设攻击者采集了100条能量迹，那么他可以组合不超过100条能量迹所提供的信息。进一步假设攻击者组合后50条能量迹的信息。对于第$i$条($50\le i<100$)能量迹能量迹$\Vector {l^{(i)}}$，攻击者可以计算迹和特定中间值所对应模板的匹配程度，并据此算出匹配程度和主密钥第0字节的值的对应关系。接着他组合这些信息推断子密钥$\hat k_0=\mathop{\mathrm{argmax}}\limits_{k_0\in\mathbb F_2^8}\left\lbrace \sum\limits_{i=50}^{99}d_1^{(i)}\left( Sbox[p^{(i)}_0\oplus k_0]\right)\right\rbrace $。
 	\end{example}
 	%假如攻击者希望综合前$t$（$t\le T_a$）条迹的信息，他能每一条迹$\Vector{l_i},0\le i<t$和对每种中间值猜测都能计算其得分$d_1^{(i)}(y)$。假如$g_p^{-1}$存在，攻击者可以这么估计密钥$\hat k$
 	
 	按照构造模板的工具对模板类侧信道分析进行划分，可以大致分为传统模板攻击和DL-SCA。
 	\subsubsection{传统模板攻击}
 	
-	在传统模板攻击中，使用多元正态分布构造模版、刻画迹的特征。模板类侧信道分析中量化迹和每一个模版的匹配程度的方法是计算条件概率的对数值。
+	在传统模板攻击中，使用多元正态分布构造模板、刻画迹的特征。模板类侧信道分析中量化迹和每一个模板的匹配程度的方法是计算条件概率的对数值。
 	
-	构建一个中间值$y$所对应的模版，就是使用所有中间值都是$y$的迹对均值向量和协方差矩阵$\Vector {\mu_y},\Sigma_y$进行估计。这两个参数的含义是，在中间值为$y$的条件下，信息泄漏$\Vector L$应当服从均值为$\Vector {\mu_y}$协方差为$\Sigma_y$的多元正态分布，其条件概率密度函数如\equationref{eq:f(b|a)}所示。
+	构建一个中间值$y$所对应的模板，就是使用所有中间值都是$y$的迹对均值向量和协方差矩阵$\Vector {\mu_y},\Sigma_y$进行估计。这两个参数的含义是，在中间值为$y$的条件下，信息泄漏$\Vector L$应当服从均值为$\Vector {\mu_y}$协方差为$\Sigma_y$的多元正态分布，其条件概率密度函数如\equationref{eq:f(b|a)}所示。
 	
 	\begin{equation}\label{eq:f(b|a)}
 		f\left(\Vector L=\Vector l|Y=y \right)=\frac{e^{\frac{-1}2(\Vector l-\Vector {\mu_y})\Sigma_y^{-1}(\Vector l-\Vector {\mu_y})}}{\sqrt{(2\pi)^M\det (\Sigma_y)}}
 	\end{equation}
 	
-	%构建一个中间值$y$所对应的模版，就是根据所有中间值都是$y$的迹，计算出此时信息泄漏应当服从的多元正态分布的条件概率分布$f\left(\Vector L|Y=y \right) $。多元正态分布的概率密度函数由均值向量和协方差矩阵完全确定，因此只用使用所有中间值都是$y$的迹对均值向量和协方差矩阵$\vector {\mu_h},\Sigma_h$进行估计即可。
+	%构建一个中间值$y$所对应的模板，就是根据所有中间值都是$y$的迹，计算出此时信息泄漏应当服从的多元正态分布的条件概率分布$f\left(\Vector L|Y=y \right) $。多元正态分布的概率密度函数由均值向量和协方差矩阵完全确定，因此只用使用所有中间值都是$y$的迹对均值向量和协方差矩阵$\vector {\mu_h},\Sigma_h$进行估计即可。
 	
-	量化迹和每一个模版的匹配程度的方法是根据贝叶斯公式计算条件概率，如\equationref{eq:pr(a|b)}所示，其中$\mathrm{Pr}\left[Y=y \right]$的数值容易用理论推算，$f\left(\Vector L=\Vector l\right)$的数值容易从建模的迹中推算。
+	量化迹和每一个模板的匹配程度的方法是根据贝叶斯公式计算条件概率，如\equationref{eq:pr(a|b)}所示，其中$\mathrm{Pr}\left[Y=y \right]$的数值容易用理论推算，$f\left(\Vector L=\Vector l\right)$的数值容易从建模的迹中推算。
 	
 	\begin{equation}\label{eq:pr(a|b)}
 		\mathrm{Pr}\left[Y=y|\Vector L=\Vector l \right]=\frac{f\left(\Vector L=\Vector l|Y=y \right)\mathrm{Pr}\left[Y=y \right]}{f\left(\Vector L=\Vector l\right)}
 	\end{equation}
 	
-	量化迹和每一个模版的匹配程度使用公式$d_1(y)=\log \mathrm{Pr}\left[Y=y|\Vector L=\Vector l \right]$。
+	量化迹和每一个模板的匹配程度使用公式$d_1(y)=\log \mathrm{Pr}\left[Y=y|\Vector L=\Vector l \right]$。
 	\subsubsection{深度学习侧信道分析}
-	在DL-SCA中，使用深度神经网络构造模版、刻画迹的特征。模板类侧信道分析中量化迹和每一个模版的匹配程度的方法是使用模型的预测结果。
+	在DL-SCA中，使用深度神经网络构造模板、刻画迹的特征。模板类侧信道分析中量化迹和每一个模板的匹配程度的方法是使用模型的预测结果。
 	
-	使用深度神经网络构造模版，首先要构造训练集。训练集由两部分构成，训练数据是信息泄漏样本总体$L_{T_t\times M}$，训练标签是敏感中间值总体$y^{(0)},y^{(1)},\dots,y^{(T_t-1)}$。将训练集输入深度神经网络后就得到了训练好的模型。
+	使用深度神经网络构造模板，首先要构造训练集。训练集由两部分构成，训练数据是信息泄漏样本总体$L_{T_t\times M}$，训练标签是敏感中间值总体$y^{(0)},y^{(1)},\dots,y^{(T_t-1)}$。将训练集输入深度神经网络后就得到了训练好的模型。
 	
-	模型可以对输入的迹$\Vector l$进行预测，输出一个概率向量$\Vector \pi$。向量的分量$\pi_y$表示模型预测迹$\Vector l$对应于中间值$y$的概率。量化迹和每一个模版的匹配程度使用公式$d_1(y)=\log \pi_y$。
+	模型可以对输入的迹$\Vector l$进行预测，输出一个概率向量$\Vector \pi$。向量的分量$\pi_y$表示模型预测迹$\Vector l$对应于中间值$y$的概率。量化迹和每一个模板的匹配程度使用公式$d_1(y)=\log \pi_y$。
 	\subsection{侧信道评估指标}
 	为了度量侧信道分析在不同应用场景的技术效果，需要使用某种指标进行量化评估。分析人员可以在完成侧信道分析之后，依据评估指标的计算结果量化密码设备的物理安全性，甚至比较不同密码设备物理安全性的差异。
 	\subsubsection{测试向量泄漏评估}
-	比攻击算法实现略微简单一点的需求是检测算法实现是否存在信息泄漏。在侧信道分析中，测试向量泄漏评估\citep{Goodwill2011,Becker2013,ISO/IEC17825}（Test Vector Leakage Assessment，TVLA）是对采集到的电磁迹中每一个采样点进行单变量检测以判断该组电磁迹是否存在信息泄漏的检测框架。对于第$j$个采样点，泄漏检测的零假设为“$\mathrm H_0:$第$j$个采样点不存在信息泄漏”，备择假设为“$\mathrm H_1:$第$j$个采样点存在信息泄漏”。如果原假设$\mathrm H_0$成立，那么第$j$个采样点的电磁场幅度应该是某种随机噪声的样本值，因此可以这么表述原假设和备择假设:
+	比攻击算法实现略微简单一点的需求是检测算法实现是否存在信息泄漏。在侧信道分析中，测试向量泄漏评估\citep{Goodwill2011,Becker2013,ISO/IEC17825}（Test Vector Leakage Assessment，TVLA）是对采集到的电磁迹中每一个采样点进行单变量检测以判断该组电磁迹是否存在信息泄漏的检测框架。对于第$j$个采样点，泄漏检测的零假设为“$\mathrm H_0:$第$j$个采样点不存在信息泄漏”，备择假设为“$\mathrm H_1:$第$j$个采样点存在信息泄漏”，其公式化表述如\equationref{eq:leakagehypothesis}所示。如果原假设$\mathrm H_0$成立，那么第$j$个采样点的电磁场幅度应该是某种随机噪声的样本值，可以利用某种方法，计算总体的统计量。%，因此可以这么表述原假设和备择假设:
 	
-	$$\begin{cases}\mathrm H_0:\exists \mu_j,\exists\sigma_j,\exists  {L_j}\sim N(\mu_j,\sigma_j^2),\forall 0\le i<T,l_{i,j}\mbox{是} {L_j}\mbox{样本值}\\\mathrm H_1:\forall \mu_j,\forall\sigma_j,\not\exists  {L_j}\sim N(\mu_j,\sigma_j^2),\forall 0\le i<T,l_{i,j}\mbox{是} {L_j}\mbox{样本值}\end{cases}$$
+	\begin{equation}\label{eq:leakagehypothesis}
+	\begin{cases}\mathrm H_0:\exists \mu_j,\exists\sigma_j,\exists  {L_j}\sim N(\mu_j,\sigma_j^2),\forall 0\le i<T,l_{i,j}\mbox{是} {L_j}\mbox{样本值}\\\mathrm H_1:\forall \mu_j,\forall\sigma_j,\not\exists  {L_j}\sim N(\mu_j,\sigma_j^2),\forall 0\le i<T,l_{i,j}\mbox{是} {L_j}\mbox{样本值}\end{cases}
+	\end{equation}
 	
-	当单变量检测的统计量被观测到的概率低于显著性水平$\alpha$时\footnote{显著性水平$\alpha$可以任意选择。在侧信道分析中，显著性水平通常设置为$10^{-5}$。}，我们拒绝原假设$\mathrm H_0$，接受备择假设$\mathrm H_1$，即有超过$(1-\alpha)$的把握认为第$j$个采样点存在信息泄漏。
+	当原假设成立的前提下统计量被观测到的概率低于显著性水平$\alpha$时\footnote{显著性水平$\alpha$可以任意选择。在侧信道分析中，显著性水平通常设置为$10^{-5}$。}，我们拒绝原假设$\mathrm H_0$，接受备择假设$\mathrm H_1$，即有超过$(1-\alpha)$的把握认为第$j$个采样点存在信息泄漏。
 	
-	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的敏感信息泄漏$\nonce^{(i)}_j,i=0,1,\dots T,j=0,1,\dots,127$的值进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l_{0,j},l_{1,j},\dots l_{T-1,j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
+	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的敏感信息泄漏$\nonce^{(i)}_j\in\{0,1\},i=0,1,\dots T-1,j=0,1,\dots,127$的值进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l^{(0)}_{j},l^{(1)}_{j},\dots l^{(T-1)}_{j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
 	
 	\begin{equation}\label{eq:calct}
 		v_j=\frac{\overline {x_{A,j}}-\overline{x_{B,j}}}{\sqrt{\frac{s_{A,j}^2}{n_A}+\frac{s_{B,j}^2}{n_B}}}
@@ -191,10 +193,11 @@
 	猜测熵是一种依赖于攻击方法的评估指标。攻击者需要使用某种方法，选定攻击所使用的能量迹条数$t$，对分组密码算法的一个（子）密钥进行多次互相独立的攻击，记录每次攻击中某个（子）密钥值$k$得分$d_t(k)$在所有密钥得分中的排名$r_t(k)$，最后取排名的均值$\mathbb E\left(r_t(k) \right) $作为该密钥值$k$的猜测熵$GE_{t}(k)$。排名的计算方式是$r_t(k)=\left\vert\left\lbrace j\in\mathcal K|d_t(j)>d_t(k)\right\rbrace  \right\vert $，其中$\vert\cdot\vert$表示集合中元素的个数。
 	
 	\begin{example}\label{ex:badge}
-		假设在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。进一步假设5次攻击所计算出的密钥得分如下表所示。
+		假设在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。进一步假设5次攻击所计算出的密钥得分如\tableref{tab:scoredemo}所示。
 		
-		\begin{table*}[!h]
-			\caption{密钥得分示例}
+		\begin{table}[!h]
+			\bicaption{\enspace 密钥得分示例}{\enspace Example of scores of key values}
+			\label{tab:scoredemo}
 			\scriptsize{
 				\begin{tabular}{cc|cccccccccccccc}
 					\hline
@@ -218,19 +221,38 @@
 				\end{tabular}
 			}
 			\tabnote{在某一次攻击中，如果错误密钥的得分超过正确密钥的得分，那么错误密钥的得分右上角使用星号*标记。}
-		\end{table*}
+		\end{table}
 	
 		为了方便解读，不妨假设未列举出来的其他密钥值的得分都小于0.5。观察表格容易知道，在5次攻击中，密钥值204的得分在所有得分的排名中分别位于第三位\footnote{本文使用汉字表述的次序从第一开始计数，有额外说明的情况除外。}、第一位、第四位、第二位、第四位。因此在每次使用100条能量迹进行传统模板攻击时，密钥值204的猜测熵为$GE_{100}(204)=\frac15$(2+ 0+ 3+ 1+ 3)= 1.8。同理可以算出其他每种密钥值的猜测熵，如密钥值140的猜测熵为$GE_{100}(140)=\frac15$(0+ 4+ 1+ 3+ 0)= 1.6，密钥值205的猜测熵为$GE_{100}(205)=\frac15$(4+ 1+ 4+ 4+ 1)= 2.8。因为正确密钥是204，所以正确密钥猜测熵是1.8。
 	\end{example}
-	\subsubsection{成功条数}
-	成功条数\citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道分析在
-	攻击阶段的时间消耗\footnote{采集迹、使用迹进行攻击的时间都和迹的条数成正比。}。成功条数计算方式为$T^*=\min\limits_{0<t\le T_a}\left\lbrace t:GE_t(k^*)=0 \right\rbrace $，其中$k^*$表示正确的（子）密钥。如果攻击不成功，那么成功条数无意义。在\exampleref{ex:badge}中，根据已有数据只能推算出$T^*\le100$。
+	\subsubsection{\chenggongtiaoshu }
+	\chenggongtiaoshu \citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道分析在
+	攻击阶段的时间消耗\footnote{采集迹、使用迹进行攻击的时间都和迹的条数成正比。}。\chenggongtiaoshu 计算方式为$T^*=\min\limits_{0<t\le T_a}\left\lbrace t:GE_t(k^*)=0 \right\rbrace $，其中$k^*$表示正确的（子）密钥。如果攻击不成功，那么\chenggongtiaoshu 无意义。在\exampleref{ex:badge}中，根据已有数据只能推算出$T^*\le100$。
 	\subsubsection{成功率}
 	恢复（子）密钥的成功率定义为多次攻击互相独立的情况下，成功恢复（子）密钥的次数与攻击次数的比值。在\exampleref{ex:badge}中，成功率为0.2。它直观地反映侧信道分析在多大程度上能恢复密钥。成功率和攻击时间通常是负相关的，但它不能直接反映攻击时间。
 	
 	成功率适用范围比准确率更大。准确率是机器学习方面的指标，它定义为所有样本中预测正确的概率。如果不同迹对应的中间值互相独立，攻击者只能使用一条迹恢复（子）密钥，准确率等价于成功率。如果不同迹对应的中间值不是互相独立的\footnote{对于AES-128算法，如果两次算法密钥不是互相独立的（如设置为相同的密钥值）且明文已知，那么以第1轮第0字节的Sbox输出$\mathrm{Sbox}[p_0\oplus k_0]$作为中间值$y$时，中间值不是互相独立的。}，准确率会因为忽略迹之间的关联性而不能准确评估模型性能。Picek等\citep{Picek19}指出准确率等标准的机器学习度量指标在侧信道分析中效果不佳。这是因为它只能为测试数据集中的每个样本提供独立的标签预测信息。
+	{\color{\xchange}
+		
+	\subsubsection{真阳性率}
+	真阳性率是指在所有真实为阳性的样本中，被正确地识别为阳性的比例，其计算方式如\equationref{eq:tpr}所示。其中TP表示实际为阳性且被估计为阳性的样本量，FP表示实际为阴性且被估计为阳性的样本量。真阳性率适用于不能容忍将阴性样本错误估计为阳性的情况。
 	
+	\begin{equation}\label{eq:tpr}
+		TPR=\frac{TP}{TP+FP}
+	\end{equation}
 	
+	就本研究（见\chapref{chap:search2}）而言，因为ECDSA本身的特性以及后续格方法的特殊要求，假阴性的数量或比例在不超过阈值的情况下不会对求解私钥的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。因此，虽然真阳性率作为评价指标的场景少见，但它适合作为本研究评价指标。
+	
+	具体来说，本研究将敏感信息泄漏值（见\subsref{subs:ecdsasymbol}）$\nonce^{(i)}_j=0,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$的样本称为阳性样本，$\nonce^{(i)}_j=1,i=0,1,\dots,T_a,j=0,1,\dots,n_s-1$的样本称为阴性样本。据此可以定义真阳性、真阴性、假阳性、假阴性的样本，从而计算真阳性率。
+		
+	\begin{itemize}
+		\item [真阳性] 如果样本符合$\nonce^{(i)}_j=0,\hat \nonce^{(i)}_j=0$的条件，那么它是真阳性；
+		\item [真阴性] 如果样本符合$\nonce^{(i)}_j=1,\hat \nonce^{(i)}_j=1$的条件，那么它是真阴性；
+		\item [假阳性] 如果样本符合$\nonce^{(i)}_j=1,\hat \nonce^{(i)}_j=0$的条件，那么它是假阳性；
+		\item [假阴性] 如果样本符合$\nonce^{(i)}_j=0,\hat \nonce^{(i)}_j=1$的条件，那么它是假阴性。
+	\end{itemize}
+
+	}
 	%猜测熵、成功率、猜测熵收敛速度(研究内容1)、真阳性率(研究内容2)
 	\section{数据增强}\label{sec:da}
 	
@@ -328,14 +350,14 @@
 	\end{breakablealgorithm}
 
 	\section{椭圆曲线数字签名算法}\label{sec:ecdsa}
-	椭圆曲线数字签名算法（Elliptic Curve Digital Signature Algorithm，ECDSA）是一种基于椭圆曲线密码学的数字签名算法。它被广泛应用于信息安全领域，用于验证数据的完整性和身份认证。
+	椭圆曲线数字签名算法（ECDSA）是一种基于椭圆曲线密码学的数字签名算法。它被广泛应用于信息安全领域，用于验证数据的完整性和身份认证。
 	
-	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘(Scalar Multiplication)实现方式是基于椭圆曲线上的群运算特性，通过重复应用点加法(Add)和倍点(Double)操作，实现椭圆曲线上的点的数乘。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall i\in\mathbb Z,\forall P\in E, i\cdot P\in E$。
+	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘(Scalar Multiplication)是基于椭圆曲线上的群运算特性，通过重复应用点加法(Add)和倍点(Double)操作实现的。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall i\in\mathbb Z,\forall P\in E, i\cdot P\in E$。
 	
 	%\subsection{一种ECDSA实际方案}\label{subs:ECDSAscheme}
 	接下来以SP 800-186\citep{SP800-186}指定的Weierstrass曲线NIST P-256为例，介绍ECDSA的基础原理的相关知识。
 	
-	\textbf{密钥生成}：NIST P-256规定了椭圆曲线$E$和生成元$G\in E$。$q$为曲线$E$的加法阶。
+	\textbf{密钥生成}：NIST P-256规定了椭圆曲线$E$和生成元$G\in E$，如\equationref{eq:P256}所示。$q$为曲线$E$的加法阶。
 	
 	
 	\begin{equation}\label{eq:P256}
@@ -353,7 +375,7 @@
 	
 	签名者选取一个256bit随机数$\sk$作为私钥并计算$\pk=\sk\cdot G$。$\sk$和$\pk$分别是签名者的私钥和公钥，$\sk$保密，$\pk$公开。
 	
-	\textbf{签名过程}：对于消息$m_0$，签名者每次秘密选取256bit整数$1<\nonce<q$\footnote{一次性随机数（Number once，Nonce），它是一个只被使用一次的随机数值。}，计算这些值：
+	\textbf{签名过程}：对于消息$m_0$，签名者每次秘密选取256bit整数$1<\nonce<q$\footnote{一次性随机数（Number once，Nonce），它是一个只被使用一次的随机数值。}，然后计算数字签名（简称签名），如\equationref{eq:sign}所示。
 	
 	\begin{equation}\label{eq:sign}
 		\begin{cases}
@@ -368,7 +390,7 @@
 	
 	如果随机数$\nonce$存在泄漏，那么攻击者有可能依据公开的参数$E,G$、公钥$P$、哈希函数$H$、签名消息$m_0$、签名$(r,s)$和随机数$\nonce$的信息泄漏,构造与私钥$\sk$和有关的方程并使用数学方法恢复私钥$\sk$，实现伪造签名、篡改数据和身份欺骗。
 	
-	\textbf{验签过程}：对于消息$m_0$，验证者可以计算
+	\textbf{验签过程}：对于消息$m_0$，验证者可以计算使用\equationref{eq:prepare-verify}计算相关参数并进行简单的数值比较。如果$R.x=r$，那么验证者可以确认$(r,s)$是签名者对消息$m_0$的有效签名；否则签名无效。
 	\begin{equation}\label{eq:prepare-verify}
 	\begin{cases}
 		u_1=s^{-1}r\bmod q\\
@@ -377,7 +399,7 @@
 	\end{cases}
 	\end{equation}
 	
-	如果$R.x=r$，那么验证者可以确认$(r,s)$是签名者对消息$m_0$的有效签名；否则签名无效。数字签名可以实现对消息的认证，推导过程如\propositionref{prop:ECDSA-authentication}所示。
+	数字签名可以实现对消息的认证，推导过程如\propositionref{prop:ECDSA-authentication}所示。
 	
 %	\subsection{一种ECDSA中的数乘实现}
 %	Roche等\citep{Roche21}对使用了SmartMX\citep{p5x}安全微控制器芯片中ECDSA中的数乘实现进行了研究并进行合理的猜想，最终通过数乘实现中敏感随机数的泄漏恢复了使用SmartMX\citep{p5x}的\textit{Google Titan Security Key}\citep{Titan}的私钥。

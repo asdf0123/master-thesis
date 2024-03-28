@@ -1,11 +1,16 @@
-\chapter{面向侧信道分析的通用数据增强方法}\label{chap:search1}{
+\chapter{面向基于深度学习侧信道分析的通用数据增强方法}\label{chap:search1}{
 	
 	%深度学习技术在侧信道攻击领域中得到了诸多应用，但样本数量不足的情况在实际中经常出现，这严重制约深度神经网络训练效果，甚至会直接影响攻击性能。因此，探讨样本数量有限情况下的数据增强方法，并讨论其对提升基于深度学习的侧信道攻击效果的实际影响，具有重要的现实意义。
-	在深度学习的训练阶段对训练数据集进行数据增强可以使训练出的模型更准确，进而降低DL-SCA成功条数。然而，当前已有数据增强方法的参数选取通常高度依赖专家知识，且只适合对特定算法实现数据集进行数据增强。因此，构造一个适用于多种算法实现数据集的通用数据增强方法、自适应地选取数据增强参数，具有重要现实意义。
+	在深度学习的训练阶段对训练数据集进行数据增强可以使训练出的模型更准确，进而降低DL-SCA\chenggongtiaoshu 。然而，当前已有数据增强方法的参数选取通常高度依赖专家知识，且只适合对特定算法实现数据集进行数据增强。因此，构造一个适用于多种算法实现数据集的通用数据增强方法、自适应地选取数据增强参数，具有重要现实意义。
 	
-	本文选取了不同的AES实现作为分析目标，从数据增强的角度出发，研究提升DL-SCA技术效果的具有通用性的方法。分析目标包括无防护AES硬件实现、无防护AES软件实现、掩码（和随机延迟）防护AES软件实现以及随机延迟防护AES软件实现，这些实现对应的数据集分别为AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）、AES\_RD。本文提出了一种通用数据增强方法，其核心思想是采用模拟退火机制依据反馈信号自适应地选择数据增强策略参数。该方法主要由三个核心组件构成：采用模拟退火机制的主控制器、采用组合式数据增强机制的数据增强单元以及提供侧信道攻击代价反馈信号的攻击评估单元。以无防护软件和硬件AES实现、随机延迟和掩码防护AES软件实现为分析目标，在相应的本领域公开数据集上，开展了深度学习侧信道攻击实验对比研究，验证了本文所提出通用数据增强方法的有效性。具体地，在AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）三种数据集五个场景下，与未采用数据增强方法的DL-SCA效果相比，攻击成功条数分别降低21\%、25\%、24\%、48\%以及5\%。在AES\_HD、DPA v4、ASCADf（N=0/N=50）三种数据集四个场景中，与采用其他数据增强方法的DL-SCA效果相比，攻击成功条数分别降低22\%、40\%、10\%以及30\%。
+	本文选取了不同的AES实现作为分析目标，从数据增强的角度出发，研究减小成功实施DL-SCA所使用的能量迹条数的具有通用性的方法。分析目标包括无防护AES硬件实现、无防护AES软件实现、掩码（和随机延迟）防护AES软件实现以及随机延迟防护AES软件实现，这些实现对应的数据集分别为AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）、AES\_RD，他们都是侧信道领域权威公开数据集。本文提出了一种通用数据增强方法，其核心思想是采用模拟退火机制依据反馈信号自适应地选择数据增强策略参数。该方法主要由三个核心组件构成：采用模拟退火机制的主控制器、采用组合式数据增强机制的数据增强单元以及提供侧信道攻击代价反馈信号的攻击评估单元。以无防护软件和硬件AES实现、随机延迟和掩码防护AES软件实现为分析目标，在相应的本领域公开数据集上，开展了深度学习侧信道攻击实验对比研究，验证了本文所提出通用数据增强方法的有效性。具体地，在AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）三种数据集五个场景下，与未采用数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低21\%、25\%、24\%、48\%以及5\%。在AES\_HD、DPA v4、ASCADf（N=0/N=50）三种数据集四个场景中，与采用其他数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低22\%、40\%、10\%以及30\%。
 	
-	\section{通用数据增强方法框架}
+	{\color{\xchange}
+	
+	\secref{sec:framework}对通用数据增强方法进行概念上的介绍，\secref{sec:intoreal}详细说明在AES实现上进行实验时通用数据增强方法这一概念的实例化结果，\secref{sec:realexp}汇报了采用通用数据增强方法DL-SCA技术效果。
+	}
+	
+	\section{通用数据增强方法框架}\label{sec:framework}
 	应用通用数据增强方法的侧信道分析框架如\figureref{fig:myframe}所示。该框架用于搜索最佳数据增强策略参数，其设计受到AutoAugment\citep{Cubuk19}的启发，它包含自适应数据增强方法、深度学习模型（见\subsref{subs:conceptdlsca}）以及对应数据集三部分。其中，本研究提出的通用数据增强方法包含三个核心组件：主控制器（见\subsref{subs:conceptcontroller}）、数据增强单元（见\subsref{subs:conceptcda}）以及攻击评估单元（见\subsref{subs:concepteva}），其核心思想是采用模拟退火机制依据反馈信号自适应地调整数据增强策略参数。
 	
 	\begin{figure}[!h]
@@ -128,7 +133,7 @@
 			\draw [arrow] (hyperparareg)|- node[pos=0.75, above] {数据增强策略参数}(cda);
 			%\draw [rarrow] (cda) --node[midway, below] {数据增强策略参数} ++(180:120pt);
 		\end{tikzpicture}
-		\bicaption{\enspace 攻击AES的引入数据增强单元的深度学习训练阶段}{\enspace Deep learning training process with data augmentation unit for SCA on AES}
+		\bicaption{\enspace 攻击AES的引入数据增强单元的深度学习训练阶段}{\enspace DL training process with data augmentation unit for SCA on AES}
 		\label{fig:mycdaanddlsca}
 	\end{figure}
 %	\begin{algorithm}
@@ -301,7 +306,7 @@
 			\caption{测试阶段}
 			\label{fig:dltestphase}
 		\end{subfigure}%
-		\bicaption{\enspace 深度学习训练过程}{\enspace Deep learning training process}
+		\bicaption{\enspace 深度学习训练过程}{\enspace DL training process}
 		\label{fig:dlallphase}
 	\end{figure}
 	
@@ -349,7 +354,7 @@
 			\draw [arrow] (cmp) -|node[pos=0.3, below] {攻击代价} (hyperparacalc);
 			\draw [arrow] (hyperparacalc)|-node[pos=0.7,above]{新的数据增强策略参数}(hyperparareg);
 		\end{tikzpicture}
-		\bicaption{\enspace 攻击AES的用于调整数据增强策略参数的深度学习验证阶段}{\enspace Deep learning validation phase for updating DA parameters for SCA on AES}
+		\bicaption{\enspace 攻击AES的用于调整数据增强策略参数的深度学习验证阶段}{\enspace DL validation phase for updating DA parameters for SCA on AES}
 		\label{fig:mydlscaandetc}
 	\end{figure}
 	
@@ -359,14 +364,14 @@
 	攻击评估单元的功能是量化并输出攻击代价。\figureref{fig:mydlscaandetc}中的密钥计算器、密钥预测器、侧信道分析指标计算器组合成了攻击评估单元。如何根据验证数据的标签预测结果计算密钥预测值、如何根据验证标签计算算法密钥、计算哪方面的侧信道分析评估指标作为攻击代价反馈给主控制器，这些都要根据具体算法实现进行单独的分析。
 	
 	攻击评估单元如果使用不合理的侧信道分析评估指标作为攻击代价反馈给主控制器，它会使得主控制器依据不准确的指标进行参数更新，进而导致主控制器无法优化数据增强策略参数。
-	\section{通用数据增强方法在AES算法实现分析中的应用}
+	\section{通用数据增强方法在AES算法实现分析中的应用}\label{sec:intoreal}
 	\subsection{AES算法实现数据集}
 	
 	本研究使用了四个侧信道领域广泛使用的公开数据集共六种实际场景，这些数据集涵盖侧信道分析场景的主要类型。第一个数据集DPA v4所对应的算法实现无任何防护，并且噪声水平低。这个数据集代表了理想的攻击目标，难度最低，因此它能评价攻击技术最佳行为\footnote{因为它难度最低，所以对于同一个攻击技术，对于这个数据集的攻击结果，从理论上来说会比其他数据集的攻击结果更优。}。第二个数据集AES\_HD所对应的算法实现同样不包含任何防护措施，但是它有较高的噪声水平。这个数据集为模板类侧信道分析带来一定难度，因为高水平噪声使得类之间的界限变得模糊不清。第三个数据集AES\_RD所对应的算法实现使用了随机延迟防护措施。随机延迟是一种实际应用中很常见的防护措施，因此该数据集代表很常见的现实攻击场景。第四个数据集ASCADf对应的算法实现使用了掩码防护措施。掩码是一种可证明安全的防护措施，因此它是一种广泛使用的抵御侧信道分析的防护措施。ASCADf可以依据引入的随机延迟的程度进一步划分为三种实际场景，更大范围的随机延迟程度对应更高的攻击难度。
 	
 	\subsubsection{DPA v4数据集}
 	
-	这个数据集对应了掩码防护的AES软件实现\footnote{数据来源：\href{http://www.dpacontest.org/v4}{第四届DPA Contest大赛}。}。Moradi等\citep{Moradi14}发现这个数据存在一阶泄漏，我们直接认为掩码是已知的，这时候掩码防护措施退化为无防护场景。因为算法实现的平台是ATMEL AVR-163微控制器，因此我们选择软件实现泄漏最多的第一轮字节替换操作作为攻击目标。以攻击主密钥第0字节为例，数据集中的标签计算方式如\equationref{eq:dpav4model}所示。
+	这个数据集对应了掩码防护的AES软件实现\footnote{数据来源：第四届DPA Contest大赛 \href{http://www.dpacontest.org/v4}{http://www.dpacontest.org/v4}。}。Moradi等\citep{Moradi14}发现这个数据存在一阶泄漏，我们直接认为掩码是已知的，这时候掩码防护措施退化为无防护场景。因为算法实现的平台是ATMEL AVR-163微控制器，因此我们选择软件实现泄漏最多的第一轮字节替换操作作为攻击目标。以攻击主密钥第0字节为例，数据集中的标签计算方式如\equationref{eq:dpav4model}所示。
 	
 	\begin{equation}\label{eq:dpav4model}
 		label=\overbrace{\mathrm{Sbox}}^{\mbox{已知}}[\overbrace{p_0}^{\mbox{已知}}\oplus k_0]\oplus \overbrace{mask_0}^{\mbox{已知}}
@@ -375,7 +380,7 @@
 	\noindent 其中$p_0$表示明文第0字节的值，$k_0$表示主密钥第0字节的值，$mask_0$表示算法第1轮掩码第0字节的值。
 	
 	\subsubsection{AES\_HD数据集}
-	这个数据集对应了无防护的AES硬件\footnote{数据来源：\href{https://github.com/AESHD/AES\_HD\_Dataset}{AES\_HD\_Dataset}。}实现。AES-128核心部件使用VHDL编写的，它采用多轮的架构，每次加密需要11个时钟周期。该设计在Xilinx Virtex-5 FPGA的SASEBO GII评估板上实现。攻击者将高灵敏度的电磁探针放置在电源线的去耦合电容附近，使用Teledyne LeCroy Waverunner 610zi示波器采样，从而获得包含信息泄漏的电磁迹。硬件实现中寄存器写通常存在比较明显的泄漏，我们选择最后一轮（第10轮）轮密钥的第7字节选为攻击目标，数据集中的标签计算方式如\equationref{eq:aeshdmodel}所示。采集的迹含有4000个采样点。本研究使用其中的5000条。
+	这个数据集对应了无防护的AES硬件\footnote{数据来源：AES\_HD\_Dataset \href{https://github.com/AESHD/AES\_HD\_Dataset}{https://github.com/AESHD/AES\_HD\_Dataset}。}实现。AES-128核心部件使用VHDL编写的，它采用多轮的架构，每次加密需要11个时钟周期。该设计在Xilinx Virtex-5 FPGA的SASEBO GII评估板上实现。攻击者将高灵敏度的电磁探针放置在电源线的去耦合电容附近，使用Teledyne LeCroy Waverunner 610zi示波器采样，从而获得包含信息泄漏的电磁迹。硬件实现中寄存器写通常存在比较明显的泄漏，我们选择最后一轮（第10轮）轮密钥的第7字节选为攻击目标，数据集中的标签计算方式如\equationref{eq:aeshdmodel}所示。采集的迹含有4000个采样点。本研究使用其中的5000条。
 	
 	\begin{equation}
 		\begin{cases}
@@ -389,7 +394,7 @@
 	\noindent 其中,$reg_{round9},reg_{round10}$分别表示硬件代码中一个寄存器\footnote{该寄存器寄存的值在第10个周期的上升沿时发生变化，电磁场强度与这个变化有一定关系，因此可以通过侧信道分析恢复每一次的变化值。又因为这个变化值和密钥有关，所以可以进一步恢复密钥。}在算法第9、10个周期的所寄存的值，$c_7,c_{11}$分别表示算法输出的第7、11字节，$k_7$表示第10轮轮密钥的第7字节。攻击者令算法执行1000000次，每次随机明文，最终采集到了1000000条采样点个数为1250的电磁迹。本研究只使用其中的75000条。
 	
 	\subsubsection{AES\_RD数据集}
-	这个数据集对应了使用了防护措施的AES算法，它在一个使用8比特AVR微控制器的ATmega16智能卡上实现\footnote{数据来源：\href{https://github.com/ikizhvatov/randomdelays-traces}{Trace sets with random delays}。}。算法使用的防护措施是Coron等\citep{Coron09}所描述的随机延迟。在加密算法的正常运行中添加随机延迟会使得重要的信息泄漏特征错位，进而增加攻击的难度。我们还是选定第一轮字节替换操作作为攻击目标。以攻击主密钥第0字节为例，数据集中的标签计算方式如\equationref{eq:aesrdmodel}所示。
+	这个数据集对应了使用了防护措施的AES算法，它在一个使用8比特AVR微控制器的ATmega16智能卡上实现\footnote{数据来源：Trace sets with random delays \href{https://github.com/ikizhvatov/randomdelays-traces}{https://github.com/ikizhvatov/randomdelays-traces}。}。算法使用的防护措施是Coron等\citep{Coron09}所描述的随机延迟。在加密算法的正常运行中添加随机延迟会使得重要的信息泄漏特征错位，进而增加攻击的难度。我们还是选定第一轮字节替换操作作为攻击目标。以攻击主密钥第0字节为例，数据集中的标签计算方式如\equationref{eq:aesrdmodel}所示。
 	
 	\begin{equation}\label{eq:aesrdmodel}
 		label=\overbrace{\mathrm{Sbox}}^{\mbox{已知}}[\overbrace{p_0}^{\mbox{已知}}\oplus k_0]
@@ -397,7 +402,7 @@
 	
 	数据集包含50000条有3500个采样点的迹，本研究使用该数据集所有的迹。
 	\subsubsection{ASCADf数据集}
-	Benadjila等\citep{Benadjila20}在一个使用8比特AVR微控制器的ATmega16智能卡上实现了有掩码防护措施的AES-128算法，并采集智能卡加密过程中的电磁辐射生成了ASCAD数据集\footnote{数据来源：\href{https://github.com/ANSSI-FR/ASCAD}{ASCAD}}。我们还是选定第一轮字节替换操作作为攻击目标。以攻击主密钥第2字节\footnote{AES算法不同字节密钥的攻击难度可能不同。在Benadjila等的研究中重点汇报了对主密钥第三字节进行攻击的结果，我们也选择第三字节作为攻击目标可以保证比较是公平的。}为例，数据集中的标签计算方式如\equationref{eq:ascadbadmodel}所示。但是在建模阶段，$mask_2$是无法知道的，这会导致无法计算标签。为了解决这个问题，我们直接舍去$mask_2$，这样就可以计算出标签\footnote{对于一阶掩码实现，信息泄漏与标签之间不再存在某种线性关系。但是深度神经网络有可能学习到信息泄漏与标签之间的非线性关系，进而完成DL-SCA。}，如\equationref{eq:ascadmodel}所示。
+	Benadjila等\citep{Benadjila20}在一个使用8比特AVR微控制器的ATmega16智能卡上实现了有掩码防护措施的AES-128算法，并采集智能卡加密过程中的电磁辐射生成了ASCAD数据集\footnote{数据来源：ASCAD \href{https://github.com/ANSSI-FR/ASCAD}{https://github.com/ANSSI-FR/ASCAD}}。我们还是选定第一轮字节替换操作作为攻击目标。以攻击主密钥第2字节\footnote{AES算法不同字节密钥的攻击难度可能不同。在Benadjila等的研究中重点汇报了对主密钥第三字节进行攻击的结果，我们也选择第三字节作为攻击目标可以保证比较是公平的。}为例，数据集中的标签计算方式如\equationref{eq:ascadbadmodel}所示。但是在建模阶段，$mask_2$是无法知道的，这会导致无法计算标签。为了解决这个问题，我们直接舍去$mask_2$，这样就可以计算出标签\footnote{对于一阶掩码实现，信息泄漏与标签之间不再存在某种线性关系。但是深度神经网络有可能学习到信息泄漏与标签之间的非线性关系，进而完成DL-SCA。}，如\equationref{eq:ascadmodel}所示。
 	
 	\begin{equation}\label{eq:ascadbadmodel}
 		label=\overbrace{\mathrm{Sbox}}^{\mbox{已知}}[\overbrace{p_2}^{\mbox{已知}}\oplus k_2]\oplus mask_2
@@ -423,7 +428,7 @@
 		%\renewcommand{\arraystretch}{1.2}%row space 
 		\begin{tabular}{c|ccc}
 			\hline
-			数据集名称&训练集大小&验证集大小&测试集大小\\
+			数据集名称&训练样本数量&验证训练样本数量&测试训练样本数量\\
 			\hline
 			DPA v4    &4000 &500 &500\\
 			AES\_HD   &45000&5000&25000\\
@@ -503,7 +508,7 @@
 	\subsubsection{数据增强单元设置}\label{subss:cdasettings}
 	在框架中，我们使用组合式数据增强机制（如\algorithmref{alg:combined-da}所示）实现数据增强单元。在组合式数据增强机制中，可变的参数有$T^{agmt},p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$，他们分别表示期望合成的迹的数目、循环位移变形概率、循环位移变形幅度、添加噪声概率、添加噪声方差、过采样概率和过采样强度。在这些参数中，$T^{agmt}$的取值会影响后续深度学习模型训练时间所以它需要单独考虑，$p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$的取值不影响后续深度学习模型训练时间所以本文对这些参数进行搜索。调用一次组合式数据增强机制可以合成多条新的迹，这使得每次构造数据增强后的训练集只需要调用一次组合式数据增强机制。
 	
-	在\algorithmref{alg:combined-da}中，我们定义了四个子函数\textsc{rotate\_deformation}、\textsc{add\_noise}、\textsc{over\_sample}和\textsc{populate}以支持模块化开发、提高代码可读性。\textsc{populate}用于合成一条新的迹，多次调用它就能获得多条新的迹，使得\algorithmref{alg:combined-da}最终输出数据增强后的训练集。\textsc{rotate\_deformation}、\textsc{add\_noise}和\textsc{over\_sample}是三种数据增强子策略，它们在\textsc{populate}函数中被调用。数据增强子策略通过引入多样性的训练数据增强技术，旨在一定程度上隐藏训练集中训练数据与训练标签的关系，将训练数据与训练标签之间的对应关系有关知识隐性地编码进神经网络中，进而提升模型对于测试集的准确度。在此之前，由于缺乏充足的与对应关系有关的知识，神经网络无法准确地捕捉到这种对应关系。
+	在\algorithmref{alg:combined-da}中，除了定义在第39行至48行的主函数，还实现了四个子函数\textsc{rotate\_deformation}、\textsc{add\_noise}、\textsc{over\_sample}和\textsc{populate}以支持模块化开发、提高代码可读性。\textsc{populate}用于合成一条新的迹，多次调用它就能获得多条新的迹，使得\algorithmref{alg:combined-da}最终输出数据增强后的训练集。\textsc{rotate\_deformation}、\textsc{add\_noise}和\textsc{over\_sample}是三种数据增强子策略，它们在\textsc{populate}函数中被调用。数据增强子策略通过引入多样性的训练数据增强技术，旨在一定程度上隐藏训练集中训练数据与训练标签的关系，将训练数据与训练标签之间的对应关系有关知识隐性地编码进神经网络中，进而提升模型对于测试集的准确度。在此之前，由于缺乏充足的与对应关系有关的知识，神经网络无法准确地捕捉到这种对应关系。
 	
 	循环位移变形函数\textsc{rotate\_deformation}参考了Pu等\citep{Pu17}的设计，模拟引入了随机延迟防护实现的能量迹。循环位移变形通过对能量迹进行变换，引入了限定幅度的随机偏移。它可以部分隐藏敏感中间值与信息泄漏之间的关系，使得神经网络学习到能量迹采样点位置受延迟影响但与敏感中间值无关的知识。因此对于有随机延迟防护实现的能量迹，不同能量迹发生泄漏的采样点位置不同，可以选取较大的$p_{sd}$和$m_{sd}$，对训练集进行位移变形操作来使神经网络习得泄漏不是时间依赖的。
 	
@@ -600,7 +605,6 @@
 					%\cline{3-5}
 					\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
 					\hline
-					\hline
 					\multirow{2}{*}{\shortstack{训练数据\\预处理}}      &\multirow{2}{*}{归一化}        &\multirow{2}{*}{无}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{无}&\multirow{2}{*}{无}\\
 					&&&&&&&\\
 					\hline
@@ -614,7 +618,7 @@
 					\multirow{1}{*}{全连接层}         &神经元个数     &(10,10)     &(2)        &(2)          &(10,10)            &(15,15,15)         &(20,20,20)          \\
 					\hline          
 					\multirow{3}{*}{训练参数}          &学习率        &$10^{-2}$   &$10^{-3}$  &$10^{-3}$    &$5\cdot10^{-3}$    &$5\cdot10^{-3}$    &$10^{-2}$         \\
-					                                  &动态学习率    &OneCycleLR  &无         &无           &OneCycleLR         &OneCycleLR         &OneCycleLR           \\
+					                                  &动态学习率    &OneCycleLR\citep{Smith18}  &无         &无           &OneCycleLR         &OneCycleLR         &OneCycleLR           \\
 					                                  &训练轮次      &50           &20         &50           &50                 &50                 &50                      \\
 					\hline          
 					
@@ -629,7 +633,6 @@
 				\begin{tabular}{cc|c}
 					\hline
 					\multicolumn{2}{c|}{网络结构} &网络超参数\\
-					\hline
 					\hline
 					\multirow{3}{*}{卷积层 }     &核初始化函数    &均匀分布初始化      \\
 					                             &激活函数  &selu     \\
@@ -742,11 +745,11 @@
 		\end{tabular}   
 	\end{table}
 
-	\subsection{通用数据增强方法在AES算法实现分析中的实证研究}\label{subs:realexp}
+	\section{通用数据增强方法在AES算法实现分析中的实证研究}\label{sec:realexp}
 	
-	本文方法进行实证研究过程中，使用的机器配置如下：处理器型号为Intel(R) Xeon(R) CPU E5-2667 v4 @ 3.20GHz，内存大小252GB，操作系统版本为CentOS release 6.6 (Final)。本文方法使用Python（版本为3.6.2）作为编程语言进行实现，其中深度学习模型通过Keras\footnote{资料来源：\href{https://pypi.org/project/keras}{keras}。}开源框架进行实现。
+	本文方法进行实证研究过程中，使用的机器配置如下：处理器型号为Intel(R) Xeon(R) CPU E5-2667 v4 @ 3.20GHz，内存大小252GB，操作系统版本为CentOS release 6.6 (Final)。本文方法使用Python（版本为3.6.2）作为编程语言进行实现，其中深度学习模型通过Keras\footnote{资料来源：keras \href{https://pypi.org/project/keras}{https://pypi.org/project/keras}。}开源框架进行实现。
 
-	DL-SCA的攻击阶段与深度学习中的测试阶段有一定相似之处但并不完全相同。如\figureref{fig:dltestphase}和\figureref{fig:mydlscatest}所示，在深度学习训练出的模型对测试数据进行预测之后，还需要组合多条迹的信息进一步对算法密钥进行估计，从而计算侧信道领域的评价指标以评估侧信道分析技术效果，在本研究中，使用成功条数作为指标评估DL-SCA的效果，成功条数越小，那么DL-SCA效果越好。
+	DL-SCA的攻击阶段与深度学习中的测试阶段有一定相似之处但并不完全相同。如\figureref{fig:dltestphase}和\figureref{fig:mydlscatest}所示，在深度学习训练出的模型对测试数据进行预测之后，还需要组合多条迹的信息进一步对算法密钥进行估计，从而计算侧信道领域的评价指标以评估侧信道分析技术效果，在本研究中，使用\chenggongtiaoshu 作为指标评估DL-SCA的效果，\chenggongtiaoshu 越小，那么DL-SCA效果越好。
 
 	\begin{figure}[!h]
 		\centering
@@ -780,18 +783,18 @@
 			
 			\draw [arrow] (keypred) -- node[right]{密钥预测值}(cmp);
 			\draw [arrow] (keycalc) |- node[pos=0.7,below]{算法密钥}(cmp);
-			\draw [arrow] (cmp) --node[pos=0.5, right] {成功条数} ++(270:40pt);
+			\draw [arrow] (cmp) --node[pos=0.5, right] {\chenggongtiaoshu } ++(270:40pt);
 		\end{tikzpicture}
-		\bicaption{\enspace 攻击AES的深度学习测试阶段}{\enspace Deep learning test phase for SCA on AES}
+		\bicaption{\enspace 攻击AES的深度学习测试阶段}{\enspace DL test phase for SCA on AES}
 		\label{fig:mydlscatest}
 	\end{figure}
 
 
-	\subsubsection{通用数据增强方法的技术效果}
+	\subsection{通用数据增强方法的技术效果}
 	
-	本研究尝试了1倍、5倍、10倍、20倍四种增广倍数$C$（见\algorithmref{alg:combined-da}输入，$T^{agmt}=T*C$，$T$是数据增强前训练集大小）以探索最优的实验条件。
+	本研究尝试了1倍、5倍、10倍、20倍四种增广倍数$C$（见\algorithmref{alg:combined-da}输入，$T^{agmt}=T*C$，$T$是数据增强前训练样本数量）以探索最优的实验条件。
 	
-	不同实验条件下DL-SCA的性能如\tableref{tab:adamtd}所示。根据实验结果可以看出，增广倍数为10倍或20倍时能取得最小的成功条数。例如，在分析引入随机延迟的软件AES实现数据集AES\_RD时，选取C=20。这样一来，在仅提供20000条能量迹用于DL-SCA的建模时，采用本文提出的数据增强方法可以将成功条数减小到5。
+	不同实验条件下DL-SCA的性能如\tableref{tab:adamtd}所示，表格中加粗的结果表示在对应数据集上取得的最优技术效果。根据实验结果可以看出，增广倍数为10倍或20倍时能取得最小的\chenggongtiaoshu 。例如，在分析引入随机延迟的软件AES实现数据集AES\_RD时，选取C=20。这样一来，在仅提供20000条能量迹用于DL-SCA的建模时，采用本文提出的数据增强方法可以将\chenggongtiaoshu 减小到5。在每个数据集上取得的最优技术效果的猜测熵曲线如\appfigureref{appfig:adadlsca}所示。
 	
 	\begin{table}[!h]
 		\bicaption{\enspace 采用通用数据增强方法的DL-SCA的性能}{\enspace Performance of DL-SCA with general DA method}
@@ -806,22 +809,23 @@
 			%\cline{3-5}
 			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
 			\hline
-			\multirow{2}{*}{\shortstack{数据增强前\\训练集大小}}&&\multirow{2}{*}{4000}&\multirow{2}{*}{45000}&\multirow{2}{*}{20000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}\\
+			\multirow{2}{*}{\shortstack{数据增强前\\训练样本数量}}&&\multirow{2}{*}{4000}&\multirow{2}{*}{45000}&\multirow{2}{*}{20000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}\\
 			&&&&&&&\\
-			\multirow{4}{*}{成功条数}
-			&1&11&1358&9&>300&>400&>400\\
-			&5&6&959&4&>300&273&>400\\
-			&10&6&\textbf{880}&\textbf{3}&\textbf{197}&305&\textbf{288}\\
-			&20&\textbf{5}&898&\textbf{3}&206&\textbf{193}&382\\
+			\hline
+			\multirow{4}{*}{\chenggongtiaoshu }
+			&1&9&1358&11&>300&>400&>400\\
+			&5&4&959&6&>300&273&>400\\
+			&10&\textbf{3}&\textbf{880}&6&\textbf{197}&305&\textbf{288}\\
+			&20&\textbf{3}&898&\textbf{5}&206&\textbf{193}&382\\
 			\hline
 			
 		\end{tabular}   
 	\end{table}
 	
-%	使用本文提出的自适应数据增强方法搜索最优的数据增强策略参数，使用这些参数对训练集进行组合式数据增强，使用数据增强后的训练集训练深度学习模型后，训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:adadlsca}所示。我们从\appfigureref{appfig:adadlsca}提取成功条数的信息，将它们列举在\tableref{tab:adamtd}中。
+%	使用本文提出的通用数据增强方法搜索最优的数据增强策略参数，使用这些参数对训练集进行组合式数据增强，使用数据增强后的训练集训练深度学习模型后，训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:adadlsca}所示。我们从\appfigureref{appfig:adadlsca}提取\chenggongtiaoshu 的信息，将它们列举在\tableref{tab:adamtd}中。
 %	
 %	\begin{table}[!h]
-%		\bicaption{\enspace 使用自适应数据增强方法时DL-SCA的性能}{\enspace Performance of DL-SCA with adaptive DA method}
+%		\bicaption{\enspace 使用通用数据增强方法时DL-SCA的性能}{\enspace Performance of DL-SCA with adaptive DA method}
 %		\label{tab:adamtd}
 %		\centering
 %		%\footnotesize% fontsize
@@ -829,8 +833,7 @@
 %		%\renewcommand{\arraystretch}{1.2}%row space 
 %		\begin{tabular}{c|cc}
 %			\hline
-%			数据集名称&数据增强前的训练集大小&成功条数\\
-%			\hline
+%			数据集名称&数据增强前的训练样本数量&\chenggongtiaoshu \\
 %			\hline
 %			DPA v4    &4000&3\\
 %			\hline
@@ -850,8 +853,8 @@
 %			\hline
 %		\end{tabular}
 %	\end{table}
-	\subsubsection{无数据增强的技术效果}
-	不进行数据增强，直接训练深度学习模型，并使用训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:origindlsca}所示。我们从\appfigureref{appfig:origindlsca}提取成功条数的信息，将它们列举在\tableref{tab:originmtd}中。
+	\subsection{无数据增强的技术效果}
+	不进行数据增强，直接训练深度学习模型，并使用训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:origindlsca}所示。我们从\appfigureref{appfig:origindlsca}提取\chenggongtiaoshu 的信息，将它们列举在\tableref{tab:originmtd}中。
 	
 	\begin{table}[!h]
 		\bicaption{\enspace 无数据增强时DL-SCA的性能}{\enspace Performance of DL-SCA without any DA method}
@@ -862,8 +865,7 @@
 		%\renewcommand{\arraystretch}{1.2}%row space 
 		\begin{tabular}{c|cc}
 			\hline
-			数据集名称&训练集大小&成功条数\\
-			\hline
+			数据集名称&训练样本数量&\chenggongtiaoshu \\
 			\hline
 			DPA v4    &4000&4\\
 			\hline
@@ -884,14 +886,14 @@
 		\end{tabular}
 	\end{table}
 
-	对比\tableref{tab:adamtd}和\tableref{tab:originmtd}相对应（建模能量迹条数相同）的表项，可以观察到本文提出的方法在AES\_HD、DPA v4、ASCADf三种数据集共五个场景上使得成功条数减少21\%、25\%、24\%、48\%以及5\%。这说明与未采用数据增强的方法相比，采用本文提出的通用数据增强方法在无防护、高噪声、随机延迟或掩码防护的密码算法实现的DL-SCA场景中，能够显著提升侧信道分析技术效果，减少成功条数。上述结果表明，本文提出的数据增强方法的通用性。
+	对比\tableref{tab:adamtd}和\tableref{tab:originmtd}相对应（建模能量迹条数相同）的表项，可以观察到本文提出的方法在AES\_HD、DPA v4、ASCADf三种数据集共五个场景上使得\chenggongtiaoshu 减少21\%、25\%、24\%、48\%以及5\%。这说明与未采用数据增强的方法相比，采用本文提出的通用数据增强方法在无防护、高噪声、随机延迟或掩码防护的密码算法实现的DL-SCA场景中，能够显著提升侧信道分析技术效果，减少\chenggongtiaoshu 。上述结果表明，本文提出的数据增强方法的通用性。
 	
-	而在AES\_RD数据集上，成功条数保持不变，可能的原因是迭代次数不足。从\figureref{fig:convrateaesrd}中可以看出，AES\_RD数据集上攻击代价的在227的迭代次数下还未稳定；\figureref{fig:convratedpav4},\figureref{fig:convrateaeshd},\figureref{fig:convrateascad0},\figureref{fig:convrateascad50}和\figureref{fig:convrateascad100}中，其他数据集上攻击代价在227的迭代次数下已经达到稳定。出于公平比较的目的，我们限制了主控制器迭代次数为227。
+	而在AES\_RD数据集上，\chenggongtiaoshu 保持不变，可能的原因是迭代次数不足。从\figureref{fig:convrateaesrd}中可以看出，AES\_RD数据集上攻击代价的在227的迭代次数下还未稳定；\figureref{fig:convratedpav4},\figureref{fig:convrateaeshd},\figureref{fig:convrateascad0},\figureref{fig:convrateascad50}和\figureref{fig:convrateascad100}中，其他数据集上攻击代价在227的迭代次数下已经达到稳定。出于公平比较的目的，我们限制了主控制器迭代次数为227。
 	
-%如果使用自适应数据增强方法的DL-SCA的数据增强前的训练集大小和无数据增强时DL-SCA的训练集大小相同，那么前者的成功条数不高于后者的成功条数。例如，对于DPA v4数据集所对应的无防护软件实现，\tableref{tab:adamtd}的结果表明如果攻击者可以采集4000条迹进行建模，那么使用自适应数据增强方法时，DL-SCA可以使用3条迹就完成攻击。同样对于DPA v4数据集所对应的无防护软件实现，\tableref{tab:originmtd}的结果表明如果攻击者可以采集4000条迹进行建模，那么不使用数据增强方法时，DL-SCA需要4条迹才能完成攻击。
+%如果使用通用数据增强方法的DL-SCA的数据增强前的训练样本数量和无数据增强时DL-SCA的训练样本数量相同，那么前者的\chenggongtiaoshu 不高于后者的\chenggongtiaoshu 。例如，对于DPA v4数据集所对应的无防护软件实现，\tableref{tab:adamtd}的结果表明如果攻击者可以采集4000条迹进行建模，那么使用通用数据增强方法时，DL-SCA可以使用3条迹就完成攻击。同样对于DPA v4数据集所对应的无防护软件实现，\tableref{tab:originmtd}的结果表明如果攻击者可以采集4000条迹进行建模，那么不使用数据增强方法时，DL-SCA需要4条迹才能完成攻击。
 %
-%	自适应数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，使得深度学习模型对信息泄漏的刻画更准确，从而减少成功条数。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）、ASCADf（N=100）五个数据集上使得成功条数相比于无数据增强减少23\%、25\%、24\%、58\%以及5\%，在AES\_RD数据集上使得成功条数与无数据增强相当。
-	\subsubsection{其他数据增强方法的技术效果}
+%	通用数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，使得深度学习模型对信息泄漏的刻画更准确，从而减少\chenggongtiaoshu 。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）、ASCADf（N=100）五个数据集上使得\chenggongtiaoshu 相比于无数据增强减少23\%、25\%、24\%、58\%以及5\%，在AES\_RD数据集上使得\chenggongtiaoshu 与无数据增强相当。
+	\subsection{其他数据增强方法的技术效果}
 
 	本文还将采用本文提出通用数据增强方法的DL-SCA和近年来采用其他数据增强方法的DL-SCA结果进行比较，以说明本文通用数据增强方法的优势。
 	
@@ -913,35 +915,34 @@
 			%\cline{3-5}
 			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
 			\hline
-			\hline    
 			\multirow{2}{*}{Cagli等\citep{Cagli17}}
-				&数据增强前训练集大小       &4000&45000&20000&45000&45000&45000\\
-				&成功条数     &5&1252&7&219&328&364        \\
+				&数据增强前训练样本数量       &4000&45000&20000&45000&45000&45000\\
+				&\chenggongtiaoshu      &5&1252&7&219&328&364        \\
 			\hline
 			\multirow{2}{*}{Kim等\citep{Kim19}}
 				&数据增强前训练集大小       &4000&45000&20000&45000&45000&45000\\
-				&成功条数    &5&1127&5&249&276&346\\
+				&\chenggongtiaoshu     &5&1127&5&249&276&346\\
 			\hline
 			\multirow{2}{*}{Won等\citep{Won20}}
 				&数据增强前训练集大小       &/&/&5000&/&/&45000\\
-				&成功条数    &/&/&15&/&/&190\\
+				&\chenggongtiaoshu     &/&/&15&/&/&190\\
 			\hline
 			\multirow{2}{*}{Luo等\citep{Luo21}}
 				&数据增强前训练集大小       &/&/&50000&50000&50000&50000\\
-				&成功条数    &/&/&>1000&1250&4000&7000\\
+				&\chenggongtiaoshu     &/&/&>1000&1250&4000&7000\\
 			\hline
 			\multirow{2}{*}{Mukhtar等\citep{Mukhtar22}}
 				&数据增强前训练集大小       &/&/&/&38400&/&/\\
-				&成功条数    &/&/&/&410&/&/\\
+				&\chenggongtiaoshu     &/&/&/&410&/&/\\
 			\hline
 			
 		\end{tabular}   
 	\end{table}
 
-	对比\tableref{tab:adamtd}、\tableref{tab:originmtd}和\tableref{tab:othermtd}相对应（建模能量迹条数相同）的表项，可以观察到在AES\_RD、AES\_HD、DPA v4、ASCADf（N=0/N=50）四种数据集五个场景中，采用本文方法的DL-SCA成功条数减小比例最高。与已有最好的数据增强方法相比，采用本文提出的数据增强方法可将实施侧信道分析的成功条数分别降低0\%、22\%、40\%、10\%、30\%。这说明，与采用了数据增强的已知最好方法相比，采用本文提出的通用数据增强方法，在无防护、高噪声或掩码防护型密码算法实现的DL-SCA场景中，本文提出的数据增强方法更高效。
+	对比\tableref{tab:adamtd}、\tableref{tab:originmtd}和\tableref{tab:othermtd}相对应（建模能量迹条数相同）的表项，可以观察到在AES\_RD、AES\_HD、DPA v4、ASCADf（N=0/N=50）四种数据集五个场景中，采用本文方法的DL-SCA\chenggongtiaoshu 减小比例最高。与已有最好的数据增强方法相比，采用本文提出的数据增强方法可将实施侧信道分析的\chenggongtiaoshu 分别降低0\%、22\%、40\%、10\%、30\%。这说明，与采用了数据增强的已知最好方法相比，采用本文提出的通用数据增强方法，在无防护、高噪声或掩码防护型密码算法实现的DL-SCA场景中，本文提出的数据增强方法更高效。
 
-	在ASCADf（N=100）数据集上，与最好的数据增强方法Won等\citep{Won20}相比，采用本文提出的数据增强方法使得实施侧信道分析的成功条数增加52\%。可能的原因是Won等\citep{Won20}尝试85种SMOTE算法的不同变体找到一种较优的数据增强方法，而本文方法仅对三种数据增强子策略进行组合式数据增强并搜索最优参数。因此在实际应用中，本文方法更容易满足时间效率的需求，可以高效地找到合适的数据增强策略参数。除此之外，增加数据增强子策略到通用数据增强方法的数据增强单元，有可能使得本文方法达到与Won等\citep{Won20}匹配的结果。
-	%自适应数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，有较大的可能使得深度学习模型对信息泄漏的刻画更准确，从而减少成功条数。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）四个数据集上使得成功条数相比于已知最好的数据增强方法分别减少24\%、40\%、10\%、43\%，在AES\_RD数据集上使得成功条数与已知最好的数据增强方法相当，在ASCADf（N=100）数据集上使得成功条数相比于已知最好的数据增强方法增加了52\%。
+	在ASCADf（N=100）数据集上，与最好的数据增强方法Won等\citep{Won20}相比，采用本文提出的数据增强方法使得实施侧信道分析的\chenggongtiaoshu 增加52\%。可能的原因是Won等\citep{Won20}尝试85种SMOTE算法的不同变体找到一种较优的数据增强方法，而本文方法仅对三种数据增强子策略进行组合式数据增强并搜索最优参数。因此在实际应用中，本文方法更容易满足时间效率的需求，可以高效地找到合适的数据增强策略参数。除此之外，增加数据增强子策略到通用数据增强方法的数据增强单元，有可能使得本文方法达到与Won等\citep{Won20}匹配的结果。
+	%通用数据增强相比于无数据增强，可以在攻击者采集相同数量的样本的情况下，有较大的可能使得深度学习模型对信息泄漏的刻画更准确，从而减少\chenggongtiaoshu 。本文提出的方法在AES\_HD、DPA v4、ASCADf（N=0）、ASCADf（N=50）四个数据集上使得\chenggongtiaoshu 相比于已知最好的数据增强方法分别减少24\%、40\%、10\%、43\%，在AES\_RD数据集上使得\chenggongtiaoshu 与已知最好的数据增强方法相当，在ASCADf（N=100）数据集上使得\chenggongtiaoshu 相比于已知最好的数据增强方法增加了52\%。
 	\section{本章小结}
-	针对已有数据增强方法的参数选取高度依赖专家知识，且只适用于特定算法实现数据集的实际问题，本文提出一种通用数据增强方法，该方法能够自适应地搜索数据增强策略参数，增广出新的样本用于训练深度学习模型，进而提升DL-SCA效果。本文通过对应于多种攻击难度的AES算法实现的数据集对新提出的自适应数据增强方法进行了验证。实验结果表明，与无数据增强或目前已知的数据增强方法相比，自适应数据增强方法可以使得成功条数最多降低48\%。
+	针对已有数据增强方法的参数选取高度依赖专家知识，且只适用于特定算法实现数据集的实际问题，本文提出一种通用数据增强方法，该方法能够自适应地搜索数据增强策略参数，增广出新的样本用于训练深度学习模型，进而提升DL-SCA效果。本文通过对应于多种攻击难度的AES算法实现的数据集对新提出的通用数据增强方法进行了验证。实验结果表明，与无数据增强或目前已知的数据增强方法相比，通用数据增强方法可以使得\chenggongtiaoshu 最多降低48\%。
 }

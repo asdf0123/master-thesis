@@ -25,6 +25,7 @@
 %->> Document settings
 %---------------------------------------------------------------------------%
 \usepackage{caption}
+%\usepackage[super,alpha, list,table,math]{Style/artratex}
 \usepackage[super,numbers, list,table,math]{Style/artratex}
 %- usage: \usepackage[option1,option2,...,optionN]{artratex}
 %- Multiple optional arguments:
@@ -62,12 +63,35 @@
 %\usepackage{ctex}
 %\usepackage{bm}
 
+\newif\ifshowcontent
+%\showcontentfalse%false for anonymous
+\showcontenttrue%true for not anonymous
+
 %\usepackage[perpage]{footmisc}
+\ifshowcontent 
 \input{Tex/Frontinfo}%
+\else
+\input{Tex/Frontinfo_anonymous}%
+\fi
+
+\newcommand{\dupc}{black}
+\newcommand{\xchange}{black}
+\newcommand{\expsettings}{}
+\newcommand{\poifanwei}{基于分块方差的特征点范围确定}
+\newcommand{\yuchuli}{基于时间模板匹配的特征点提取}
+\newcommand{\shujuzengqiang}{基于数据增强的模板构建}
+\newcommand{\jiashejianyan}{基于假设检验的}
+\newcommand{\guji}{模板匹配}
+\newcommand{\jiashejianyanguji}{\jiashejianyan\guji}
+\newcommand{\jiaodu}{减少实施DL-SCA时间、提升DL-SCA技术效果的角度}
+\newcommand{\chenggongtiaoshu}{攻击成功时所需要的迹的条数}
+
+
 \begin{document}
 %-
 %-> Frontmatter: title page, abstract, content list, symbol list, preface
 %-
+
 
 \frontmatter% initialize the environment
 
@@ -86,6 +110,7 @@
 }
 \thispagestyle{figureheader}
 \input{Tex/Prematter}% symbol list, preface content
+\input{Tex/Abbr}% symbol list, preface content
 %-
 %-> Mainmatter
 %-
@@ -119,7 +144,10 @@
 
 \thispagestyle{appendixheader}
 \backmatter% initialize the environment
+
+\ifshowcontent 
 \input{Tex/Backmatter}% other information
+\fi
 \end{document}
 %---------------------------------------------------------------------------%
 
