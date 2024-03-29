@@ -40,12 +40,12 @@
 	\end{proof}
 		
 	\begin{proposition}\label{prop:expotime}
-		如果敏感信息估计值真阳性率$p$略小于100\%，运用格方法恢复实际私钥的时间的期望会随着真阳性率$p$的下降而乘指数级增长。
+		如果\zyx$p$略小于100\%，运用格方法恢复实际私钥的时间的期望会随着\zyx$p$的下降而乘指数级增长。
 	\end{proposition}
 	\begin{proof}
-		令构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特敏感信息泄漏（即可利用的泄漏有$r$比特），运用一次格基规约时间开销为$u$。
+		令构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特敏感中间值（即可利用的泄漏有$r$比特），运用一次格基规约时间开销为$u$。
 		
-		因为格方法只运用估计为阳性的敏感信息泄漏，所以对格方法而言，所利用的敏感信息泄漏估计的正阳性率就是所利用的敏感信息泄漏估计的准确率。敏感信息泄漏估计准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，恢复的泄漏都准确的概率为$p_r=p^r$。
+		（本研究所调用的）格方法只运用nonce数值为0的比特。nonce比特0恢复准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，所利用的被恢复的比特准确的概率为$p_r=p^r$。
 	
 		能量迹恢复的泄漏没有错误这一事件对于每条能量迹是互相独立的，因此对于构造签名的所有能量迹，恢复的泄漏都没有错误的概率为\begin{align*}
 			p_s&=p_r^{\frac sr}\\
@@ -53,7 +53,7 @@
 			&=p^s
 		\end{align*}
 	
-		利用签名多次构造方程并运用格方法求解实际私钥是伯努利实验。因此，如果构造方程的所有能量迹恢复的泄漏都没有假阳性，那么运用格方法一定可以求解出实际私钥。在这种情况下，多次尝试构造方程并运用格方法直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
+		利用签名多次构造方程并运用格方法求解实际私钥是伯努利实验。因此，如果构造方程的所有能量迹恢复的泄漏都没有准确，那么运用格方法一定可以求解出实际私钥。在这种情况下，多次尝试构造方程并运用格方法直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
 		
 		因此，恢复实际私钥的时间是$u\xi$。结合$\xi\sim G(p_s)$，可以推算\begin{align*}
 			E(u\xi)&=uE(\xi)\\
@@ -75,10 +75,10 @@
 	又由于推导过程中假设了“构造方程的所有能量迹恢复的泄漏没有错误时格方法一定可以求解出实际私钥”，在实际攻击中，恢复实际私钥的时间的期望会比理论值更大。
 	
 	\begin{proposition}\label{prop:highalpha}
-		对于$T_a$条电磁迹，每条电磁迹中包含$n_s$次迭代的情况，总共有$T_an_s$条电磁子迹，它们会包含总共$T_an_s$比特的一次性随机数$\nonce$的高比特泄漏的值，即$\nonce^{(i)}_j,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$。根据ECDSA实现可以推算有比例约为$\frac38$的样本是原本就是阳性。不妨假设每个样本以$p_{pred0}$的概率被估计为阳性，且不同样本的估计结果互相独立。
-		如果阳性样本均为真阳性，
-		%如果被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹数与所有电磁子迹数比值为$p_{pred1}$，对于被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹敏感信息泄漏$\tilde \nonce_j$恢复准确率都为100\%，构造方程所有敏感信息泄漏没有错误时求解算法$S$一定
-		运用格方法可以求解出实际私钥。此时能否恢复私钥取决于能否筛选出含有足够多（75条）可利用（连续4比特敏感信息泄漏）的签名构造方程。那么只要$\epsilon=T_a\pi_{n_s}(4)-75\ge0$，就有超过$1-\frac{\epsilon+75}{\epsilon^2}$的概率\footnote{实际上二项分布的累积分布函数可以用正则化不完全$Beta$函数表示，这个概率更精确的近似结果为$I_{\pi_{n_s}(4)}(75+1,T_a-75)=(75+1)\begin{pmatrix}T_a\\75\end{pmatrix}\int_0^{\pi_{n_s}(4)}t^{75}(1-t)^{T_a-75-1}\mathrm dt$。}可以构造方程，进而恢复私钥。其中，$\pi_{j}(k)$满足\equationref{eq:recursion}描述的递推关系。
+		对于$T_a$条电磁迹，每条电磁迹中包含$n_s$次迭代的情况，总共有$T_an_s$条电磁子迹，它们会包含总共$T_an_s$比特的一次性随机数$\nonce$的高比特泄漏的值，即$\nonce^{(i)}_j,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$。根据ECDSA实现可以推算有比例约为$\frac38$的样本是原本就对应nonce的比特0。不妨假设每个样本以$p_{pred0}$的概率被估计为0，且不同样本的估计结果互相独立。
+		如果\zyx 为100\%，
+		%如果被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹数与所有电磁子迹数比值为$p_{pred1}$，对于被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹敏感中间值$\tilde \nonce_j$恢复准确率都为100\%，构造方程所有敏感中间值没有错误时求解算法$S$一定
+		运用格方法可以求解出实际私钥。此时能否恢复私钥取决于能否筛选出含有足够多（75条）可利用（连续4比特估计为0的敏感中间值）的签名构造方程。那么只要$\epsilon=T_a\pi_{n_s}(4)-75\ge0$，就有超过$1-\frac{\epsilon+75}{\epsilon^2}$的概率\footnote{实际上二项分布的累积分布函数可以用正则化不完全$Beta$函数表示，这个概率更精确的近似结果为$I_{\pi_{n_s}(4)}(75+1,T_a-75)=(75+1)\begin{pmatrix}T_a\\75\end{pmatrix}\int_0^{\pi_{n_s}(4)}t^{75}(1-t)^{T_a-75-1}\mathrm dt$。}可以构造方程，进而恢复私钥。其中，$\pi_{j}(k)$满足\equationref{eq:recursion}描述的递推关系。
 		\begin{equation}\label{eq:recursion}
 			\pi_{j}(k)=\begin{cases}
 				1,j=0,k=0\\
@@ -151,19 +151,19 @@
 	状态空间$\mathcal E$的每个状态有如下定义：
 	
 	\begin{enumerate}
-		\item [0] 没有足够的把握认为当前敏感信息泄漏估计$\hat\nonce_j=0$；
-		\item [1] 有足够的把握认为当前敏感信息泄漏估计$\hat\nonce_j=0$，但没有足够的把握认为上一次敏感信息泄漏估计$\hat\nonce_{j-1}=0$；
-		\item [2] 有足够的把握认为上一次和当前敏感信息泄漏估计$\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上一次敏感信息泄漏估计$\hat\nonce_{j-2}=0$；
-		\item [3] 有足够的把握认为上上一次、上一次和当前敏感信息泄漏估计$\hat\nonce_{j-2}=\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上上一次敏感信息泄漏估计$\hat\nonce_{j-3}=0$；
-		\item [4] $\exists 3\le t\le j$，有足够的把握认为到$t$为止的连续4比特敏感信息泄漏估计都为0，即$\hat\nonce_{t-3}=\hat\nonce_{t-2}=\hat\nonce_{t-1}=\hat\nonce_{t-0}=0$。
+		\item [0] 没有足够的把握认为当前敏感中间值估计值$\hat\nonce_j=0$；
+		\item [1] 有足够的把握认为当前敏感中间值估计值$\hat\nonce_j=0$，但没有足够的把握认为上一次敏感中间值估计值$\hat\nonce_{j-1}=0$；
+		\item [2] 有足够的把握认为上一次和当前敏感中间值估计值$\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上一次敏感中间值估计值$\hat\nonce_{j-2}=0$；
+		\item [3] 有足够的把握认为上上一次、上一次和当前敏感中间值估计值$\hat\nonce_{j-2}=\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上上一次敏感中间值估计值$\hat\nonce_{j-3}=0$；
+		\item [4] $\exists 3\le t\le j$，有足够的把握认为到$t$为止的连续4比特敏感中间值估计值估计都为0，即$\hat\nonce_{t-3}=\hat\nonce_{t-2}=\hat\nonce_{t-1}=\hat\nonce_{t-0}=0$。
 	\end{enumerate}
 
-	容易验证，从采集的（含有一次性随机数$\nonce$共$n_s$个高比特泄漏的）一条迹中恢复出可利用（连续4比特）敏感信息泄漏的概率就是$\pi_{n_s}(4)$。$\Vector \pi_{n_s}$可以通过时间复杂度$\Theta(n_s)$的递推公式直接计算，也可以利用$\Vector \pi_{n_s}=\Vector \pi_0 P^{n_s}$并结合矩阵快速幂以$\Theta(\log n_s)$的复杂度进行计算。
+	容易验证，从采集的（含有一次性随机数$\nonce$共$n_s$个高比特泄漏的）一条电磁迹中恢复出可利用（连续4比特估计值为0的敏感中间值）比特泄漏的概率就是$\pi_{n_s}(4)$。$\Vector \pi_{n_s}$可以通过时间复杂度$\Theta(n_s)$的递推公式直接计算，也可以利用$\Vector \pi_{n_s}=\Vector \pi_0 P^{n_s}$并结合矩阵快速幂以$\Theta(\log n_s)$的复杂度进行计算。
 		
 	%实际上$\pi_{i}(j)$的物理含义某种概率，在$j<4$时它表示对于随机的一条迹，预测$\nonce_{i-j+1},\nonce_{i-j+2},\dots,\nonce_{i}$同时为0的概率，在$j=4$时它表示根据预测结果$\nonce_0,\nonce_1,\dots,\nonce_i$中存在至少连续4比特都被预测为0的概率。
 	
-	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本研究使用的求解算法$S$）可利用的敏感信息泄漏的概率。
-	显然$T_a$条电磁迹中可以恢复出可利用的敏感信息泄漏的迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。能成功构造方程并求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}当且仅当$75\le\xi$。
+	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本研究使用的求解算法$S$）可利用的敏感中间值的概率。
+	显然$T_a$条电磁迹中可以恢复出可利用的比特泄漏的电磁迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。能成功构造方程并求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}当且仅当$75\le\xi$。
 	
 	容易知道该二项分布的均值的方差$\mathbb E\xi=T_a\pi_{n_s}(4)=\epsilon+75,\mathbb D\xi=T_a\pi_{n_s}(4)(1-\pi_{n_s}(4))\le T_a\pi_{n_s}(4)=\epsilon+75$。
 	
@@ -185,7 +185,7 @@
 	\end{align*}
 
 	\end{proof}
-	对于本研究，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred0}\approx0.18354$，从而显著性水平$\alpha=\frac{\frac38-p_{pred0}}{\frac38}\approx0.51056$。这就是说，在前提假设都成立的情况下，对于本研究采集的5000条电磁迹，虽然它理论上含有约150000比特的可利用的敏感信息，但只要我们可以指出其中27531比特对应的敏感信息泄漏$\hat\nonce^{(i)}_j=0,i=0,1,\dots,4999,j=0,1,\dots,29$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
+	对于本研究，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred0}\approx0.18354$，从而显著性水平$\alpha=\frac{\frac38-p_{pred0}}{\frac38}\approx0.51056$。这就是说，在前提假设都成立的情况下，对于本研究采集的5000条电磁迹，虽然它理论上含有约150000比特泄漏（实际含有133493比特泄漏），但只要我们可以指出其中27531比特对应的敏感中间值$\hat\nonce^{(i)}_j=0,i=0,1,\dots,4999,j=0,1,\dots,29$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
 		
 
 %对公式的引用如，公式\eqref{eq:appedns}
@@ -233,7 +233,7 @@
 	
 	
 	\begin{apptab}[!htb]
-		\bicaption{\enspace 无噪声$\leakedmultiplier_j$泄漏场景下可推断的敏感信息泄漏$\tilde \nonce_j$和$\nonce_j$的信息}{\enspace Deduced information of $\tilde \nonce_j$ and $\nonce_j$ from Noise Free $\leakedmultiplier_j$}
+		\bicaption{\enspace 无噪声$\leakedmultiplier_j$泄漏场景下可推断的敏感中间值$\tilde \nonce_j$和$\nonce_j$的信息}{\enspace Deduced information of $\tilde \nonce_j$ and $\nonce_j$ from Noise Free $\leakedmultiplier_j$}
 		\stepcounter{app_tab}
 		\label{apptab:infoonsymbol}
 		\centering
@@ -993,10 +993,10 @@
 	\begin{breakablealgorithm}
 		\caption{位移变形}\label{alg:SH}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条迹
-			\Statex \textbf{输入:} $M^\prime$:合成的迹的采样点个数
+			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条能量迹或电磁迹
+			\Statex \textbf{输入:} $M^\prime$:合成的能量迹或电磁迹的采样点个数
 			\Statex \textbf{输入:} $lb,ub$:模拟随机延迟的范围
-			\Statex \textbf{输出:} $\Vector{l^\prime}$:采样点个数为$M^\prime$的新的迹
+			\Statex \textbf{输出:} $\Vector{l^\prime}$:采样点个数为$M^\prime$的新的能量迹或电磁迹
 			\State $j\stackrel{\$}\gets \{lb,lb+1,lb+2,\dots,rb-1\}$
 			\State $\Vector{l^\prime}:=\Vector {l^{(i)}}[j:j+M^\prime]$\Comment{获取索引从$j$到$j+M^\prime$的切片}
 			\State \Return $\Vector{l^\prime}$
@@ -1006,9 +1006,9 @@
 	\begin{breakablealgorithm}
 		\caption{添加删除变形}\label{alg:AR}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条迹
+			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条能量迹或电磁迹
 			\Statex \textbf{输入:} $R$:需要添加或删除的采样点个数
-			\Statex \textbf{输出:} $\Vector{l^\prime}$:合成的迹
+			\Statex \textbf{输出:} $\Vector{l^\prime}$:合成的能量迹或电磁迹
 			\State $\Vector{l^\prime}:=\Vector {l^{(i)}}$\Comment{拷贝副本}
 			\For {$r:=0,\dots,R-1$}\Comment{随机$R$个位置添加采样点}
 				\State $j\stackrel{\$}\gets \{0,1,\dots,M+r-1\}$
@@ -1025,10 +1025,10 @@
 	\begin{breakablealgorithm}
 		\caption{循环位移变形}\label{alg:RO}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的迹
+			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的能量迹或电磁迹
 			\Statex \textbf{输入:} $\gamma$:最大平移率
 			\Statex \textbf{输入:} $C$:数据增强数量的比例
-			\Statex \textbf{输出:} $L^{agmt}$:合成的共$(1+\gamma C)T$条迹
+			\Statex \textbf{输出:} $L^{agmt}$:合成的共$(1+\gamma C)T$条能量迹或电磁迹
 			\State $L^{agmt}:=L$\Comment{拷贝副本}
 			\For {$i:=0,\dots,T-1$}
 				\For {$r:=0,\dots,\gamma C-1$}
@@ -1044,11 +1044,11 @@
 	\begin{breakablealgorithm}
 		\caption{合成少数类过采样法}\label{alg:smotepolulate}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的迹
-			\Statex \textbf{输入:} $\mathcal I_y$:对应中间值为$y$迹的索引
+			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的能量迹或电磁迹
+			\Statex \textbf{输入:} $\mathcal I_y$:对应中间值为$y$能量迹或电磁迹的索引
 			\Statex \textbf{输入:} $n$:最近点的个数
 			\Statex \textbf{输入:} $C$:数据增强数量的比例
-			\Statex \textbf{输出:} $L^{agmt}$:合成的共$C\vert\mathcal I_y\vert$条中间值为$y$迹
+			\Statex \textbf{输出:} $L^{agmt}$:合成的共$C\vert\mathcal I_y\vert$条中间值为$y$能量迹或电磁迹
 			\State $L^{agmt}:=[]$\Comment{初始化为空列表}
 			\If{$C<1$}
 				\State $\mathcal I\stackrel{\$}\gets\{\mathcal A\subset \mathcal I_y:\vert\mathcal A\vert=C\vert\mathcal I_y\vert\}$\Comment{随机保留比例为$C$的集合元素}
@@ -1058,8 +1058,8 @@
 				\State $C:=\lfloor C\rfloor$
 			\EndIf
 			\For {$i\in \mathcal I$}
-				\State 计算中间值为$y$的迹中距离$\Vector {l^{(i)}}$最近的$n$条迹的索引，索引集合记为$\mathcal J$
-				\For{$c:=0,\dots,C-1$}\Comment{每条迹会合成$C$条新的迹}
+				\State 计算中间值为$y$的能量迹或电磁迹中距离$\Vector {l^{(i)}}$最近的$n$条能量迹或电磁迹的索引，索引集合记为$\mathcal J$
+				\For{$c:=0,\dots,C-1$}\Comment{每条能量迹或电磁迹会合成$C$条新的能量迹或电磁迹}
 					\State $j\stackrel{\$}\gets\mathcal J$
 					\For {$m:=0,\dots M-1$}
 						\State $\lambda\stackrel{\$}\gets U(0,1)$\Comment{从均匀分布中采样}
@@ -1135,11 +1135,11 @@
 	\end{breakablealgorithm}
 	
 	\begin{breakablealgorithm}
-		\caption{量化}\label{alg:quantize}
+		\caption{模数转换}\label{alg:quantize}
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
-			\Statex \textbf{输入:} $th$:量化的阈值
-			\Statex \textbf{输出:} $\Vector Q$量化后的数列
+			\Statex \textbf{输入:} $th$:模数转换的阈值
+			\Statex \textbf{输出:} $\Vector Q$模数转换后的数列
 			\For {$i:=0\dots N_X-1$}
 			\If{$x_i<th$}
 			\State $q_i:=0$

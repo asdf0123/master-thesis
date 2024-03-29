@@ -2,6 +2,7 @@
 /picturegeneration
 /Tmp
 Thesis.*
+*_bak.*
 *.pdf
 token.txt
 

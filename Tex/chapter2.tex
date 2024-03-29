@@ -165,7 +165,7 @@
 	
 	当原假设成立的前提下统计量被观测到的概率低于显著性水平$\alpha$时\footnote{显著性水平$\alpha$可以任意选择。在侧信道分析中，显著性水平通常设置为$10^{-5}$。}，我们拒绝原假设$\mathrm H_0$，接受备择假设$\mathrm H_1$，即有超过$(1-\alpha)$的把握认为第$j$个采样点存在信息泄漏。
 	
-	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的敏感信息泄漏$\nonce^{(i)}_j\in\{0,1\},i=0,1,\dots T-1,j=0,1,\dots,127$的值进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l^{(0)}_{j},l^{(1)}_{j},\dots l^{(T-1)}_{j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
+	本文在TVLA框架下使用的单变量检测是Welch's T检验\citep{Welch38}。使用某种方法\footnote{对于本文评估ECDSA实现电磁迹的信息泄漏，依据电磁迹所对应的敏感中间值$\nonce^{(i)}_j\in\{0,1\},i=0,1,\dots T-1,j=0,1,\dots,127$进行划分。}划分所有电磁迹第$j$个采样点构成的总体$\{l^{(0)}_{j},l^{(1)}_{j},\dots l^{(T-1)}_{j}\}$得到两个互不相交的总体，记为$L_{A,j},L_{B,j}$。我们将这两个总体的样本数量分别记为$n_A,n_B$，将其样本均值分别记为$\overline{x_{A,j}},\overline{x_{B,j}}$，将其样本标准差分别记为$s_{A,j},s_{B,j}$。在之后，使用统计量$v_j$来描述它们的差异。统计量$v_j$的计算方式如\equationref{eq:calct}所示。
 	
 	\begin{equation}\label{eq:calct}
 		v_j=\frac{\overline {x_{A,j}}-\overline{x_{B,j}}}{\sqrt{\frac{s_{A,j}^2}{n_A}+\frac{s_{B,j}^2}{n_B}}}
@@ -234,26 +234,18 @@
 	成功率适用范围比准确率更大。准确率是机器学习方面的指标，它定义为所有样本中预测正确的概率。如果不同迹对应的中间值互相独立，攻击者只能使用一条迹恢复（子）密钥，准确率等价于成功率。如果不同迹对应的中间值不是互相独立的\footnote{对于AES-128算法，如果两次算法密钥不是互相独立的（如设置为相同的密钥值）且明文已知，那么以第1轮第0字节的Sbox输出$\mathrm{Sbox}[p_0\oplus k_0]$作为中间值$y$时，中间值不是互相独立的。}，准确率会因为忽略迹之间的关联性而不能准确评估模型性能。Picek等\citep{Picek19}指出准确率等标准的机器学习度量指标在侧信道分析中效果不佳。这是因为它只能为测试数据集中的每个样本提供独立的标签预测信息。
 	{\color{\xchange}
 		
-	\subsubsection{真阳性率}
-	真阳性率是指在所有真实为阳性的样本中，被正确地识别为阳性的比例，其计算方式如\equationref{eq:tpr}所示。其中TP表示实际为阳性且被估计为阳性的样本量，FP表示实际为阴性且被估计为阳性的样本量。真阳性率适用于不能容忍将阴性样本错误估计为阳性的情况。
+%	\subsubsection{真阳性率}
+%	真阳性率是指在所有真实为阳性的样本中，被正确地识别为阳性的比例，其计算方式如\equationref{eq:tpr}所示。其中TP表示实际为阳性且被估计为阳性的样本量，FP表示实际为阴性且被估计为阳性的样本量。真阳性率适用于不能容忍将阴性样本错误估计为阳性的情况。
+%	
+%	\begin{equation}\label{eq:tpr}
+%		TPR=\frac{TP}{TP+FP}
+%	\end{equation}
+%	
+%	就本研究（见\chapref{chap:search2}）而言，因为ECDSA本身的特性以及后续格方法的特殊要求，假阴性的数量或比例在不超过阈值的情况下不会对求解私钥的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。因此，虽然真阳性率作为评价指标的场景少见，但它适合作为本研究评价指标。
 	
-	\begin{equation}\label{eq:tpr}
-		TPR=\frac{TP}{TP+FP}
-	\end{equation}
-	
-	就本研究（见\chapref{chap:search2}）而言，因为ECDSA本身的特性以及后续格方法的特殊要求，假阴性的数量或比例在不超过阈值的情况下不会对求解私钥的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。因此，虽然真阳性率作为评价指标的场景少见，但它适合作为本研究评价指标。
-	
-	具体来说，本研究将敏感信息泄漏值（见\subsref{subs:ecdsasymbol}）$\nonce^{(i)}_j=0,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$的样本称为阳性样本，$\nonce^{(i)}_j=1,i=0,1,\dots,T_a,j=0,1,\dots,n_s-1$的样本称为阴性样本。据此可以定义真阳性、真阴性、假阳性、假阴性的样本，从而计算真阳性率。
-		
-	\begin{itemize}
-		\item [真阳性] 如果样本符合$\nonce^{(i)}_j=0,\hat \nonce^{(i)}_j=0$的条件，那么它是真阳性；
-		\item [真阴性] 如果样本符合$\nonce^{(i)}_j=1,\hat \nonce^{(i)}_j=1$的条件，那么它是真阴性；
-		\item [假阳性] 如果样本符合$\nonce^{(i)}_j=1,\hat \nonce^{(i)}_j=0$的条件，那么它是假阳性；
-		\item [假阴性] 如果样本符合$\nonce^{(i)}_j=0,\hat \nonce^{(i)}_j=1$的条件，那么它是假阴性。
-	\end{itemize}
+%	具体来说，本研究将敏感中间值（见\subsref{subs:ecdsasymbol}）$\nonce^{(i)}_j=0,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$的样本称为阳性样本，$\nonce^{(i)}_j=1,i=0,1,\dots,T_a,j=0,1,\dots,n_s-1$的样本称为阴性样本。
 
 	}
-	%猜测熵、成功率、猜测熵收敛速度(研究内容1)、真阳性率(研究内容2)
 	\section{数据增强}\label{sec:da}
 	
 	\subsection{侧信道分析领域数据增强}
@@ -375,7 +367,7 @@
 	
 	签名者选取一个256bit随机数$\sk$作为私钥并计算$\pk=\sk\cdot G$。$\sk$和$\pk$分别是签名者的私钥和公钥，$\sk$保密，$\pk$公开。
 	
-	\textbf{签名过程}：对于消息$m_0$，签名者每次秘密选取256bit整数$1<\nonce<q$\footnote{一次性随机数（Number once，Nonce），它是一个只被使用一次的随机数值。}，然后计算数字签名（简称签名），如\equationref{eq:sign}所示。
+	\textbf{签名过程}：对于消息$m_0$，签名者每次秘密选取256bit整数$1<\nonce<q$作为一次性随机数，然后计算数字签名（简称签名），如\equationref{eq:sign}所示。
 	
 	\begin{equation}\label{eq:sign}
 		\begin{cases}

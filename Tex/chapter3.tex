@@ -380,7 +380,7 @@
 	\noindent 其中$p_0$表示明文第0字节的值，$k_0$表示主密钥第0字节的值，$mask_0$表示算法第1轮掩码第0字节的值。
 	
 	\subsubsection{AES\_HD数据集}
-	这个数据集对应了无防护的AES硬件\footnote{数据来源：AES\_HD\_Dataset \href{https://github.com/AESHD/AES\_HD\_Dataset}{https://github.com/AESHD/AES\_HD\_Dataset}。}实现。AES-128核心部件使用VHDL编写的，它采用多轮的架构，每次加密需要11个时钟周期。该设计在Xilinx Virtex-5 FPGA的SASEBO GII评估板上实现。攻击者将高灵敏度的电磁探针放置在电源线的去耦合电容附近，使用Teledyne LeCroy Waverunner 610zi示波器采样，从而获得包含信息泄漏的电磁迹。硬件实现中寄存器写通常存在比较明显的泄漏，我们选择最后一轮（第10轮）轮密钥的第7字节选为攻击目标，数据集中的标签计算方式如\equationref{eq:aeshdmodel}所示。采集的迹含有4000个采样点。本研究使用其中的5000条。
+	这个数据集对应了无防护的AES硬件\footnote{数据来源：AES\_HD\_Dataset \href{https://github.com/AESHD/AES\_HD\_Dataset}{https://github.com/AESHD/AES\_HD\_Dataset}。}实现。AES-128核心部件使用VHDL编写的，它采用多轮的架构，每次加密需要11个时钟周期。该设计在Xilinx Virtex-5 FPGA的SASEBO GII评估板上实现。攻击者将高灵敏度的电磁探针放置在电源线的去耦合电容附近，使用Teledyne LeCroy Waverunner 610zi示波器采样，从而获得包含信息泄漏的电磁迹。硬件实现中寄存器写通常存在比较明显的泄漏，我们选择最后一轮（第10轮）轮密钥的第7字节选为攻击目标，数据集中的标签计算方式如\equationref{eq:aeshdmodel}所示。采集的电磁迹含有4000个采样点。本研究使用其中的5000条。
 	
 	\begin{equation}
 		\begin{cases}
@@ -400,7 +400,7 @@
 		label=\overbrace{\mathrm{Sbox}}^{\mbox{已知}}[\overbrace{p_0}^{\mbox{已知}}\oplus k_0]
 	\end{equation}
 	
-	数据集包含50000条有3500个采样点的迹，本研究使用该数据集所有的迹。
+	数据集包含50000条有3500个采样点的能量迹或电磁迹，本研究使用该数据集所有的能量迹或电磁迹。
 	\subsubsection{ASCADf数据集}
 	Benadjila等\citep{Benadjila20}在一个使用8比特AVR微控制器的ATmega16智能卡上实现了有掩码防护措施的AES-128算法，并采集智能卡加密过程中的电磁辐射生成了ASCAD数据集\footnote{数据来源：ASCAD \href{https://github.com/ANSSI-FR/ASCAD}{https://github.com/ANSSI-FR/ASCAD}}。我们还是选定第一轮字节替换操作作为攻击目标。以攻击主密钥第2字节\footnote{AES算法不同字节密钥的攻击难度可能不同。在Benadjila等的研究中重点汇报了对主密钥第三字节进行攻击的结果，我们也选择第三字节作为攻击目标可以保证比较是公平的。}为例，数据集中的标签计算方式如\equationref{eq:ascadbadmodel}所示。但是在建模阶段，$mask_2$是无法知道的，这会导致无法计算标签。为了解决这个问题，我们直接舍去$mask_2$，这样就可以计算出标签\footnote{对于一阶掩码实现，信息泄漏与标签之间不再存在某种线性关系。但是深度神经网络有可能学习到信息泄漏与标签之间的非线性关系，进而完成DL-SCA。}，如\equationref{eq:ascadmodel}所示。
 	
@@ -412,7 +412,7 @@
 		label=\overbrace{\mathrm{Sbox}}^{\mbox{已知}}[\overbrace{p_2}^{\mbox{已知}}\oplus k_2]
 	\end{equation}
 	
-	ASCAD数据集主要分成两个部分：一个部分使用固定的密钥设置（记为ASCADf），另一个部分使用随机的密钥设置（记为ASCADr）。本文只使用ASCADf。ADCADf数据集包含60000条迹。本研究使用该数据集所有的迹，并从每条迹中过滤出包含敏感信息泄漏的700个采样点。
+	ASCAD数据集主要分成两个部分：一个部分使用固定的密钥设置（记为ASCADf），另一个部分使用随机的密钥设置（记为ASCADr）。本文只使用ASCADf。ADCADf数据集包含60000条电磁迹。本研究使用该数据集所有的迹，并从每条迹中过滤出包含敏感信息泄漏的700个采样点。
 	
 	除此之外，Benadjila等向数据集中添加了使用脚本模拟的随机延迟，以测试神经网络抗抖动的能力。根据随机延迟程度不同，ASCADf数据集可以进一步分为三个：ASCADf（N=0）、ASCADf（N=50）以及ASCADf（N=100），它们分别对应于延迟最多0、50以及100个采样点的场景。
 	
@@ -506,30 +506,30 @@
 	%对于初始数据增强策略参数，每个参数从可行范围内随机选取。初始温度设置为不进行数据增强情况下的攻击代价。将终止温度设置为初始温度的0.001倍，使得在初始阶段后有足够的机会跳出局部最优，且在接近结束阶段时尽可能保留更优的数据增强策略参数。退火速度设置为$\gamma=0.97$，这样一来可以计算出迭代次数为$n=227=\lceil\log_{0.97}0.001\rceil$既使得程序运行时间在可接受的范围内，又尽可能多选取数据增强策略参数进行搜索以提高搜索到最优数据增强策略参数的概率。
 	
 	\subsubsection{数据增强单元设置}\label{subss:cdasettings}
-	在框架中，我们使用组合式数据增强机制（如\algorithmref{alg:combined-da}所示）实现数据增强单元。在组合式数据增强机制中，可变的参数有$T^{agmt},p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$，他们分别表示期望合成的迹的数目、循环位移变形概率、循环位移变形幅度、添加噪声概率、添加噪声方差、过采样概率和过采样强度。在这些参数中，$T^{agmt}$的取值会影响后续深度学习模型训练时间所以它需要单独考虑，$p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$的取值不影响后续深度学习模型训练时间所以本文对这些参数进行搜索。调用一次组合式数据增强机制可以合成多条新的迹，这使得每次构造数据增强后的训练集只需要调用一次组合式数据增强机制。
+	在框架中，我们使用组合式数据增强机制（如\algorithmref{alg:combined-da}所示）实现数据增强单元。在组合式数据增强机制中，可变的参数有$T^{agmt},p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$，他们分别表示期望合成的能量迹或电磁迹的数目、循环位移变形概率、循环位移变形幅度、添加噪声概率、添加噪声方差、过采样概率和过采样强度。在这些参数中，$T^{agmt}$的取值会影响后续深度学习模型训练时间所以它需要单独考虑，$p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os}$的取值不影响后续深度学习模型训练时间所以本文对这些参数进行搜索。调用一次组合式数据增强机制可以合成多条新的迹，这使得每次构造数据增强后的训练集只需要调用一次组合式数据增强机制。
 	
-	在\algorithmref{alg:combined-da}中，除了定义在第39行至48行的主函数，还实现了四个子函数\textsc{rotate\_deformation}、\textsc{add\_noise}、\textsc{over\_sample}和\textsc{populate}以支持模块化开发、提高代码可读性。\textsc{populate}用于合成一条新的迹，多次调用它就能获得多条新的迹，使得\algorithmref{alg:combined-da}最终输出数据增强后的训练集。\textsc{rotate\_deformation}、\textsc{add\_noise}和\textsc{over\_sample}是三种数据增强子策略，它们在\textsc{populate}函数中被调用。数据增强子策略通过引入多样性的训练数据增强技术，旨在一定程度上隐藏训练集中训练数据与训练标签的关系，将训练数据与训练标签之间的对应关系有关知识隐性地编码进神经网络中，进而提升模型对于测试集的准确度。在此之前，由于缺乏充足的与对应关系有关的知识，神经网络无法准确地捕捉到这种对应关系。
+	在\algorithmref{alg:combined-da}中，除了定义在第39行至48行的主函数，还实现了四个子函数\textsc{rotate\_deformation}、\textsc{add\_noise}、\textsc{over\_sample}和\textsc{populate}以支持模块化开发、提高代码可读性。\textsc{populate}用于合成一条新的能量迹或电磁迹，多次调用它就能获得多条新的能量迹或电磁迹，使得\algorithmref{alg:combined-da}最终输出数据增强后的训练集。\textsc{rotate\_deformation}、\textsc{add\_noise}和\textsc{over\_sample}是三种数据增强子策略，它们在\textsc{populate}函数中被调用。数据增强子策略通过引入多样性的训练数据增强技术，旨在一定程度上隐藏训练集中训练数据与训练标签的关系，将训练数据与训练标签之间的对应关系有关知识隐性地编码进神经网络中，进而提升模型对于测试集的准确度。在此之前，由于缺乏充足的与对应关系有关的知识，神经网络无法准确地捕捉到这种对应关系。
 	
 	循环位移变形函数\textsc{rotate\_deformation}参考了Pu等\citep{Pu17}的设计，模拟引入了随机延迟防护实现的能量迹。循环位移变形通过对能量迹进行变换，引入了限定幅度的随机偏移。它可以部分隐藏敏感中间值与信息泄漏之间的关系，使得神经网络学习到能量迹采样点位置受延迟影响但与敏感中间值无关的知识。因此对于有随机延迟防护实现的能量迹，不同能量迹发生泄漏的采样点位置不同，可以选取较大的$p_{sd}$和$m_{sd}$，对训练集进行位移变形操作来使神经网络习得泄漏不是时间依赖的。
 	
 	添加噪声函数\textsc{add\_noise}参考了Kim等\citep{Kim19}的设计，但与之相比本研究将添加噪声的步骤从批归一化之后提前到分批之前，这使得我们不用对深度神经网络本身的结构进行改动。添加噪声可以模拟引入了随机噪声防护的算法实现的能量迹。添加噪声通过在训练样本中引入一定程度的噪声以增加数据的多样性，混淆敏感中间值与信息泄漏之间的关联。类似于向目标函数添加正则化项，我们使用添加噪声操作来平衡模型复杂度和泛化能力，并使神经网络能学习到能量迹采样点数值受噪声影响但与敏感中间值无关的知识。添加噪声过少可能使得网络特征提取不当从而过拟合。因此对于信噪比较大的算法实现的能量迹，应选取较大的$p_{an}$和$m_{an}$，向样本添加足够强度的噪声才可能使得神经网络习得能量迹采样点的数值受噪声影响的知识。
 	
-	过采样函数\textsc{over\_sample}同时参考了Picek等\citep{Picek19}使用的合成少数类过采样法和Luo等\citep{Luo21}基于混淆技术的数据增强方法。过采样函数基于样本的特征空间进行插值来合成新的迹，这与合成少数类过采样法相同，避免了混淆技术中需要猜测的标签空间过大的问题。但是就具体实现而言，过采样函数使用从$Beta$分布随机采样出的插值比例直接对两个样本数据进行插值，这类似于混淆，避免了合成少数类过采样法需要计算最近点和插值比例只能从均匀分布中选取的问题。对训练样本进行插值，旨在生成符合掩码所对应的多点泄漏模型的新的样本，从而提升数据多样性，扩展神经网络决策区域。这使神经网络能学习到这样的知识：迹的采样点单点数值与敏感中间值无线性相关，但是多个采样点数值组合与敏感中间值有关。因为过采样函数计算过程中没有利用少数类特有的性质，可以认为插值合成新样本的方法对所有类别都适用。对于使用掩码防护的算法实现的能量迹，应当选取较大的插值强度（$m_{os}>1$）使得泄漏有更多样的组合，从而提高神经网络的对特征的识别准确度。
+	过采样函数\textsc{over\_sample}同时参考了Picek等\citep{Picek19}使用的合成少数类过采样法和Luo等\citep{Luo21}基于混淆技术的数据增强方法。过采样函数基于样本的特征空间进行插值来合成新的能量迹或电磁迹，这与合成少数类过采样法相同，避免了混淆技术中需要猜测的标签空间过大的问题。但是就具体实现而言，过采样函数使用从$Beta$分布随机采样出的插值比例直接对两个样本数据进行插值，这类似于混淆，避免了合成少数类过采样法需要计算最近点和插值比例只能从均匀分布中选取的问题。对训练样本进行插值，旨在生成符合掩码所对应的多点泄漏模型的新的样本，从而提升数据多样性，扩展神经网络决策区域。这使神经网络能学习到这样的知识：能量迹或电磁迹的采样点单点数值与敏感中间值无线性相关，但是多个采样点数值组合与敏感中间值有关。因为过采样函数计算过程中没有利用少数类特有的性质，可以认为插值合成新样本的方法对所有类别都适用。对于使用掩码防护的算法实现的能量迹，应当选取较大的插值强度（$m_{os}>1$）使得泄漏有更多样的组合，从而提高神经网络的对特征的识别准确度。
 	
 	\begin{breakablealgorithm}
 		\caption{组合式数据增强}\label{alg:combined-da}
 		\begin{algorithmic}[1]
-			\Statex \textbf{输入:} $L$:$T$条迹
-			\Statex \textbf{输入:} $Label$:$T$条迹的敏感中间值
-			\Statex \textbf{输入:} $T^{agmt}$期望合成的迹的数目
+			\Statex \textbf{输入:} $L$:$T$条能量迹或电磁迹
+			\Statex \textbf{输入:} $Label$:$T$条能量迹或电磁迹的敏感中间值
+			\Statex \textbf{输入:} $T^{agmt}$期望合成的能量迹或电磁迹的数目
 			\Statex \textbf{输入:} $p_{ro}$:循环位移变形概率
 			\Statex \textbf{输入:} $m_{ro}$:循环位移变形幅度
 			\Statex \textbf{输入:} $p_{an}$:添加噪声概率
 			\Statex \textbf{输入:} $p_{an}$:添加噪声方差
 			\Statex \textbf{输入:} $p_{os}$:过采样概率
 			\Statex \textbf{输入:} $p_{os}$:过采样强度
-			\Statex \textbf{输出:} $L^{agmt}$:$T^{agmt}$条合成的迹
-			\Statex \textbf{输出:} $Label^{agmt}$:$T^{agmt}$条合成的迹的敏感中间值
+			\Statex \textbf{输出:} $L^{agmt}$:$T^{agmt}$条合成的能量迹或电磁迹
+			\Statex \textbf{输出:} $Label^{agmt}$:$T^{agmt}$条合成的能量迹或电磁迹的敏感中间值
 			\Function{rotate\_deformation}{$\Vector x,\varphi$}
 				\State $s\stackrel{\$}\gets\{-\varphi,-\varphi+1,-\varphi+2,\dots,\varphi-1,\varphi\}$
 				\If {$s<0$}
@@ -576,7 +576,7 @@
 			\State $Label^{agmt}:=[]$\Comment{初始化为空列表}
 			\For{$i:=0,\dots,T^{agmt}-1$}
 				\State $label:=Label^{(i\bmod T)}$
-				\State $j\stackrel{\$}\gets\left\lbrace a:Label^{(a)}=label\right\rbrace $\Comment{随机选取一条敏感中间值为$label$的迹}
+				\State $j\stackrel{\$}\gets\left\lbrace a:Label^{(a)}=label\right\rbrace $\Comment{随机选取一条敏感中间值为$label$的能量迹或电磁迹}
 				\State $\Vector {l^\prime}:=\textsc{populate}(\Vector {l^{(i\bmod T)}},\Vector l^{(j)},p_{ro},m_{ro},p_{an},m_{an},p_{os},m_{os})$
 				\State 将$\Vector {l^\prime}$加入到$L^{agmt}$中
 				\State 将$label$加入到$Label^{agmt}$中
@@ -585,11 +585,11 @@
 		\end{algorithmic}
 	\end{breakablealgorithm}
 
-	合成一条新的迹的函数\textsc{populate}中，概率$p$（\algorithmref{alg:combined-da}第25、29、33行）是随机采样的，这使得它会概率性地对迹进行三种数据增强子策略对应的变换。在三种子策略中，也会依据参数进行随机采样（如\textsc{rotate\_deformation}中的偏移$s$、\textsc{add\_noise}中的噪声$\Vector e$、\textsc{over\_sample}中的插值比例$\lambda$），进一步增加数据多样性。
+	合成一条新的能量迹或电磁迹的函数\textsc{populate}中，概率$p$（\algorithmref{alg:combined-da}第25、29、33行）是随机采样的，这使得它会概率性地对能量迹或电磁迹进行三种数据增强子策略对应的变换。在三种子策略中，也会依据参数进行随机采样（如\textsc{rotate\_deformation}中的偏移$s$、\textsc{add\_noise}中的噪声$\Vector e$、\textsc{over\_sample}中的插值比例$\lambda$），进一步增加数据多样性。
 	
 	本研究提出的组合式数据增强机制具有很强的可扩展性，在已集成的三种数据增强子策略的基础上，可以替换或增加若干基础数据增强方法，以适应更多的防护型密码实现的数据集的数据增强需求。例如，增加基于混淆技术的数据增强，只用将其实现封装为函数\textsc{mixup}并在\textsc{populate}进行概率性地调用即可。
 	\subsubsection{深度学习模型设置}
-	Zaid等\citep{Zaid20}针对AES\_RD、AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）四种数据集六个场景，设计了与其分别对应的多个CNN实例作为深度学习模型，它们的具体参数如\tableref{tab:cnnhyperpara}所示。本文使用这些CNN实例，并选择直接使用敏感中间值作为分类标签进行攻击，以验证本研究提出的通用数据增强方法的有效性。相比于使用敏感中间值的汉明重量或最低有效位作为标签等其他选择，直接使用敏感中间值作为标签只假设敏感信息泄漏与敏感中间值有关，没有额外假设敏感信息泄漏与敏感中间值的对应关系。直接使用敏感中间值作为标签具有更广泛的适用性，但需要准确的工具来刻画敏感信息泄漏与敏感中间值的对应关系，而CNN正好能准确地刻画数据与标签的对应关系。分别将含有泄漏的迹和敏感中间值用作CNN的训练数据和标签，可以使得两者优势结合，因此DL-SCA通常选取直接使用敏感中间值作为分类标签进行建模和攻击。
+	Zaid等\citep{Zaid20}针对AES\_RD、AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）四种数据集六个场景，设计了与其分别对应的多个CNN实例作为深度学习模型，它们的具体参数如\tableref{tab:cnnhyperpara}所示。本文使用这些CNN实例，并选择直接使用敏感中间值作为分类标签进行攻击，以验证本研究提出的通用数据增强方法的有效性。相比于使用敏感中间值的汉明重量或最低有效位作为标签等其他选择，直接使用敏感中间值作为标签只假设敏感信息泄漏与敏感中间值有关，没有额外假设敏感信息泄漏与敏感中间值的对应关系。直接使用敏感中间值作为标签具有更广泛的适用性，但需要准确的工具来刻画敏感信息泄漏与敏感中间值的对应关系，而CNN正好能准确地刻画数据与标签的对应关系。分别将含有泄漏的能量迹或电磁迹和敏感中间值用作CNN的训练数据和标签，可以使得两者优势结合，因此DL-SCA通常选取直接使用敏感中间值作为分类标签进行建模和攻击。
 	
 	\begin{table}[!htb]
 		\bicaption{\enspace 卷积神经网络的超参数设定}{\enspace Hyper-parameters for CNN}
@@ -661,11 +661,11 @@
 	convrate=\sum\limits_{t=0}^{T_a}(\log t)GE_t(k^*)
 	\end{equation}
 	
-	\noindent 其中$GE_t(k^*)$表示组合$t$条迹的信息计算密钥时的正确密钥猜测熵，$T_a$表示可被用于攻击的迹的最大条数。正确密钥猜测熵收敛速度枚举从1到$T_a$（含）的所有攻击条数$t$，对正确密钥猜测熵$GE_t(k^*)$加权求和。求和权重$\log t$是依据经验选取的：攻击条数$t$较小时$GE_t(k^*)$方差较大，应当减小$GE_t(k^*)$在求和项中的权重；攻击条数$t$较大时，$GE_t(k^*)$趋于稳定，应当增加$GE_t(k^*)$在求和项中的权重。
+	\noindent 其中$GE_t(k^*)$表示组合$t$条能量迹或电磁迹的信息计算密钥时的正确密钥猜测熵，$T_a$表示可被用于攻击的能量迹或电磁迹的最大条数。正确密钥猜测熵收敛速度枚举从1到$T_a$（含）的所有攻击条数$t$，对正确密钥猜测熵$GE_t(k^*)$加权求和。求和权重$\log t$是依据经验选取的：攻击条数$t$较小时$GE_t(k^*)$方差较大，应当减小$GE_t(k^*)$在求和项中的权重；攻击条数$t$较大时，$GE_t(k^*)$趋于稳定，应当增加$GE_t(k^*)$在求和项中的权重。
 	
-	在使用$T_a$条迹攻击不成功时，正确密钥猜测熵收敛速度和正确密钥猜测熵正相关，可以度量在侧信道分析中，在平均意义下正确密钥在所有密钥猜测中的排序情况，它能够细粒度地反映侧信道分析的结果。
+	在使用$T_a$条能量迹或电磁迹攻击不成功时，正确密钥猜测熵收敛速度和正确密钥猜测熵正相关，可以度量在侧信道分析中，在平均意义下正确密钥在所有密钥猜测中的排序情况，它能够细粒度地反映侧信道分析的结果。
 	
-	在使用$T_a$条迹攻击成功时，存在减少攻击迹的数量导致攻击不成功的情况\footnote{如果这种情况不存在，那么使用任意数量的迹都能完成攻击。在仅使用1条迹就足以完成攻击的情况下，攻击已经达到理论上最优的结果，没有必要使用本文提出的通用数据增强方法。}。正确密钥猜测熵收敛速度复用了这些不成功情况的正确密钥猜测熵，从而也能细粒度地反映侧信道分析的结果。而使用$T_a$条能量迹的正确密钥猜测熵 ，它恒为0而不具有区分度。
+	在使用$T_a$条能量迹或电磁迹攻击成功时，存在减少攻击能量迹或电磁迹的数量导致攻击不成功的情况\footnote{如果这种情况不存在，那么使用任意数量的能量迹或电磁迹都能完成攻击。在仅使用1条能量迹或电磁迹就足以完成攻击的情况下，攻击已经达到理论上最优的结果，没有必要使用本文提出的通用数据增强方法。}。正确密钥猜测熵收敛速度复用了这些不成功情况的正确密钥猜测熵，从而也能细粒度地反映侧信道分析的结果。而使用$T_a$条能量迹的正确密钥猜测熵 ，它恒为0而不具有区分度。
 	
 	这些特点使得正确密钥猜测熵收速度提供了更全面、准确的视角来观察和评估侧信道分析结果，并与已有的评价指标正确密钥猜测熵相匹配。
 	
@@ -749,7 +749,7 @@
 	
 	本文方法进行实证研究过程中，使用的机器配置如下：处理器型号为Intel(R) Xeon(R) CPU E5-2667 v4 @ 3.20GHz，内存大小252GB，操作系统版本为CentOS release 6.6 (Final)。本文方法使用Python（版本为3.6.2）作为编程语言进行实现，其中深度学习模型通过Keras\footnote{资料来源：keras \href{https://pypi.org/project/keras}{https://pypi.org/project/keras}。}开源框架进行实现。
 
-	DL-SCA的攻击阶段与深度学习中的测试阶段有一定相似之处但并不完全相同。如\figureref{fig:dltestphase}和\figureref{fig:mydlscatest}所示，在深度学习训练出的模型对测试数据进行预测之后，还需要组合多条迹的信息进一步对算法密钥进行估计，从而计算侧信道领域的评价指标以评估侧信道分析技术效果，在本研究中，使用\chenggongtiaoshu 作为指标评估DL-SCA的效果，\chenggongtiaoshu 越小，那么DL-SCA效果越好。
+	DL-SCA的攻击阶段与深度学习中的测试阶段有一定相似之处但并不完全相同。如\figureref{fig:dltestphase}和\figureref{fig:mydlscatest}所示，在深度学习训练出的模型对测试数据进行预测之后，还需要组合多条能量迹或电磁迹的信息进一步对算法密钥进行估计，从而计算侧信道领域的评价指标以评估侧信道分析技术效果，在本研究中，使用\chenggongtiaoshu 作为指标评估DL-SCA的效果，\chenggongtiaoshu 越小，那么DL-SCA效果越好。
 
 	\begin{figure}[!h]
 		\centering
@@ -908,7 +908,7 @@
 		%\footnotesize% fontsize
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space
-		\footnotesize
+		\scriptsize
 		\begin{tabular}{cc|cccccc}
 			\hline
 			\multirow{2}{*}{数据增强方法} &\multirow{2}{*}{性能指标} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
