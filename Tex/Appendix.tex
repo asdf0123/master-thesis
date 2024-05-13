@@ -45,7 +45,7 @@
 	\begin{proof}
 		令构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特敏感中间值（即可利用的泄漏有$r$比特），运用一次格基规约时间开销为$u$。
 		
-		（本研究所调用的）格方法只运用nonce数值为0的比特。nonce比特0恢复准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，所利用的被恢复的比特准确的概率为$p_r=p^r$。
+		（本文所调用的）格方法只运用nonce数值为0的比特。nonce比特0恢复准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，所利用的被恢复的比特准确的概率为$p_r=p^r$。
 	
 		能量迹恢复的泄漏没有错误这一事件对于每条能量迹是互相独立的，因此对于构造签名的所有能量迹，恢复的泄漏都没有错误的概率为\begin{align*}
 			p_s&=p_r^{\frac sr}\\
@@ -162,7 +162,7 @@
 		
 	%实际上$\pi_{i}(j)$的物理含义某种概率，在$j<4$时它表示对于随机的一条迹，预测$\nonce_{i-j+1},\nonce_{i-j+2},\dots,\nonce_{i}$同时为0的概率，在$j=4$时它表示根据预测结果$\nonce_0,\nonce_1,\dots,\nonce_i$中存在至少连续4比特都被预测为0的概率。
 	
-	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本研究使用的求解算法$S$）可利用的敏感中间值的概率。
+	%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本文使用的求解算法$S$）可利用的敏感中间值的概率。
 	显然$T_a$条电磁迹中可以恢复出可利用的比特泄漏的电磁迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。能成功构造方程并求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}当且仅当$75\le\xi$。
 	
 	容易知道该二项分布的均值的方差$\mathbb E\xi=T_a\pi_{n_s}(4)=\epsilon+75,\mathbb D\xi=T_a\pi_{n_s}(4)(1-\pi_{n_s}(4))\le T_a\pi_{n_s}(4)=\epsilon+75$。
@@ -185,7 +185,7 @@
 	\end{align*}
 
 	\end{proof}
-	对于本研究，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred0}\approx0.18354$，从而显著性水平$\alpha=\frac{\frac38-p_{pred0}}{\frac38}\approx0.51056$。这就是说，在前提假设都成立的情况下，对于本研究采集的5000条电磁迹，虽然它理论上含有约150000比特泄漏（实际含有133493比特泄漏），但只要我们可以指出其中27531比特对应的敏感中间值$\hat\nonce^{(i)}_j=0,i=0,1,\dots,4999,j=0,1,\dots,29$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
+	对于本文，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred0}\approx0.18354$，从而显著性水平$\alpha=\frac{\frac38-p_{pred0}}{\frac38}\approx0.51056$。这就是说，在前提假设都成立的情况下，对于本文采集的5000条电磁迹，虽然它理论上含有约150000比特泄漏（实际含有133493比特泄漏），但只要我们可以指出其中27531比特对应的敏感中间值$\hat\nonce^{(i)}_j=0,i=0,1,\dots,4999,j=0,1,\dots,29$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
 		
 
 %对公式的引用如，公式\eqref{eq:appedns}
@@ -1126,7 +1126,7 @@
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector{l}^{(i)}$:采样点个数为$M$的电磁迹
 			\Statex \textbf{输入:} $w_d$:分块大小
-			\Statex \textbf{输出:} $\Vector D$分块后每块的方差
+			\Statex \textbf{输出:} $\Vector D$:分块后每块的方差
 			\For {$j:=0\dots\left\lfloor\frac{M}{w_d}\right\rfloor-1$}
 			\State $d_i:=\mathrm{Var}(l^{(i)}_{jw_d},l^{(i)}_{jw_d+1},\dots,l^{(i)}_{jw_d+w_d-1})$
 			\EndFor
@@ -1139,7 +1139,7 @@
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
 			\Statex \textbf{输入:} $th$:模数转换的阈值
-			\Statex \textbf{输出:} $\Vector Q$模数转换后的数列
+			\Statex \textbf{输出:} $\Vector Q$:模数转换后的数列
 			\For {$i:=0\dots N_X-1$}
 			\If{$x_i<th$}
 			\State $q_i:=0$
@@ -1156,7 +1156,7 @@
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的01数列
 			\Statex \textbf{输入:} $w_a$:去抖动窗口大小
-			\Statex \textbf{输出:} $\Vector A$去抖动后的数列
+			\Statex \textbf{输出:} $\Vector A$:去抖动后的数列
 			\State $s:=0$\Comment{初始状态需要设置为常数，可以是0，也可以是1}
 			\State $b:=0$
 			\For {$i:=0\dots N_X-1$}
@@ -1177,7 +1177,7 @@
 		\begin{algorithmic}[1]
 			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列（下标范围之外的数值为0）
 			\Statex \textbf{输入:} $w_g$:高斯模糊的窗口大小的一半（下取整）
-			\Statex \textbf{输出:} $\Vector G$高斯模糊的数列
+			\Statex \textbf{输出:} $\Vector G$:高斯模糊的数列
 			\For {$i:=0\dots 2w_g$}
 			\State $c_i:=\begin{pmatrix}
 			2w_g\\
