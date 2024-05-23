@@ -1,17 +1,20 @@
 \chapter{面向双界面商用智能卡ECDSA实现的电磁分析方法}\label{chap:search2}{
-	确保密码硬件单元物理安全性检测评估结果的准确性和可靠性，高度依赖于所使用的先进、高效的侧信道分析方法。因此，为确保密码硬件单元物理安全性评估体系的准确性、可靠性和前沿性，有必要持续深入研究并发展先进、高效的侧信道分析方法。%DL-SCA是一类强大的侧信道分析方法，但实际应用DL-SCA时还存在DL-SCA量化指标选择不合理、计算量巨大、采集电磁迹消耗的时间长、恢复私钥的理论时间长等问题。
+	密码硬件单元物理安全性检测评估结果的准确性和可靠性，高度依赖于所使用的先进、高效的侧信道分析方法。%因此，为确保密码硬件单元物理安全性评估体系的准确性、可靠性和前沿性，有必要持续深入研究并发展先进、高效的侧信道分析方法。%DL-SCA是一类强大的侧信道分析方法，但实际应用DL-SCA时还存在DL-SCA量化指标选择不合理、计算量巨大、采集电磁迹消耗的时间长、恢复私钥的理论时间长等问题。
 	
 	%本文以分析一款双界面商用智能卡为例，开展了面向基于深度学习侧信道分析的数据增强方法应用示例研究，提出了新的预处理技术并应用了\chapref{chap:search1}的方法和基于假设检验的敏感信息泄漏估计方案，有效提升了DL-SCA在双界面商用智能卡分析场景中的技术效果。在缺少双界面商用智能卡产品设计细节、ECDSA实现所使用的防护对策未知的情况下，成功实现了一款具有ECDSA签名功能的双界面商用智能卡的破解。本文首先进行信息泄漏预处理，将DL-SCA的训练阶段计算量减小到$1.727\cdot10^{11}$浮点运算次数，为原来的0.16\%，DL-SCA变得可行。在不改进网络架构的情况下，使用数据增强进行DL-SCA可以将恢复双界面商用智能卡ECDSA签名信息泄漏的\zyx 由91.35\%提升到95.50\%。使用基于假设检验的估计方案后，\zyx 进一步提升到100\%。这使得从理论上讲，在侧信道分析之后使用格方法恢复双界面商用智能卡ECDSA私钥的时间会从超过七百万年减少到12.5年，再进一步减少到400秒，包含采样时间在内的攻击总时间变为4天，深度学习侧信道方法在双界面商用智能卡分析场景中的攻击成本显著降低。
 	
 	%具体来说，本文选择DL-SCA作为主体，选取ECDSA中的一次性随机数泄漏作为攻击目标，使用格基规约从一次性随机数泄漏推算私钥。在这个过程中，提出模数转换、去抖动、高斯模糊多种预处理技术及其组合实现特征点（Point of Interest, POI）高效、准确地提取，使用面向基于深度学习侧信道分析的数据增强方法减少对训练数据的依赖，依据ECDSA签名实现本身的特点定制最有助于恢复私钥的估计方法提高格基规约的成功率。最终成功在可接受的时间内恢复了双界面商用智能卡ECDSA私钥。本文的分析思路和技术方法可以应用于其他类型的双界面商用智能卡分析场景中，为开展其他类似密码硬件单元的分析与破解提供可行的思路和真实的案例。
 	
 		
-	本文以分析一款双界面商用智能卡为例，开展了电磁分析方法研究，减少了DL-SCA时间，提高了DL-SCA\zyx。该方法包括预处理、模板构建以及模板匹配三个阶段。在现有实验环境下，成功实现了对型号为J3D081的Java卡的电磁分析，在1天内采集5000条电磁迹、3天内进行电磁迹预处理得到样本数量为十万的数据集、137秒内对数据集中的训练集进行数据增强、1小时内实施DL-SCA恢复nonce比特。实际攻击时，利用被恢复的比特泄漏可以过滤出119个含有连续4比特0的nonce，达到了使用由nonce部分比特恢复私钥的格方法的条件。%在分析双界面商用智能卡的ECDSA实现时，需要将侧信道分析与格方法结合才可能利用当前实验环境在可接受的时间范围内恢复私钥。在实际分析时，电磁迹采样点多导致深度学习模型训练时间长达315天，电磁迹特征点不明显导致运用格方法恢复ECDSA私钥的时间达到约$2\times10^{85}$年，仍然超过可接受的时间范围。本文提出并使用\yuchuli 预处理技术，以增加3天的预处理时间为代价，将DL-SCA时间由315天减小为8分钟，将运用格方法的时间由约$2\times10^{85}$年减小到约$7\times10^{6}$年。本文使用\chapref{chap:search1}的面向基于深度学习侧信道分析的通用数据增强方法，以增加2分钟的数据增强时间和1小时的DL-SCA时间为代价，将运用格方法的时间由约$7\times10^{6}$年减小到约12.5年。本文提出并使用\jiashejianyanguji 方案，将运用格方法的时间由约12.5年减小到400秒。本文仅用4天就恢复了ECDSA私钥，其分析思路和技术方法可以应用于其他类型的双界面商用智能卡分析场景中，为开展其他类似密码硬件单元的分析与破解提供可行的思路和真实的案例。
+	本文以分析一款双界面商用智能卡为例，从\jiaodu 开展了电磁分析方法研究，解决了实际场景侧信道分析时存在样本数量不足和单个样本过大的问题，减少了DL-SCA时间，提高了DL-SCA\zyx。该方法包括预处理、模板构建以及模板匹配三个阶段。
+	%在分析双界面商用智能卡的ECDSA实现时，需要将侧信道分析与格方法结合才可能利用当前实验环境在可接受的时间范围内恢复私钥。在实际分析时，电磁迹采样点多导致深度学习模型训练时间长达315天，电磁迹特征点不明显导致运用格方法恢复ECDSA私钥的时间达到约$2\times10^{85}$年，仍然超过可接受的时间范围。本文提出并使用\yuchuli 预处理技术，以增加3天的预处理时间为代价，将DL-SCA时间由315天减小为8分钟，将运用格方法的时间由约$2\times10^{85}$年减小到约$7\times10^{6}$年。本文使用\chapref{chap:search1}的面向基于深度学习侧信道分析的通用数据增强方法，以增加2分钟的数据增强时间和1小时的DL-SCA时间为代价，将运用格方法的时间由约$7\times10^{6}$年减小到约12.5年。本文提出并使用\jiashejianyanguji 方案，将运用格方法的时间由约12.5年减小到400秒。本文仅用4天就恢复了ECDSA私钥，其分析思路和技术方法可以应用于其他类型的双界面商用智能卡分析场景中，为开展其他类似密码硬件单元的分析与破解提供可行的思路和真实的案例。
 	
-	\yuchuli 技术通过\poifanwei 技术将特征点范围从五千万缩小到1.8万，接着使用相关系数极值点的时间模板实现特征点提取，执行TVLA后可以检测出泄漏。\yuchuli 技术提取了特征点，完成了电磁迹的预处理，成功构造了用于深度学习的数据集。
-	\shujuzengqiang 选择最优的数据增强策略参数对现有数据集中的训练集进行数据增强，使得实际攻击时在不额外采集电磁迹的情况下将DL-SCA的\zyx 由91.35\%提高到95.50\%。
-	\jiashejianyanguji 利用格方法攻击目标双界面商用智能卡ECDSA实现的特点（对错误预测为比特0敏感，错误预测为比特1不敏感），使用更严格的标准估计比特0。在五次实验中，在训练完成后样本数量为5000的测试集中平均有981个敏感中间值估计值为0，其准确率为100\%；有4019个敏感中间值估计值为1，其准确率为75.89\%。\zyx 达到了100\%。
-	本文分析思路和技术方法可以应用于其他类型的双界面商用智能卡分析场景中，为开展其他类似密码硬件单元的分析与破解提供可行的思路和真实的案例。
+	预处理阶段采用了\poifanwei 和\yuchuli 两项技术，首先运用了\poifanwei 技术将特征点范围从5000万缩小到1.8万，接着使用\yuchuli 技术提取了特征点，完成了电磁迹的预处理，成功构造了用于深度学习的数据集。
+	模板构建阶段采用了\shujuzengqiang，选择最优的数据增强策略参数对现有数据集中的训练集进行数据增强，使得实际攻击时在不额外采集电磁迹的情况下将DL-SCA的\zyx 由91.35\%提高到95.50\%。
+	模版匹配阶段采用了\jiashejianyanguji ，利用格方法攻击目标双界面商用智能卡ECDSA实现的特点（对错误预测为比特0敏感，错误预测为比特1不敏感），使用更严格的标准估计比特0。在五次实验中，在训练完成后样本数量为5000的测试集中平均有981个敏感中间值估计值为0，其准确率为100\%；有4019个敏感中间值估计值为1，其准确率为75.89\%。\zyx 达到了100\%。
+	
+	
+	在现有实验环境下，成功实现了对型号为J3D081的Java卡的电磁分析，在1天内采集5000条电磁迹、3天内进行电磁迹预处理得到样本数量为十万的数据集、137秒内对数据集中的训练集进行数据增强、1小时内实施DL-SCA恢复nonce比特。实际攻击时，利用被恢复的比特泄漏可以过滤出119个含有连续4比特0的nonce，达到了使用由nonce部分比特恢复私钥的格方法的条件。本文分析思路和技术方法可以应用于其他类型的双界面商用智能卡分析场景中，为开展其他类似密码硬件单元的分析与破解提供可行的思路和真实的案例。
 	
 	\secref{sec:vulnerable}介绍了作为本文攻击目标的双界面商用智能卡ECDSA实现的预备知识，\secref{sec:hardpoint}介绍了攻击智能卡存在的难点，\secref{sec:solution}详细说明了解决现有问题的技术方案，\secref{sec:ecdsaresult}以双界面商用智能卡ECDSA实现为例，汇报了实施面向智能卡电磁分析的技术效果。
 	
@@ -41,7 +44,7 @@
 	\section{ECDSA攻击预备知识}\label{sec:vulnerable}
 	\subsection{智能卡ECDSA签名实现推测}
 	
-	作为研究目标的智能卡所属的产品家族(Product Family)为J3D081，它是符合ISO7816\citep{ISO/IEC7816}与ISO14443 A\citep{ISO/IEC14443}规范的双界面的Java产品，其JCOP版本是Java Card3.0.1，GlobalPlatform版本是2.2.1。该智能卡使用了SmartMX\citep{p5x}安全微控制器芯片。Roche等\citep{Roche21}对同样使用SmartMX的两款智能卡进行过研究，并对其在ECDSA算法中的数乘实现进行了分析和猜想。因为芯片型号完全相同，我们认为J3D081智能卡与Roche等\citep{Roche21}研究的智能卡中ECDSA中的数乘实现也相同。
+	作为研究目标的智能卡所属的产品家族（Product Family）为J3D081，它是符合ISO7816\citep{ISO/IEC7816}与ISO14443 A\citep{ISO/IEC14443}规范的双界面的Java产品，其JCOP版本是Java Card3.0.1，GlobalPlatform版本是2.2.1。该智能卡使用了SmartMX\citep{p5x}安全微控制器芯片。Roche等\citep{Roche21}对同样使用SmartMX的两款智能卡进行过研究，并对其在ECDSA算法中的数乘实现进行了分析和猜想。因为芯片型号完全相同，我们认为J3D081智能卡与Roche等\citep{Roche21}研究的智能卡中ECDSA中的数乘实现也相同。
 	
 	Roche等\citep{Roche21}对智能卡中数乘实现进行了分析，依据分析结果对签名操作的数乘算法进行了推测。签名操作的数乘$\nonce\cdot G$应当执行如下步骤进行了计算：
 	
@@ -93,14 +96,15 @@
 	\end{algorithm}
 
 	在签名操作中，\algorithmref{alg:improvesignscalar}的输入$\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_{128}\right\}$是\algorithmref{alg:encodek}的输出，$G_1,G_2,G_3,G_4$是不必重复计算的\footnote{这些值在确定椭圆曲线$E$和生成元$G$之后就可以预计算，将计算结果硬编码进外存。每次签名时，将外存的数据载入内存参与运算即可完成签名。因此这些值是不必重复计算的。}椭圆曲线$E$上的点，$G_1=G,G_2=2^{129}\cdot G,G_3=\left(2^{129}+1 \right) \cdot G,G_4=2^{128}\cdot G$，$G$是选定椭圆曲线$E$的同时所选定的生成元。
-	\subsection{随机数部分泄漏的请况下基于格的ECDSA攻击}\label{subs:infoforlattice}
+	\subsection{随机数部分泄漏的情况下基于格的ECDSA攻击背景}\label{subs:infoforlattice}
 	
 	有大量工作\citep{Howgrave-Graham01,Nguyen02,Nguyen03,Hlavac06,Brumley11,Mulder14,Benger14,Goudarzi16,Fan16,Ryan19,Jancar20,Moghimi20,Weiser20,Micheli20}研究了在随机数泄漏少量比特的情况下攻击ECDSA方案，它们的主要思想是利用签名中的随机数的泄漏构造扩展隐藏数问题\citep{Boneh96}的方程并使用格基规约求解。
 	
 	在本文中，为了恢复私钥，需要使用格方法从一次性随机数$\nonce$的泄漏求解私钥$\sk$。但是格方法本身不在本文研究范围内，因此只做大致描述。
 	
-	\begin{figure}[!htb]
+	\begin{figure}[!h]
 		\centering
+		\small
 		\begin{tikzpicture}[node distance=20pt]
 			\node[draw, rounded corners,align=center]  (start)  {运算开始};
 			\node[draw, trapezium, trapezium left angle=70, trapezium right angle=110,below=of start,align=center](inputleak){输入:用于构造方程的签名及其泄漏};
@@ -122,7 +126,7 @@
 				(start)->(inputleak)->(constructequ)->(solve)->(calcd) -> (chkd);
 			};
 		\end{tikzpicture}
-		\bicaption{\enspace 利用随机数部分泄漏使用基于格的ECDSA攻击流程图}{\enspace Flowchart of Lattice-based ECDSA Attacks with Partial Knowledge of the Nonces}
+		\bicaption{\enspace 利用随机数部分泄漏进行基于格的ECDSA攻击流程图}{\enspace Flowchart of lattice-based ECDSA attacks with partial knowledge of the nonces}
 		\label{fig:solver}	
 	\end{figure}
 	
@@ -154,7 +158,8 @@
 	%本文严格区分“预测”和“估计”两个概念。前者用于描述深度学习网络输出概率向量的过程，后者用于描述使用数理统计的方法，依据统计量（例如深度学习网络输出概率向量），判定是否接受与一个值（例如敏感中间值）有关的假设。
 	
 	本文严格区分“敏感中间值”和“敏感中间值估计值”两个概念。%b阳性率b、b阳性率b值、b阳性率b估计、b阳性率b估计值。%它们的关系如\figureref{fig:leakageill}所示。
-{	
+	
+%{	
 %	\begin{figure}[!h]
 %		\begin{center}
 %			\begin{tikzpicture}[node distance=40pt, auto]
@@ -202,15 +207,15 @@
 %			\label{fig:leakageill}
 %		\end{center}
 %	\end{figure}
-}	
-	在本文中，每条电磁迹对应的签名操作所使用的一次性随机数记为$\nonce$。$\nonce$是敏感信息但没有直接泄漏，$\nonce$通过它的编码形式$\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_{128}\right\}$在\algorithmref{alg:improvesignscalar}执行过程中产生泄漏。因为一次性随机数$\nonce$、\algorithmref{alg:encodek}中的$\tilde\nonce_j,j=0,1,2,\dots128$和\algorithmref{alg:improvesignscalar}中的$\nonce_j,j=0,1,2,\dots257$存在等价关系，本文将这三个变量都称为敏感中间值。敏感中间值的下标表示它出现在电磁迹中的次序。
-	为了区分敏感中间值来自具体哪条能量迹，进一步使用上标加以区分。令第$i$条签名对应的敏感中间值用符号$\nonce^{(i)}$、$\nonce^{(i)}_j,j=0,1,2,\dots257$和$\tilde{\nonce}^{(i)}_j,j=0,1,2,\dots128$表示。
+%}	
+	在本文中，每条电磁迹对应的签名操作所使用的一次性随机数记为$\nonce$。$\nonce$是敏感信息但没有直接泄漏，$\nonce$通过它的编码形式$\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_{128}\right\}$在\algorithmref{alg:improvesignscalar}执行过程中产生泄漏。因为一次性随机数$\nonce$、\algorithmref{alg:encodek}中的$\tilde\nonce_j,j=0,1,2,\dots,128$和\algorithmref{alg:improvesignscalar}中的$\nonce_j,j=0,1,2,\dots,257$存在等价关系，本文将这三个变量都称为敏感中间值。敏感中间值的下标表示它出现在电磁迹中的次序。
+	为了区分敏感中间值来自具体哪条能量迹，进一步使用上标加以区分。令第$i$条签名对应的敏感中间值用符号$\nonce^{(i)}$、$\nonce^{(i)}_j,j=0,1,2,\dots,257$和$\tilde{\nonce}^{(i)}_j,j=0,1,2,\dots,128$表示。
 	
-	虽然$\nonce$、$\tilde\nonce_j,j=0,1,2,\dots128$和$\nonce_j,j=0,1,2,\dots257$两两之间都有对应关系，并且它们都是敏感中间值，但是它们有各有侧重。$\nonce$用于帮助理解ECDSA签名操作以及签名操作的数乘结果，$\tilde\nonce_j,j=0,1,2,\dots128$用于帮助理解敏感中间值如何产生了泄漏，$\nonce_j,j=0,1,2,\dots257$实际用于侧信道分析。
+	虽然$\nonce$、$\tilde\nonce_j,j=0,1,2,\dots,128$和$\nonce_j,j=0,1,2,\dots,257$两两之间都有对应关系，并且它们都是敏感中间值，但是它们有各有侧重。$\nonce$用于帮助理解ECDSA签名操作以及签名操作的数乘结果，$\tilde\nonce_j,j=0,1,2,\dots,128$用于帮助理解敏感中间值如何产生了泄漏，$\nonce_j,j=0,1,2,\dots,257$实际用于侧信道分析。
 	
-	$\nonce^{(i)}$、$\nonce^{(i)}_j,j=0,1,2,\dots257$之间有对应关系，都是敏感中间值，它们也有各有侧重。$\nonce^{(i)}$用于描述实际第$i$条签名的一次性随机数的数值，$\nonce^{(i)}_j,j=0,1,2,\dots257$用于描述直接被用于构建数据集标签的敏感中间值。
+	$\nonce^{(i)}$、$\nonce^{(i)}_j,j=0,1,2,\dots,257$之间有对应关系，都是敏感中间值，它们也有各有侧重。$\nonce^{(i)}$用于描述实际第$i$条签名的一次性随机数的数值，$\nonce^{(i)}_j,j=0,1,2,\dots,257$用于描述直接被用于构建数据集标签的敏感中间值。
 
-	攻击者无法直接得到敏感中间值，只能利用所获得的电磁迹，使用某些具体的分析技术（对本文而言，指的是基于深度学习的电磁分析方法）来获取与敏感中间值尽可能一致的结果。攻击者获得的这个结果就称为敏感中间值估计值，具体表示方法为在原有敏感中间值符号上添加$\hat{}$标记。$\hat\nonce$、$\hat\nonce_j,j=0,1,2,\dots257$和$\hat{\tilde\nonce}_j,j=0,1,2,\dots128$都是敏感中间值估计值。为了区分敏感中间值估计值对应于具体哪条能量迹，进一步使用上标加以区分。$\hat\nonce^{(i)}$、$\hat\nonce^{(i)}_j,j=0,1,2,\dots257$和$\hat{\tilde\nonce}^{(i)}_j,j=0,1,2,\dots128$也是敏感中间值估计值。
+	攻击者无法直接得到敏感中间值，只能利用所获得的电磁迹，使用某些具体的分析技术（对本文而言，指的是基于深度学习的电磁分析方法）来获取与敏感中间值尽可能一致的结果。攻击者获得的这个结果就称为敏感中间值估计值，具体表示方法为在原有敏感中间值符号上添加$\hat{}$标记。$\hat\nonce$、$\hat\nonce_j,j=0,1,2,\dots,257$和$\hat{\tilde\nonce}_j,j=0,1,2,\dots,128$都是敏感中间值估计值。为了区分敏感中间值估计值对应于具体哪条能量迹，进一步使用上标加以区分。$\hat\nonce^{(i)}$、$\hat\nonce^{(i)}_j,j=0,1,2,\dots,257$和$\hat{\tilde\nonce}^{(i)}_j,j=0,1,2,\dots,128$也是敏感中间值估计值。
 	
 	%为了方便表述，将$\nonce^{(i)}_j=0,i=0,1,\dots,T_a-1,j=0,1,\dots,257$的样本称为阳性样本，$\nonce^{(i)}_j=1,i=0,1,\dots,T_a,j=0,1,\dots,257$的样本称为阴性样本。据此可以定义真阳性、真阴性、假阳性、假阴性的样本。
 	
@@ -226,9 +231,9 @@
 	
 	
 	\section{智能卡ECDSA算法实现侧信道分析难点分析}\label{sec:hardpoint}
-	为了以双界面商用智能卡ECDSA实现为目标实施DL-SCA，需要针对这两个难点提出解决方案：1.训练时间长。在本文实验条件下，即使深度学习模型仅使用1个训练样本训练1个迭代轮次，也需要10分钟。使用167个样本训练20轮次理论上需要315天。2.\zyx 低。即使进行了预处理，\zyx 也只有91.35\%，未达到格方法所要求的准确率99.27\%。
+	为了以双界面商用智能卡ECDSA实现为目标实施DL-SCA，需要针对这两个难点提出解决方案：1.单个样本过大导致训练时间长。在本文实验条件下，即使深度学习模型仅使用1个训练样本训练1个迭代轮次，也需要10分钟。使用167个样本训练20轮次理论上需要315天。2.样本数量不足导致\zyx 低。即使进行了预处理，\zyx 也只有91.35\%，未达到格方法所要求的准确率99.27\%。
 	
-	本文采集数据的参数如\tableref{tab:acquisitionpara}所示。从中可以看到每条电磁迹的采样时间小于一次数乘时间\footnote{这不能通过降低采样率加以解决。当采样率下降，尽管采集时间变长，但是采集的电磁迹难以分析出敏感中间值，反而影响恢复敏感中间值，降低\zyx 。}，这导致理论上可利用的中间值是$\nonce_j,j=0,1,2,\dots257$，但是因为采集条件受限而只采集到中间值$\nonce_j,j=0,1,2,\dots 29$的信息泄漏。%这会使得在采集阶段本应采集到每次签名操作完整的128次迭代的信息泄漏，但是因为采集条件受限，只能采集到每次签名操作的$n_s$次迭代的信息泄漏。经过实验发现，签名操作被采集信息泄漏的迭代次数不超过30。
+	本文采集数据的参数如\tableref{tab:acquisitionpara}所示。从中可以看到每条电磁迹的采样时间小于一次数乘时间\footnote{这不能通过降低采样率加以解决。当采样率下降，尽管采集时间变长，但是采集的电磁迹会失真，难以从中分析出敏感中间值，反而降低\zyx 。}，这导致理论上可利用的中间值是$\nonce_j,j=0,1,2,\dots,257$，但是因为采集条件受限而只采集到中间值$\nonce_j,j=0,1,2,\dots,29$的信息泄漏。%这会使得在采集阶段本应采集到每次签名操作完整的128次迭代的信息泄漏，但是因为采集条件受限，只能采集到每次签名操作的$n_s$次迭代的信息泄漏。经过实验发现，签名操作被采集信息泄漏的迭代次数不超过30。
 	在当前的采集条件下可以采集到每次签名操作的前30次迭代的信息泄漏，为了方便后续分析，将现有条件下可以用的敏感中间值的比特数记为$n_s=30$。
 	
 	
@@ -245,7 +250,7 @@
 			采集参数&参数数值\\                                                          
 			\hline
 			操作 & ECDSA签名\\
-			输入 & 固定消息$m$,(随机选择的)固定私钥$\sk$\\
+			输入 & 固定消息$m$，（随机选择的）固定私钥$\sk$\\
 			哈希函数& sha256\citep{FIPS180-4}\\
 			操作次数（能量迹条数） & 5000\\
 			一次数乘时间 & 40ms\\
@@ -260,11 +265,48 @@
 	\end{table}
 
 	
-	本文从理论证明了运用格方法恢复私钥（直到成功为止）的时间期望的下界会随着\zyx 的减小而成指数级增长，推导过程如\propositionref{prop:expotime}所示。\figureref{fig:expotime}展示了\zyx 略小于100\%的情况下多次运用格方法恢复私钥（直到成功为止）在理论上的技术效果，其中橙色实线表示恢复实际私钥的时间的期望的下界，蓝色虚线表示使用指数函数可以对下界的下界做一个很好的估计，不同线型的绿色虚线表示攻击所能容忍的不同程度时间消耗（一小时、一天、一个月）。进一步分析可以知道，如果要求运用格方法分别在一个月、一天、一小时内恢复实际私钥，那么通过侧信道分析\zyx 分别需要达到97.12\%、98.22\%、99.27\%。
+	本文从理论证明了运用格方法恢复私钥（直到成功为止）的时间期望的下界会随着\zyx 的减小而成指数级增长，推导过程如\propositionref{prop:expotime}所示。
+	
+	\begin{proposition}\label{prop:expotime}
+		如果\zyx$p$略小于100\%，运用格方法恢复实际私钥的时间的期望会随着\zyx$p$的下降而乘指数级增长。
+	\end{proposition}
+	\begin{proof}
+		令构造方程所需的可利用的泄漏总量为$s$比特，构造方程的每条签名恢复了连续$r$比特敏感中间值（即可利用的泄漏有$r$比特），运用一次格基规约时间开销为$u$。
+		
+		（本文所调用的）格方法只运用nonce数值为0的比特。nonce比特0恢复准确这一事件对于每个样本是互相独立的，因此对于任意一条构造签名的能量迹，所利用的被恢复的比特准确的概率为$p_r=p^r$。
+		
+		能量迹恢复的泄漏没有错误这一事件对于每条能量迹是互相独立的，因此对于构造签名的所有能量迹，恢复的泄漏都没有错误的概率为\begin{align*}
+		p_s&=p_r^{\frac sr}\\
+		&=\left(p^r \right) ^{\frac sr}\\
+		&=p^s
+		\end{align*}
+		
+		利用签名多次构造方程并运用格方法求解实际私钥是伯努利实验。因此，如果构造方程的所有能量迹恢复的泄漏都没有准确，那么运用格方法一定可以求解出实际私钥。在这种情况下，多次尝试构造方程并运用格方法直至求解出私钥的方法，到恢复实际私钥为止所尝试的次数$\xi$服从参数为$p_s$的几何分布，即$\xi\sim G(p_s)$。
+		
+		因此，恢复实际私钥的时间是$u\xi$。结合$\xi\sim G(p_s)$，可以推算\begin{align*}
+		E(u\xi)&=uE(\xi)\\
+		&=u\frac{1}{p_s}\\
+		&=\frac{u}{p^s}\\
+		\end{align*}
+		
+		注意到自变量$p$是底数，我们对公式在$p=1$处进行泰勒展开\begin{align*}
+		E(u\xi)&=\frac{u}{p^s}\\
+		&=u\left( \frac1p\right) ^s\\
+		&=u\left( \sum\limits_{i=0}^{\infty}\left( 1-p\right) ^i-1\right) ^s\\
+		&>u\left( \sum\limits_{i=0}^{1}\left( 1-p\right) ^i-1\right) ^s\\
+		&=u\left( 1-p\right) ^s
+		\end{align*}
+		
+	\end{proof}
+	当构造的方程维度和格方法确定后，运用一次格方法的时间开销$u$以及构造方程所需的可利用的泄漏总量$s$保持不变。对于本文使用的格方法，$r=4,s=4\times75=300,u=400$秒。%构造方程所需的可利用的泄漏总量会因为ECDSA的位数而有所不同。对于256位ECDSA，$s$理论上的下界是256，实际攻击中，在$r=4$的情况下。
+	
+	又由于推导过程中假设了“构造方程的所有能量迹恢复的泄漏没有错误时格方法一定可以求解出实际私钥”，在实际攻击中，恢复实际私钥的时间的期望会比理论值更大。
+	
+	\figureref{fig:expotime}展示了\zyx 略小于100\%的情况下多次运用格方法恢复私钥（直到成功为止）在理论上的技术效果，其中橙色实线表示恢复实际私钥的时间的期望的下界，蓝色虚线表示使用指数函数可以对下界的下界做一个很好的估计，不同线型的绿色虚线表示攻击所能容忍的不同程度时间消耗（一小时、一天、一个月）。进一步分析可以知道，如果要求运用格方法分别在一个月、一天、一小时内恢复实际私钥，那么通过侧信道分析\zyx 分别需要达到97.12\%、98.22\%、99.27\%。
 	
 	\begin{figure}[!h]
 		\begin{center}
-			\includegraphics[width=\textwidth]{expotime}
+			\includegraphics[width=0.8\textwidth]{expotime}
 			\bicaption{\enspace \zyx 对攻击时间期望的影响}{\enspace Impact of accuracy of predicted nonce bit 0 on the expectation of attack time}
 			\label{fig:expotime}
 		\end{center}
@@ -304,16 +346,19 @@
 			\bicaption{\enspace 技术与难点的对应关系}{\enspace Technical solutions to the problems}
 			\label{tab:solution2problem}
 			\centering
-			\tiny
+			\footnotesize
 			%\setlength{\tabcolsep}{4pt}% column separation
 			%\renewcommand{\arraystretch}{1.2}%row space 
-			\begin{tabular}{c|ccc}
+			\begin{tabular}{cccc}
 				\hline
-				解决方案&是否减少执行DL-SCA时间&是否提高DL-SCA\zyx &是否增加训练数据\\
+				解决方案&是否减少执行DL-SCA时间&是否提高DL-SCA准确率 &是否增加训练数据\\
 				\hline
-				\yuchuli&是(315天$\rightarrow$8分钟)&是(无法计算$\rightarrow$91.35\%)&否\\
-				\shujuzengqiang&否(8分钟$\rightarrow$1小时)&是(91.35\%$\rightarrow$95.50\%)&是\\
-				\jiashejianyanguji&否(保持不变)&是(95.50\%$\rightarrow$100\%)&否\\
+				基于时间模板匹配&\multirow{2}{*}{是（315天$\rightarrow$8分钟）}&\multirow{2}{*}{是（无法计算$\rightarrow$91.35\%）}&\multirow{2}{*}{否}\\
+				的特征点提取&&&\\
+				%\hline
+				\shujuzengqiang&否（8分钟$\rightarrow$1小时）&是（91.35\%$\rightarrow$95.50\%）&是\\
+				%\hline
+				\jiashejianyanguji&否（保持不变）&是（95.50\%$\rightarrow$100\%）&否\\
 				\hline
 			\end{tabular}
 		\end{table}
@@ -501,9 +546,9 @@
 }
 	
 	%\subsection{分析技术选择}
-	\subsection{\yuchuli}\label{subs:selectpoi}
+	\subsection{ECDSA电磁迹预处理}\label{subs:selectpoi}
 
-	直接使用深度学习模型对电磁迹进行DL-SCA在理论上可行，但是在实践中所需的计算量巨大，本文实验环境需要使用315天才能完成深度学习模型的训练。为了解决这个问题，本文选择提取POIs，使得在尽可能保留特征的同时减少信息泄漏的维数，对应的深度学习模型所需的存储空间和训练的计算量可以有效地减小，使用现有的计算资源足够进行DL-SCA。这样做还带来一个额外的好处：电磁迹可以根据POIs对齐结果，量化评价对齐程度可以直观地反映特征点提取是否准确。
+	直接使用深度学习模型对电磁迹进行DL-SCA在理论上可行，但是在实践中所需的计算量巨大，本文实验环境需要使用315天才能完成深度学习模型的训练。为了解决这个问题，本文选择从提取POIs的角度实现预处理，提出了\poifanwei 和\yuchuli 技术，在尽可能保留特征的同时减少信息泄漏的维数，对应的深度学习模型所需的存储空间和训练的计算量可以有效地减小，使用现有的计算资源足够进行DL-SCA。这样做还带来一个额外的好处：电磁迹可以根据POIs对齐结果，量化评价对齐程度可以直观地反映特征点提取是否准确。
 {	
 %	本文提出了一种基于时间模板的两阶段对齐解决信息泄漏难以定位的问题；本文应用了前一章的通用数据增强方法提升敏感信息估计值精确率。
 	
@@ -535,7 +580,7 @@
 %	信息泄漏指的是$\leakedmultiplier_i$的泄漏。
 }
 	
-	通常来说，提取POIs是通过对电磁迹进行对齐，再从对齐结果中选取POIs。但就本文而言，一条签名的电磁迹采样点个数达到五千万，但一条电磁迹中包含150小组、共7500个特征不明显的POIs，且不同组的50个POIs不连续。现有的对齐方法无法同时满足高效和准确的需求，因此也不能高效和准确的完成POIs的提取。电磁迹中每处信息泄漏的POIs少（约50个采样点），使用基于与单处信息泄漏相关系数的静态对齐会因为产生大量误报\footnote{原本不存在敏感信息泄漏，但是静态对齐结果显示存在敏感信息泄漏。}而无法准确提取POIs。电磁迹中每处信息泄漏之间引入了随机延迟，使用基于与多处信息泄漏相关系数的静态对齐会使得出现大量漏报\footnote{原本存在敏感信息泄漏，但是静态对齐结果显示不存在敏感信息泄漏。}而过滤掉可利用的信息泄漏。电磁迹中每处信息泄漏间隔的时间长，使用动态对齐会因为计算量巨大而不能高效提取POIs。
+	通常来说，提取POIs是通过对电磁迹进行对齐，再从对齐结果中选取POIs。但就本文而言，一条签名的电磁迹采样点个数达到5000万，但一条电磁迹中包含150小组、共7500个特征不明显的POIs，且不同组的50个POIs不连续。现有的对齐方法无法同时满足高效和准确的需求，因此也不能高效和准确的完成POIs的提取。电磁迹中每处信息泄漏的POIs少（约50个采样点），使用基于与单处信息泄漏相关系数的静态对齐会因为产生大量误报\footnote{原本不存在敏感信息泄漏，但是静态对齐结果显示存在敏感信息泄漏。}而无法准确提取POIs。电磁迹中每处信息泄漏之间引入了随机延迟，使用基于与多处信息泄漏相关系数的静态对齐会使得出现大量漏报\footnote{原本存在敏感信息泄漏，但是静态对齐结果显示不存在敏感信息泄漏。}而过滤掉可利用的信息泄漏。电磁迹中每处信息泄漏间隔的时间长，使用动态对齐会因为计算量巨大而不能高效提取POIs。
 	
 	本文提出\yuchuli 技术。它的核心思想是筛选电磁迹和卷积核卷积的极值点\footnote{极大值点或极小值点。在一个有定义的点的周围的点也都有定义，且在这个点的左右邻域的函数值都小于这个点的值，则该点为极大值点，同理为极小值点。}，将最匹配时间模板的极值点组合记为POIs。
 %	本文提出一种基于时间模板的\yuchuli 预处理技术可以高效准确地从目标电磁迹中提取POIs。它大致分为如下两个阶段：
@@ -550,15 +595,87 @@
 	%可以认为智能卡ECDSA算法实现信息泄漏预处理的时间消耗和采样点个数线性相关。在阶段一，本文在保留信息泄漏特征的情况下使用时间复杂度低（$\Theta(M)$）的算法高效确定信息泄漏范围；在阶段二，本文使用时间复杂度高（$\Theta(n_sM_s\log M_s)$）的算法准确确定信息泄漏位置。算法复杂度中的$M,n_s,M_s$分别表示电磁迹采样点个数、电磁迹包含的迭代次数、一次迭代所对应的电磁子迹\footnote{本文将一次迭代所对应的POI附近的电磁迹称为电磁子迹（Subtrace）的采样点个数，这么命名的原因是它实际上就是电磁迹的一部分。}的采样点个数。虽然阶段二的算法复杂度较高，但是算法复杂度中的变量的数值更小（对于本文，$M=5\cdot10^7,n_s=30,M_s=18000$），所以在当前数据范围内阶段二时间消耗也是很小的。因此，预处理时间消耗中执行阶段一的时间消耗占主导作用，预处理时间消耗和电磁迹采样点个数线性相关。
 
 	\textbf{采用\poifanwei 技术确定特征点范围。}	
-	\poifanwei 技术使用降采样的思想，以线性时间复杂度定位到POIs的大致范围，范围从五千万采样点减小到1.8万采样点。一条五千万个采样点的电磁迹含有30组POIs，每组POIs互不连续（坐标之差超过一百万采样点），一组POIs包括5小组不连续的POIs（每个POI与同组的其他POI的距离在2300至3500采样点之间）。\poifanwei 技术首先依据信息泄漏部分电磁场强度变化大的特性分块计算方差可以降采样并使得信息泄漏处依然保留的特征。接着依次使用模数转换、去抖动、模糊、模数转换、去抖动的方法组合电磁迹更多信息得到的用于确定特征点范围的辅助信息。这个辅助信息是一个01数列，我们将其视为方波的采样结果。此时电磁迹可以依据计算出的辅助信息较为准确地划分每次迭代\footnote{具体划分方法取决于模数转换、去抖动、一维高斯模糊、模数转换、去抖动的参数。对于本文的电磁迹和函数参数，每过8个方波，数乘实现会在上升沿进入下一次迭代。}，且每次迭代中有多个锚点辅助定位泄漏的大致范围\footnote{锚点即为方波的上升沿或下降沿时刻。对于本文的电磁迹和函数参数，每次迭代中第一个方波的下降沿到泄漏的位置相隔的采样点个数一定在区间$[8.0\cdot10^{4},9.8\cdot10^{4}]$以内。}。
+	\poifanwei 技术使用降采样的思想，以线性时间复杂度定位到POIs的大致范围，范围从5000万采样点减小到1.8万采样点。一条5000万个采样点的电磁迹含有30组POIs，每组POIs互不连续（坐标之差超过一百万采样点），一组POIs包括5小组不连续的POIs（每个POI与同组的其他POI的距离在2300至3500采样点之间）。\poifanwei 技术首先依据信息泄漏部分电磁场强度变化大的特性分块计算方差可以降采样并使得信息泄漏处依然保留的特征。接着依次使用模数转换、去抖动、模糊、模数转换、去抖动的方法组合电磁迹更多信息得到的用于确定特征点范围的辅助信息。这个辅助信息是一个01数列，我们将其视为方波的采样结果。此时电磁迹可以依据计算出的辅助信息较为准确地划分每次迭代\footnote{具体划分方法取决于模数转换、去抖动、一维高斯模糊、模数转换、去抖动的参数。对于本文的电磁迹和函数参数，每过8个方波，数乘实现会在上升沿进入下一次迭代。}，且每次迭代中有多个锚点辅助定位泄漏的大致范围\footnote{锚点即为方波的上升沿或下降沿时刻。对于本文的电磁迹和函数参数，每次迭代中第一个方波的下降沿到泄漏的位置相隔的采样点个数一定在区间$[8.0\cdot10^{4},9.8\cdot10^{4}]$以内。}。
 	
 	分块方差的实现见\algorithmref{alg:calcvar}，它依据参数$w_d$对电磁迹分块并计算每块中所有电磁场强度样本值的方差，在信息泄漏处依然保留的特征的情况下进行降采样以降低后续操作的时间复杂度，其本身时间复杂度$\Theta(M)$。分块计算方差的输出结果可以视为一个降采样后的波。
 	
+	\begin{breakablealgorithm}
+		\caption{分块方差}\label{alg:calcvar}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector{l}^{(i)}$:采样点个数为$M$的电磁迹
+			\Statex \textbf{输入:} $w_d$:分块大小
+			\Statex \textbf{输出:} $\Vector D$:分块后每块的方差
+			\For {$j:=0,\dots,\left\lfloor\frac{M}{w_d}\right\rfloor-1$}
+			\State $d_i:=\mathrm{Var}(l^{(i)}_{jw_d},l^{(i)}_{jw_d+1},\dots,l^{(i)}_{jw_d+w_d-1})$
+			\EndFor
+			\State \Return $\left\{d_0,d_1,\dots,d_{\left\lfloor\frac{M}{w_d}\right\rfloor-1}\right\}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
+	
 	模数转换的实现见\algorithmref{alg:quantize}，它依据阈值参数$th$将非01数列（模拟信号）转换为01数列（数字信号）以便于后续操作和分析，其时间复杂度为$\Theta(N_X)$。
+	
+	\begin{breakablealgorithm}
+		\caption{模数转换}\label{alg:quantize}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
+			\Statex \textbf{输入:} $th$:模数转换的阈值
+			\Statex \textbf{输出:} $\Vector Q$:模数转换后的数列
+			\For {$i:=0,\dots, N_X-1$}
+			\If{$x_i<th$}
+			\State $q_i:=0$
+			\Else
+			\State $q_i:=1$
+			\EndIf
+			\EndFor
+			\State \Return $\left\{q_0,q_1,\dots,q_{N_X-1}\right\}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
 	
 	本文从硬件设计中对物理按键去抖动的硬件代码得到启发而设计了去抖动函数。函数通过缓存一段长度的数列实现排除偶然噪声（采样点个数少于$w_a$的方波）的干扰但保留主体波形，它的实现见\algorithmref{alg:antijitter}。它通过检查当前位置数据以及之前的$w_a-1$个数据，综合判断应该如何解析当前状态并记录。去抖动会对数据引入延迟，去抖动后方波的上升沿和下降沿会相比于去抖动前延后$w_a$个采样点，有时需要进行校正。去抖动时间复杂度为$\Theta(N_X)$。
 	
+	\begin{breakablealgorithm}
+		\caption{去抖动}\label{alg:antijitter}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的01数列
+			\Statex \textbf{输入:} $w_a$:去抖动窗口大小
+			\Statex \textbf{输出:} $\Vector A$:去抖动后的数列
+			\State $s:=0$\Comment{初始状态需要设置为常数，可以是0，也可以是1}
+			\State $b:=0$
+			\For {$i:=0,\dots, N_X-1$}
+			\State $b:=(b\cdot2+x_i)\bmod 2^{w_a}$
+			\If{$b=0$}
+			\State $s:=0$\Comment{连续$w_a$比特0需要重置状态为0}
+			\ElsIf {$b=2^{w_a}-1$}
+			\State $s:=1$\Comment{连续$w_a$比特1需要设置状态为1}
+			\EndIf
+			\State $a_i:=s$
+			\EndFor
+			\State \Return $\begin{bmatrix}a_0&a_1&\ldots&a_{N_X-1}\end{bmatrix}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
+	
 	本文从图像处理中的模糊操作得到启发而设计了模糊函数。函数计算窗口大小为$2w_g+1$的二项分布的卷积核，扫描数列中的每个样本，用卷积核确定的邻域内的样本的加权平均数替代当前样本的值，它的实现见\algorithmref{alg:gaussblur}。它作为上一步去抖动函数的补充，进一步排除噪声的干扰并保留主体波形。模糊函数本质上是实现了卷积，为了使得模糊后的数列与输入的数列大小相同，卷积使用了same\footnote{使用文档见\href{https://numpy.org/doc/stable/reference/generated/numpy.convolve.html}{numpy.convolve}。}模式。模糊函数的时间复杂度为$\Theta(w_gN_X)$。
+	
+	\begin{breakablealgorithm}
+		\caption{模糊}\label{alg:gaussblur}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列（下标范围之外的数值为0）
+			\Statex \textbf{输入:} $w_g$:高斯模糊的窗口大小的一半（下取整）
+			\Statex \textbf{输出:} $\Vector G$:高斯模糊的数列
+			\For {$i:=0,\dots, 2w_g$}
+			\State $c_i:=\begin{pmatrix}
+			2w_g\\
+			i
+			\end{pmatrix}$\Comment{组合数}
+			\EndFor
+			\State $Kernel:=2^{-2w_g}\begin{bmatrix}c_0&c_1&\ldots&c_{2w_g}\end{bmatrix}$\Comment{计算卷积核}
+			\State $\Vector G=Kernel*X$\Comment{卷积}
+			%			\For {$i:=0\dots N_X-1$}
+			%			\State $g_i:=K\cdot [x_{i-w_g},x_{i-w_g+1},\dots,x_{i+w_g-1},x_{i+w_g}]$
+			%			\EndFor
+			\State \Return $G$%$\left\{g_0,g_1,\dots,g_{N_X-1}\right\}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
 	
 	执行模糊操作之后，需要再次执行模数转换和去抖动，利用这之后的结果才能确定特征点范围。
 
@@ -573,6 +690,36 @@
 	\yuchuli 技术使用静态对齐和模板匹配的思想，准确提取特征点坐标，可以达到与人工标注相当的效果，偏差不超过10个采样点。\yuchuli 技术首先构造模板（为了与后文的时间模板加以区分，将其称为电磁模板）和时间模板，计算每个特征点范围内的电磁信号和电磁模板的卷积（逐点的相关系数），取卷积的前$m$个邻域互不相交的极值点，枚举所有$m$选五的组合，逐一检验每个极值点组合与时间模板的匹配程度，选择最匹配的组合所对应的极值点作为特征点。其中，参数$m$可以依据具体情况选择，$m$越大那么执行时间越长，结果也越准确。
 	
 	取前$m$个极值点的实现如\algorithmref{alg:maxpoint}所示，其中函数的输入$\Vector X$应当是计算出的协方差数列，极值点定义中的"邻域"通过阈值$th$加以描述。对于本文，$th=100,m=9$。算法首先对数列的绝对值进行排序，依次检查第$i$大的绝对值，如果它不在当前所有极值点的邻域内，那么它就是一个新的极值点，把它加入集合$\mathcal M$。最后，假如极值点个数达到需求，程序结束并返回极值点的集合。函数的算法复杂度是$\Theta(N_X\log N_X)$，其中$N_X$是信息泄漏所在区间的宽度，对于本文$N_X=18000$。
+	
+	\begin{breakablealgorithm}
+		\caption{前$m$极值点}\label{alg:maxpoint}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector X$:采样点个数为$N_X$的数列
+			\Statex \textbf{输入:} $m$:需要选出的极值点个数
+			\Statex \textbf{输入:} $th$:可接受的极值点之间的最小距离
+			\Statex \textbf{输出:} $\mathcal M$:前$m$大极值的极值点的集合
+			\For {$i:=0,\dots, N_X-1$}
+			\State $p_i:=(\vert x_i\vert,i)$\Comment{生成数值、索引对}
+			\EndFor
+			\State $Pair:=\begin{bmatrix}p_0&p_1&\ldots&p_{N_X-1}\end{bmatrix}$
+			\State $\mathrm{sort}(Pair)$\Comment{以数值索引对中的数值作为关键字，降序排序}
+			\State $\mathcal M:=\{\}$
+			\For{$i:=0,\dots,N_X$}
+			\State $p^\prime=Pair[i].second$\Comment{取第二个分量（索引）}
+			\If{$\forall pos\in \mathcal M,\vert pos-p^\prime\vert\ge th$}
+			\State $\mathcal M:=\mathcal M\cup\{p^\prime\}$
+			\If {$\left\vert\mathcal M\right\vert=m$}
+			\State break
+			\EndIf
+			\EndIf
+			\EndFor
+			\If {$\left\vert\mathcal M\right\vert=m$}
+			\State \Return $\mathcal M$
+			\Else
+			\State \Return $\phi$
+			\EndIf
+		\end{algorithmic}
+	\end{breakablealgorithm}
 	
 	枚举$m$个极值点中所有的5个极值点两两配对的组合并计算坐标之差，逐一使用实现构造的时间模板进行匹配的实现如\algorithmref{alg:checkdelta}所示，其中函数的输入$\mathcal M$应当是上一个算法输出的采样点集合，$\mu_{5\times5},\sigma_{5\times5}$是预计算的模板，它们刻画了POIs横坐标之间的时间的规律，如果极值点之间的距离可以匹配模板，那么我们认为选出的极值点恰好就对应POIs。实际验证时发现存在无论如何枚举$m$个极值点中的5个都不能匹配模板的问题（算法返回空集），因为这种情况发生的概率很小，我们直接丢弃当前迭代所对应的电磁迹，认为这一次迭代不存在泄漏（也可以直接将这一次迭代对应的信息泄漏直接估计为阴性样本）。函数的算法复杂度是$\Theta\left( \begin{pmatrix}m\\5\end{pmatrix}\begin{pmatrix}5\\2\end{pmatrix}\right) =\Theta(m^5)$。
 	
@@ -624,7 +771,7 @@
 			
 	%即使是评估者也只能知道比例约为$\frac34$的信息泄漏$\leakedmultiplier_i$真实值，对于剩下的电磁子迹，攻击者不知道信息泄漏真实值，因此也无法判断它们哪些是正例，那些是反例。为了排除潜在的系统误差，我们也需要对数据集进行处理。
 	
-	对于评估者而言，他知道敏感信息而可以区分这两种电磁子迹，因此在量化评价分析技术的时候可以选择“最有利于攻击者的情况”进行评估。如果在这种情况下攻击者都难以完成攻击，那么说明ECDSA实现具有一定抵抗侧信道分析的能力。\algorithmref{alg:filter}给出了评估者构造最有利于攻击者的数据集的流程，它从电磁迹中提取包含信息泄漏的电磁子迹，并处理好了相应的标签以用于深度学习。使用这种方法能提取POIs还避免构造出的数据集有不对齐的问题，一条电磁迹的采样点数也由五千万减小到300，这使得DL-SCA变得可行。在5000条电磁迹中，提取出了$cnt=100000$次迭代所对应的电磁子迹作为数据集用于深度学习模型的训练、验证和测试，即$L_0^{out}$中有$cnt$条电磁子迹、$L_1^{out}$中有$cnt$条电磁子迹……这意味着ECDSA实现有多处操作与敏感中间值$\tilde \nonce_j$有关\footnote{具体关系因为缺少相关资料而无法证实也无法证伪。本文的猜测是，硬件从外存中取出数据到寄存器时，因为数据过大（数据为两个256比特的数，但通用寄存器位宽相对较小，比如64比特），需要执行多个周期，因此地址线的数据会在多个时刻都有泄漏。}。
+	对于评估者而言，他知道敏感信息而可以区分这两种电磁子迹，因此在量化评价分析技术的时候可以选择“最有利于攻击者的情况”进行评估。如果在这种情况下攻击者都难以完成攻击，那么说明ECDSA实现具有一定抵抗侧信道分析的能力。\algorithmref{alg:filter}给出了评估者构造最有利于攻击者的数据集的流程，它从电磁迹中提取包含信息泄漏的电磁子迹，并处理好了相应的标签以用于深度学习。使用这种方法能提取POIs还避免构造出的数据集有不对齐的问题，一条电磁迹的采样点数也由5000万减小到300，这使得DL-SCA变得可行。在5000条电磁迹中，提取出了$cnt=100000$次迭代所对应的电磁子迹作为数据集用于深度学习模型的训练、验证和测试，即$L_0^{out}$中有$cnt$条电磁子迹、$L_1^{out}$中有$cnt$条电磁子迹……这意味着ECDSA实现有多处操作与敏感中间值$\tilde \nonce_j$有关\footnote{具体关系因为缺少相关资料而无法证实也无法证伪。本文的猜测是，硬件从外存中取出数据到寄存器时，因为数据过大（数据为两个256比特的数，但通用寄存器位宽相对较小，比如64比特），需要执行多个周期，因此地址线的数据会在多个时刻都有泄漏。}。
 	
 	\begin{breakablealgorithm}
 		\caption{有效电磁子迹提取}\label{alg:filter}
@@ -666,6 +813,7 @@
 					\EndIf
 				\EndFor
 			\EndFor
+			\State \Return $\left\lbrace L_0^{out},L_1^{out},L_2^{out},L_3^{out},L_4^{out}\right\rbrace,Label^{out},cnt $
 		\end{algorithmic}
 	\end{breakablealgorithm}
 	
@@ -704,6 +852,7 @@
 	
 	\begin{figure}[!h]
 		\centering
+		\small
 		\begin{tikzpicture}[node distance=45pt, auto]
 		% 定义节点样式
 		\tikzstyle{reg} = [rectangle, draw,text centered]
@@ -736,13 +885,39 @@
 
 	模板类攻击通常为了最小化错误判定的概率而使用极大似然判定准则，来估计敏感中间值或密钥。但目标双界面商用智能卡上ECDSA实现本身较为特殊（格方法理论上需要方程含有不少于256比特的nonce比特泄漏以恢复256比特的私钥$\sk$，但是\algorithmref{alg:improvesignscalar}相比于\algorithmref{alg:signscalar}引入了随机数，导致nonce比特1的敏感信息泄漏难以利用，使用不少于64个nonce含有连续4比特0的签名构造方程有助于提高求解成功的概率），这导致侧信道分析在一定的限度内只需要减少敏感中间值取伪错误（将nonce比特1误判为比特0），而弃真错误（将nonce比特0误判为比特1）不会对恢复私钥的效率和正确性产生影响。
 	
+	\begin{algorithm}[!h]
+		\caption{签名操作的数乘算法}\label{alg:signscalar}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\left\{\tilde{\nonce}_0,\tilde{\nonce}_1,\dots,\tilde{\nonce}_j,\dots, \tilde{\nonce}_{128}\right\}$:一次性随机数$\nonce$的长度为129的编码形式
+			\Statex \textbf{输入:} $G_0,G_1,G_2,G_3,G_4$:预计算的椭圆曲线$E$上的点
+			\Statex \textbf{输出:} $\nonce\cdot G$:基点$G$与一次性随机数$\nonce$数乘的结果
+			\State $S:=G_1$
+			\For{$j:=1,\dots , 128$}
+			\State $S:=2\cdot S$
+			\If {$\tilde \nonce_j>0$}
+			\State $\leakedmultiplier_j:=\tilde \nonce_j$
+			\State $S:=S+G_{\leakedmultiplier_j}$\Comment{$\leakedmultiplier_j$存在泄漏}
+			\Else
+			\State $\leakedmultiplier_j:=\tilde \nonce_j$\Comment{未进行防护}
+			\State $Dummy:=S+G_{\leakedmultiplier_j}$\Comment{$\leakedmultiplier_j$存在泄漏}
+			\EndIf
+			\EndFor
+			\If {$\tilde \nonce_0=0$}
+			\State $S:=S-G_4$
+			\Else
+			\State $Dummy:=S-G_4$
+			\EndIf
+			\State \Return S
+		\end{algorithmic}
+	\end{algorithm}
+	
 	本文提出了\jiashejianyanguji 方案，最小化取伪错误发生的概率。具体来说，对于每一个敏感中间值$\nonce^{(i)}_j$对应的电磁子迹，假设$\nonce^{(i)}_j=0$并计算统计量$\theta$进行检验。统计量$\theta$的计算方法就是使用深度学习模型预测敏感中间值概率向量，显著性水平$\alpha$依据由电磁迹条数、一条电磁迹包含的迭代次数、最终运用的格方法共同决定，统计量阈值$\theta_{\alpha}$由显著性水平决定。
 	
 	%利用深度学习模型输出得敏感信息泄漏概率向量对敏感信息泄漏进行估计时，无论采用何种估计方法，理论上会存在两种错误的可能性：弃真错误和取伪错误。对于以对称加密算法（如AES）实现为攻击目标侧信道分析而言，需要同时减少弃真错误和取伪错误以提高所恢复的敏感信息泄漏准确率。
 	%使用现有的深度神经网络对ECDSA算法实现进行侧信道攻击时，我们不能保证深度神经网络的对电磁迹子所对应的信息泄漏预测结果是100\%准确的，因此也不能保证对敏感信息泄漏也可能含有错误。某些特定的错误\footnote{实际上是对于$\leakedmultiplier_i=1$（$\nonce_i=0$）的弃真错误。}并不会对本文使用的求解算法$S$的效率和正确性产生影响，另一些错误\footnote{实际上是对于$\leakedmultiplier_i=1$（$\nonce_i=0$）的取伪错误。}会使得求解算法$S$求解错误。
 	
 	%在\secref{sec:vulnerable}中已经说明了侧信道攻击只用恢复一次性随机数$\nonce$的高比特，指出哪些位置对应的$\nonce_i=0$即可。
-	估计敏感中间值可以表述为对于每条电磁子迹的预测结果，独立地执行如\equationref{eq:determindewhich}所示的假设检验。我们可以容忍一定数量的弃真错误但是不能容忍取伪错误。为了减少取伪错误，我们可以增大显著性水平。增大显著性水平会导致弃真错误相应增多，但它在不超过阈值的情况下不会对本文运用格方法的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。从实现的角度来说，增大显著性水平就是在对某条电磁子迹的信息泄漏进行估计时，得出$\hat\nonce^{(i)}_j=0$的结论需要更严格的标准。显著性水平常见的取值为$10^{-5},0.01,0.05,0.1$，但就本文而言，显著性水平可以达到$0.51056$，证明见\propositionref{prop:highalpha}。
+	估计敏感中间值可以表述为对于每条电磁子迹的预测结果，独立地执行如\equationref{eq:determindewhich}所示的假设检验。我们可以容忍一定数量的弃真错误但是不能容忍取伪错误。
 	
 	\begin{equation}
 		\begin{cases}
@@ -752,6 +927,128 @@
 		\label{eq:determindewhich}
 	\end{equation}
 	
+	为了减少取伪错误，我们可以增大显著性水平。增大显著性水平会导致弃真错误相应增多，但它在不超过阈值的情况下不会对本文运用格方法的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。从实现的角度来说，增大显著性水平就是在对某条电磁子迹的信息泄漏进行估计时，得出$\hat\nonce^{(i)}_j=0$的结论需要更严格的标准。
+	
+	\begin{proposition}\label{prop:highalpha}
+		对于$T_a$条电磁迹，每条电磁迹中包含$n_s$次迭代的情况，总共有$T_an_s$条电磁子迹，它们会包含总共$T_an_s$比特的一次性随机数$\nonce$的高比特泄漏的值，即$\nonce^{(i)}_j,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$。根据ECDSA实现可以推算有比例约为$\frac38$的样本是原本就对应nonce的比特0。不妨假设每个样本的标签以$p_{pred0}$的概率被估计为0，且不同样本的估计结果互相独立。
+		如果\zyx 为100\%，
+		%如果被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹数与所有电磁子迹数比值为$p_{pred1}$，对于被预测为对应的中间值$\leakedmultiplier_i=1$的电磁子迹敏感中间值$\tilde \nonce_j$恢复准确率都为100\%，构造方程所有敏感中间值没有错误时求解算法$S$一定
+		运用格方法可以求解出实际私钥。此时能否恢复私钥取决于能否筛选出含有足够多（75条）可利用（连续4比特估计为0的敏感中间值）的签名构造方程。那么只要$\epsilon=T_a\pi_{n_s}(4)-75\ge0$，就有超过$1-\frac{\epsilon+75}{\epsilon^2}$的概率\footnote{实际上二项分布的累积分布函数可以用正则化不完全$Beta$函数表示，这个概率更精确的近似结果为$I_{\pi_{n_s}(4)}(75+1,T_a-75)=(75+1)\begin{pmatrix}T_a\\75\end{pmatrix}\int_0^{\pi_{n_s}(4)}t^{75}(1-t)^{T_a-75-1}\mathrm dt$。}可以构造方程，进而恢复私钥。其中，$\pi_{j}(k)$满足\equationref{eq:recursion}描述的递推关系。
+		\begin{equation}\label{eq:recursion}
+		\pi_{j}(k)=\begin{cases}
+		1,j=0,k=0\\
+		0,j=0,k>0\\
+		(1-p_{pred0})\sum\limits_{t=0}^{3}\pi_{j-1}(t),j>0,k=0\\
+		p_{pred0}\pi_{j-1}(k-1),j>0,0<k<4\\
+		\pi_{j-1}(k)+p_{pred0}\pi_{j-1}(k-1),j>0,k=4
+		\end{cases}\\
+		\end{equation}
+	\end{proposition}
+	\begin{proof}
+		实际上$\Vector{\pi_j}$的物理含义是概率分布，$\pi_j(k)$表示服从概率分布$\Vector\pi_j$的随机变量$X_j$取值为$k$的概率。假设$\Vector X=(X_n,n\ge0)$是马尔科夫链，状态空间为$\mathcal E=\left\lbrace 0,1,2,3,4\right\rbrace $，转移概率矩阵为$$P=\begin{bmatrix}
+		1-p_{pred0}&p_{pred0}&0&0&0\\
+		1-p_{pred0}&0&p_{pred0}&0&0\\
+		1-p_{pred0}&0&0&p_{pred0}&0\\
+		1-p_{pred0}&0&0&0&p_{pred0}\\
+		0&0&0&0&1
+		\end{bmatrix},$$初始分布为$\Vector\pi_0=\begin{bmatrix}
+		1&0&0&0&0
+		\end{bmatrix}$。转移概率矩阵$P$所对应的有向图为\figureref{fig:pdag}。
+		
+		
+		\begin{figure}[!h]
+			\centering
+			\begin{tikzpicture}[scale=0.2]
+			\tikzstyle{every node}+=[inner sep=0pt]
+			\draw [black] (25,-25) circle (3);
+			\draw (25,-25) node {$0$};
+			\draw [black] (5,-5) circle (3);
+			\draw (5,-5) node {$1$};
+			\draw [black] (25,-5) circle (3);
+			\draw (25,-5) node {$2$};
+			\draw [black] (45,-5) circle (3);
+			\draw (45,-5) node {$3$};
+			\draw [black] (45,-25) circle (3);
+			\draw (45,-25) node {$4$};
+			\draw [black] (26.323,-27.68) arc (54:-234:2.25);
+			\draw (25,-32.25) node [below] {$1-p_{pred0}$};
+			\fill [black] (23.68,-27.68) -- (22.8,-28.03) -- (23.61,-28.62);
+			\draw [black] (8,-5) -- (22,-5);
+			\fill [black] (22,-5) -- (21.2,-4.5) -- (21.2,-5.5);
+			\draw (15,-4.5) node [above] {$p_{pred0}$};
+			\draw [black] (28,-5) -- (42,-5);
+			\fill [black] (42,-5) -- (41.2,-4.5) -- (41.2,-5.5);
+			\draw (35,-4.5) node [above] {$p_{pred0}$};
+			\draw [black] (45,-8) -- (45,-22);
+			\fill [black] (45,-22) -- (45.5,-21.2) -- (44.5,-21.2);
+			\draw (45.5,-15) node [right] {$p_{pred0}$};
+			\draw [black] (22.013,-25.237) arc (-90.41225:-179.58775:17.375);
+			\fill [black] (4.76,-7.99) -- (4.27,-8.79) -- (5.27,-8.78);
+			\draw (8.83,-20.62) node [below] {$p_{pred0}$};
+			\draw [black] (7.12,-7.12) -- (22.88,-22.88);
+			\fill [black] (22.88,-22.88) -- (22.67,-21.96) -- (21.96,-22.67);
+			\draw (17.02,-13.00) node [above] {$1-p_{pred0}$};
+			\draw [black] (25,-8) -- (25,-22);
+			\fill [black] (25,-22) -- (25.5,-21.2) -- (24.5,-21.2);
+			\draw (25.5,-13) node [right] {$1-p_{pred0}$};
+			\draw [black] (42.88,-7.12) -- (27.12,-22.88);
+			\fill [black] (27.12,-22.88) -- (28.04,-22.67) -- (27.33,-21.96);
+			\draw (32,-20) node [right] {$1-p_{pred0}$};
+			\draw [black] (46.323,-27.68) arc (54:-234:2.25);
+			\draw (45,-32.25) node [below] {$1$};
+			\fill [black] (43.68,-27.68) -- (42.8,-28.03) -- (43.61,-28.62);
+			\end{tikzpicture}
+			\bicaption{\enspace 矩阵$P$所对应的有向图}{\enspace Corresponding directed acyclic graph of matrix $P$}
+			
+			\label{fig:pdag}
+		\end{figure}
+		
+		状态空间$\mathcal E$的每个状态有如下定义：
+		
+		\begin{enumerate}
+%			\item [0] 没有足够的把握认为当前敏感中间值估计值$\hat\nonce_j=0$；
+%			\item [1] 有足够的把握认为当前敏感中间值估计值$\hat\nonce_j=0$，但没有足够的把握认为上一次敏感中间值估计值$\hat\nonce_{j-1}=0$；
+%			\item [2] 有足够的把握认为上一次和当前敏感中间值估计值$\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上一次敏感中间值估计值$\hat\nonce_{j-2}=0$；
+%			\item [3] 有足够的把握认为上上一次、上一次和当前敏感中间值估计值$\hat\nonce_{j-2}=\hat\nonce_{j-1}=\hat\nonce_j=0$，但没有足够的把握认为上上上一次敏感中间值估计值$\hat\nonce_{j-3}=0$；
+%			\item [4] $\exists 3\le t\le j$，有足够的把握认为到$t$为止的连续4比特敏感中间值估计值估计都为0，即$\hat\nonce_{t-3}=\hat\nonce_{t-2}=\hat\nonce_{t-1}=\hat\nonce_{t-0}=0$。
+			\item [0] 当前迭代敏感中间值$\nonce_j=0$的置信度低于置信水平$1-\alpha$；（显著水平$\alpha$和$p_{pred0}$有这样的关系：$\frac38\alpha=\frac38-p_{pred0}$，其中$\frac38$的含义是有比例约为$\frac38$的样本是原本就对应nonce的比特0）
+			\item [1] 当前迭代敏感中间值$\nonce_j=0$的置信度高于置信水平$1-\alpha$，上一次迭代敏感中间值$\nonce_{j-1}=0$的置信度低于置信水平$1-\alpha$；
+			\item [2] 当前迭代敏感中间值$\nonce_j=0$、上一次迭代敏感中间值$\nonce_{j-1}=0$的置信度都高于置信水平$1-\alpha$，但上上一次迭代敏感中间值$\nonce_{j-2}=0$的置信度低于置信水平$1-\alpha$；
+			\item [3] 当前迭代敏感中间值$\nonce_j=0$、上一次迭代敏感中间值$\nonce_{j-1}=0$、上上一次迭代敏感中间值$\nonce_{j-2}=0$的置信度都高于置信水平$1-\alpha$，但上上上一次迭代敏感中间值$\nonce_{j-3}=0$的置信度低于置信水平$1-\alpha$；
+			\item [4] $\exists 3\le t\le j$，第$t-3$次迭代敏感中间值$\nonce_{t-3}=0$、第$t-2$次迭代敏感中间值$\nonce_{t-2}=0$、第$t-1$次迭代敏感中间值$\nonce_{t-1}=0$、第$t$次迭代敏感中间值$\nonce_{t}=0$的置信度都高于置信水平$1-\alpha$。
+		\end{enumerate}
+		
+		容易验证，从采集的（含有一次性随机数$\nonce$共$n_s$个高比特泄漏的）一条电磁迹中恢复出可利用（连续4比特估计值为0的敏感中间值）比特泄漏的概率就是$\pi_{n_s}(4)$。$\Vector \pi_{n_s}$可以通过时间复杂度$\Theta(n_s)$的递推公式直接计算，也可以利用$\Vector \pi_{n_s}=\Vector \pi_0 P^{n_s}$并结合矩阵快速幂以$\Theta(\log n_s)$的复杂度进行计算。
+		
+		%实际上$\pi_{i}(j)$的物理含义某种概率，在$j<4$时它表示对于随机的一条迹，预测$\nonce_{i-j+1},\nonce_{i-j+2},\dots,\nonce_{i}$同时为0的概率，在$j=4$时它表示根据预测结果$\nonce_0,\nonce_1,\dots,\nonce_i$中存在至少连续4比特都被预测为0的概率。
+		
+		%因此，$\pi_{n_s}(4)$可以描述从采集的一条迹中恢复出（对于本文使用的求解算法$S$）可利用的敏感中间值的概率。
+		显然$T_a$条电磁迹中可以恢复出可利用的比特泄漏的电磁迹的数量$\xi$服从参数为$n=T_a,p=\pi_{n_s}(4)$的二项分布，即$\xi\sim B(T_a,\pi_{n_s}(4))$。能成功构造方程并求解出实际私钥\footnote{如果$\xi<75$，那么无法过滤出足够多的含有可利用泄漏的签名，无法构造方程，因此无法求解出实际私钥。}当且仅当$75\le\xi$。
+		
+		容易知道该二项分布的均值和方差$\mathbb E\xi=T_a\pi_{n_s}(4)=\epsilon+75,\mathbb D\xi=T_a\pi_{n_s}(4)(1-\pi_{n_s}(4))\le T_a\pi_{n_s}(4)=\epsilon+75$。
+		
+		通过放缩可以知道\begin{align*}
+		\Pr\left[75\le\xi\right]&\ge\Pr\left[75<\xi\right]\\
+		&\ge\Pr\left[75<\xi<75+2\epsilon\right]\\
+		&=\Pr\left[\vert \xi-(75+\epsilon)\vert<\epsilon\right]\\
+		&=\Pr\left[\vert \xi-\mathbb E\xi\vert<\epsilon\right]\\
+		&=1-\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]
+		\end{align*}
+		
+		结合切比雪夫不等式$\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]\le \frac{\mathbb D\xi}{\epsilon^2}$可以知道
+		
+		\begin{align*}
+		\Pr\left[75\le\xi\right]&\ge1-\Pr\left[\vert \xi-\mathbb E\xi\vert\ge\epsilon\right]\\
+		&\ge 1-\frac{\mathbb D\xi}{\epsilon^2}\\
+		%&=1-\frac{T_ag_{n_s,4}(1-\pi_{n_s}(4))}{\epsilon^2}\\
+		&\ge1-\frac{\epsilon+75}{\epsilon^2}
+		\end{align*}
+		
+	\end{proof}
+
+	显著性水平常见的取值为$10^{-5},0.01,0.05,0.1$，但就本文而言，显著性水平可以达到$0.51056$。
+	
+	对于本文，$T_a=5000,n_s=30$，不妨令$\epsilon=50$，据此可以计算$\pi_{30}(4)=0.025,p_{pred0}\approx0.18354$，从而显著性水平$\alpha=\frac{\frac38-p_{pred0}}{\frac38}\approx0.51056$。这就是说，在前提假设都成立的情况下，对于本文采集的5000条电磁迹，虽然它理论上含有约150000比特泄漏（实际含有133493比特泄漏），但只要我们可以指出其中27531比特对应的敏感中间值$\hat\nonce^{(i)}_j=0,i=0,1,\dots,4999,j=0,1,\dots,29$，那么一定有超过95\%的概率\footnote{实际上概率的精确值保留16位小数的结果为0.9999992772226471}恢复私钥。
 	
 	\begin{example}
 		假设对于某条实际信息泄漏为$\nonce^{(i)}_j=0$的电磁子迹$\Vector l$，神经网络预测出的概率向量是这样的形式$\begin{bmatrix}\hat\theta&1-\hat\theta\end{bmatrix}=\begin{bmatrix}0.9&0.1\end{bmatrix}$。%，这表示神经网络根据学到的知识判断出电磁子迹对应的信息泄漏$\tilde\nonce^{(i)}_j=1$（即敏感信息泄漏$\nonce^{(i)}_j=0$）的概率是$\tilde\nonce^{(i)}_j\neq 1$（即敏感信息泄漏$\nonce^{(i)}_j=1$）的概率的9倍。
@@ -798,7 +1095,7 @@
 	\begin{figure}[!h]
 		\begin{center}
 			\includegraphics[width=\textwidth]{onetrs}
-			\bicaption{\enspace ECDSA实现信息泄漏范围}{\enspace ECDSA Implementation EM Leakage Range}
+			\bicaption{\enspace ECDSA实现信息泄漏范围}{\enspace ECDSA implementation EM leakage range}
 			\label{fig:onetrs}
 		\end{center}
 	\end{figure}
@@ -910,14 +1207,94 @@
 }
 
 	随机选取部分计算结果，人工地对标注的POIs和在\yuchuli 之后计算出的POIs进行对比。对比的方法是，根据POIs对电磁子迹进行对齐，量化评价电磁子迹的对齐程度可以从侧面反映POIs提取的准确程度。
-	获得了POIs后，我们从相应位置及其邻域\footnote{邻域的大小可以自行设定。在本文中，邻域设定为以当前位置为中心，左右各150个采样点的区间。}提取电磁子迹并重新对采样点编号。\figureref{fig:aligndemo}绘制了提取出的每次迭代的第二处包含信息泄漏的电磁子迹，上图是500条中间值$\tilde\nonce_j=1$的电磁子迹以及500条中间值$\tilde\nonce_j=3$的电磁子迹，下图是这1000条电磁子迹进行TVLA的结果。下图TVLA结果在第140个采样点取得极值且超过阈值4.5，因此提取出的电磁子迹在第140个采样点处对齐且存在敏感中间值泄漏的置信水平达到99.999\%。上图中曲线的颜色的深浅可以体现某一类电磁子迹的集中程度，可以看出，$\tilde\nonce_j=1$所对应的电磁子迹在第140个采样点的幅度总体来说是比$\tilde\nonce_j=3$所对应的幅度大，这与TVLA的结果是一致的。根据结果认为\yuchuli 达到了预期效果，可以准确确定POIs，也能在此基础上进行电磁子迹的对齐。对于每次迭代包含敏感信息泄漏的电磁迹，不同中间值$\tilde\nonce_i$之间TVLA结果见\appfigureref{appfig:aligndemoall}。
+	获得了POIs后，我们从相应位置及其邻域\footnote{邻域的大小可以自行设定。在本文中，邻域设定为以当前位置为中心，左右各150个采样点的区间。}提取电磁子迹并重新对采样点编号。\figureref{fig:aligndemo}绘制了提取出的每次迭代的第二处包含信息泄漏的电磁子迹，上图是500条中间值$\tilde\nonce_j=1$的电磁子迹以及500条中间值$\tilde\nonce_j=3$的电磁子迹，下图是这1000条电磁子迹进行TVLA的结果。下图TVLA结果在第140个采样点取得极值且超过阈值4.5，因此提取出的电磁子迹在第140个采样点处对齐且存在敏感中间值泄漏的置信水平达到99.999\%。上图中曲线的颜色的深浅可以体现某一类电磁子迹的集中程度，可以看出，$\tilde\nonce_j=1$所对应的电磁子迹在第140个采样点的幅度总体来说是比$\tilde\nonce_j=3$所对应的幅度大，这与TVLA的结果是一致的。根据结果认为\yuchuli 达到了预期效果，可以准确确定POIs，也能在此基础上进行电磁子迹的对齐。
 	
 	\begin{figure}[!h]
 		\begin{center}
 			\includegraphics[width=\textwidth]{aligndemo}
-			\bicaption{\enspace 每次迭代包含第二处信息泄漏的电磁子迹及其TVLA结果}{\enspace Subtraces Containing the Second Leakage and their TVLA Result}
+			\bicaption{\enspace 每次迭代包含第二处信息泄漏的电磁子迹及其TVLA结果}{\enspace Subtraces containing the second leakage and their TVLA result}
 			\label{fig:aligndemo}
 		\end{center}
+	\end{figure}
+
+	对于每次迭代包含敏感信息泄漏的电磁迹，不同中间值$\tilde\nonce_i$之间TVLA结果见\appfigureref{appfig:aligndemoall}。
+	
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i0-j1-k2}
+			\caption{第一处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=2$}
+			\label{fig:aligndemo012}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i0-j1-k3}
+			\caption{第一处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo013}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i0-j2-k3}
+			\caption{第一处POIs,$\tilde\nonce_j=2$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo023}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i1-j1-k2}
+			\caption{第二处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=2$}
+			\label{fig:aligndemo112}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i1-j1-k3}
+			\caption{第二处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo113}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i1-j2-k3}
+			\caption{第二处POIs,$\tilde\nonce_j=2$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo123}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i2-j1-k2}
+			\caption{第三处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=2$}
+			\label{fig:aligndemo212}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i2-j1-k3}
+			\caption{第三处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo213}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i2-j2-k3}
+			\caption{第三处POIs,$\tilde\nonce_j=2$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo223}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i3-j1-k2}
+			\caption{第四处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=2$}
+			\label{fig:aligndemo312}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i3-j1-k3}
+			\caption{第四处POIs,$\tilde\nonce_j=1$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo313}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/aligndemo-i3-j2-k3}
+			\caption{第四处POIs,$\tilde\nonce_j=2$ vs $\tilde\nonce_j=3$}
+			\label{fig:aligndemo323}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 合计1000次迭代所对应的电磁迹TVLA结果}{\enspace TLVA results of 1000 subtraces}
+		\label{appfig:aligndemoall}
 	\end{figure}
 
 {	
@@ -976,7 +1353,7 @@
 	
 	在未采用数据增强方法时，DL-SCA使用$L_1^{out}$进行训练和验证的结果如\figureref{fig:ecdsanoda}所示。从图中可以看出随着训练轮次逐渐增加，验证集精确率逐渐提升，说明训练有效。在五次实验中，在训练完成后样本数量为5000的测试集中平均有1720.4个敏感中间值估计值为0，其准确率为91.35\%；有3279.6个敏感中间值估计值为1，其准确率为96.08\%。%精确率（使用极大似然估计时的\zyx ，见\subsref{subs:useagmt}中\textbf{攻击评估单元设置}部分。）可以达到91.35\%。%，在这种情况下，运用格方法恢复双界面商用智能卡ECDSA私钥的时间在理论上会超过七百万年。
 	
-	在特征点提取之后，电磁迹的采样点个数从五千万减小为300\footnote{$150*2=300$它表示邻域设定为以一个特征点为中心，左右各150个采样点的区间。}，深度学习模型的所占用的存储空间变为原来的$\frac{3}{500000}$。数据处理前深度学习训练阶段会使用333条电磁迹训练20个训练轮次，计算量为$8.7\cdot10^{16}$浮点运算次数（Floating Point Operation,FLOP）。提取特征点构造新的数据集后深度学习训练阶段会使用一万条电磁子迹（333条电磁迹包含共9990次迭代的敏感中间值，这对应于9990条电磁子迹）训练20个训练轮次，计算量减少为$1.6\cdot10^{13}$FLOPs。对本文的实验环境而言，算力不超过3.2G\footnote{实际上CPU主频为3.2GHz，算力难以直接测量。在不考虑数据并行的情况下，CPU每个时钟周期执行最多一次浮点运算，此时算力数值大小不超过CPU主频数值大小。}每秒浮点运算次数，因此深度学习训练阶段所消耗的时间会从315天减小为8分钟。实际实验中，DL-SCA时间为490秒（8分10秒），与理论分析一致。%样本数量变为原来的30倍，因此深度学习模型训练阶段计算量减小为原来的$\frac{9}{50000}$。
+	在特征点提取之后，电磁迹的采样点个数从5000万减小为300\footnote{$150*2=300$它表示邻域设定为以一个特征点为中心，左右各150个采样点的区间。}，深度学习模型的所占用的存储空间变为原来的$3/500000$。数据处理前深度学习训练阶段会使用333条电磁迹训练20个训练轮次，计算量为$8.7\cdot10^{16}$浮点运算次数（Floating Point Operation,FLOP）。提取特征点构造新的数据集后深度学习训练阶段会使用一万条电磁子迹（333条电磁迹包含共9990次迭代的敏感中间值，这对应于9990条电磁子迹）训练20个训练轮次，计算量减少为$1.6\cdot10^{13}$FLOPs。对本文的实验环境而言，算力不超过3.2G\footnote{实际上CPU主频为3.2GHz，算力难以直接测量。在不考虑数据并行的情况下，CPU每个时钟周期执行最多一次浮点运算，此时算力数值大小不超过CPU主频数值大小。}每秒浮点运算次数，因此深度学习训练阶段所消耗的时间会从315天减小为8分钟。实际实验中，DL-SCA时间为490秒（8分10秒），与理论分析一致。%样本数量变为原来的30倍，因此深度学习模型训练阶段计算量减小为原来的$\frac{9}{50000}$。
 	
 	\begin{figure}[!h]
 		\centering
@@ -1052,18 +1429,22 @@
 	Roche等\citep{Roche21}他们运用了滤波的预处理技术、聚类以及格方法实施攻击。本文运用了\yuchuli 预处理技术、面向基于深度学习侧信道分析的通用数据增强方法、\jiashejianyanguji 方案以及格方法实施攻击。
 	
 	\begin{table}[!h]
-		\bicaption{\enspace 采用工作的效果}{\enspace Nuts to crack in attacking the smart card}
+		\bicaption{\enspace 攻击相似芯片上ECDSA实现的技术效果}{\enspace Result of works that attack ECDSA implementation on similar chips}
 		\label{tab:improve}
 		\centering
-		\tiny% fontsize
+		\small% fontsize
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space 
-		\begin{tabular}{c|cccccc}
+		\begin{tabular}{ccc}
 			\hline
-			工作&采集时间&预处理时间&数据增强时间&DL-SCA时间&聚类时间&\zyx\\
+			技术指标&Roche等\citep{Roche21}&本文\\
 			\hline
-			Roche等\citep{Roche21}&6小时&/&0&0&/&99.6\%\\
-			本文&1天&3天&2分钟&1小时&0&100\%\\
+			采集时间&6小时&1天\\
+			预处理时间&/&3天\\
+			数据增强时间&0&2分钟\\
+			DL-SCA时间&0&1小时\\
+			聚类时间&/&0\\
+			\zyx&99.6\%&100\%\\
 			\hline
 		\end{tabular}
 		\tabnote{数据不详使用斜杠/ 标记。}
@@ -1095,11 +1476,11 @@
 %	针对DL-SCA时间长、运用格方法时间长这两个直接问题，本文提出并使用\yuchuli 预处理技术、面向基于深度学习侧信道分析的数据增强方法以及\jiashejianyanguji 方案，将成功恢复ECDSA私钥的时间从理论上约$2\times10^{85}$年减小到4天，完成了针对目标双界面商用智能卡的分析。
 	本文提出了面向双界面商用智能卡ECDSA实现的电磁分析方法，并给出了参考实现。该方法可以恢复型号为J3D081的Java卡的ECDSA实现敏感中间值泄漏，并在与格方法结合时恢复ECDSA私钥。实际应用时，本文在1天内采集5000条电磁迹、3天内进行电磁迹预处理得到样本数量为100000数据集、137秒内对数据集中的训练集进行数据增强、1小时内实施DL-SCA恢复敏感中间值。利用被恢复的比特泄漏可以过滤出119个含有连续4比特0的nonce，达到了使用由nonce部分比特恢复私钥的格方法的条件。
 	
-	本文使用了\yuchuli 技术。它通过\poifanwei 技术将特征点范围从五千万缩小到1.8万，接着使用相关系数极值点的时间模板实现特征点提取，执行TVLA后可以检测出泄漏。提取特征点后，还完成了电磁迹的预处理，成功构造了用于深度学习的数据集。
+	该方法包括预处理、模板构建以及模板匹配三个阶段。
 	
-	本文使用了\shujuzengqiang。它选择最优的数据增强策略参数对现有数据集中的训练集进行数据增强，使得实际攻击时在不额外采集电磁迹的情况下将DL-SCA的\zyx 由91.35\%提高到95.50\%。
-	
-	本文使用了\jiashejianyanguji。它利用格方法攻击目标双界面商用智能卡ECDSA实现的特点（对错误预测为比特0敏感，错误预测为比特1不敏感），使用更严格的标准估计比特0。在五次DL-SCA中，在训练完成后样本数量为5000的测试集中平均有981个敏感中间值估计值为0，其准确率为100\%；有4019个敏感中间值估计值为1，其准确率为75.89\%。\zyx 达到了100\%。
+	在预处理阶段使用了\poifanwei 和\yuchuli 技术。它采用\poifanwei 技术将特征点范围从5000万缩小到1.8万，接着采用\yuchuli 技术提取了特征点，执行TVLA后可以检测出泄漏。完成了电磁迹的预处理后，还成功构造了用于深度学习的数据集。
+	在模板构建阶段使用了\shujuzengqiang。它选择最优的数据增强策略参数对现有数据集中的训练集进行数据增强，使得实际攻击时在不额外采集电磁迹的情况下将DL-SCA的\zyx 由91.35\%提高到95.50\%。
+	在模版匹配阶段使用了\jiashejianyanguji。它利用格方法攻击目标双界面商用智能卡ECDSA实现的特点（对错误预测为比特0敏感，错误预测为比特1不敏感），使用更严格的标准估计比特0。在五次DL-SCA中，在训练完成后样本数量为5000的测试集中平均有981个敏感中间值估计值为0，其准确率为100\%；有4019个敏感中间值估计值为1，其准确率为75.89\%。\zyx 达到了100\%。
 	
 	这个参考实现为密码评估和设计人员提供了便捷、高效的面向双界面商用智能卡的电磁分析方法。这个高效的电磁分析方法可以提高攻击依赖型侧信道安全检测的准确性和可靠性，有助于改善和提升智能卡信息泄漏分析和物理安全性测评的技术能力，对建立先进的智能卡物理安全性评估体系具有重要意义。
 	}

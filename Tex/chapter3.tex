@@ -1,9 +1,9 @@
 \chapter{面向基于深度学习侧信道分析的通用数据增强方法}\label{chap:search1}{
 	
 	%深度学习技术在侧信道攻击领域中得到了诸多应用，但样本数量不足的情况在实际中经常出现，这严重制约深度神经网络训练效果，甚至会直接影响攻击性能。因此，探讨样本数量有限情况下的数据增强方法，并讨论其对提升基于深度学习的侧信道攻击效果的实际影响，具有重要的现实意义。
-	在深度学习的训练阶段对训练数据集进行数据增强可以使训练出的模型更准确，进而降低DL-SCA\chenggongtiaoshu 。然而，当前已有数据增强方法的参数选取通常高度依赖专家知识，且只适合对特定算法实现运行过程中采集到的数据集进行数据增强。因此，构造一个适用于多种算法实现数据集的通用数据增强方法、自适应地选取数据增强参数，具有重要现实意义。
+	在深度学习的训练阶段对训练数据集进行数据增强可以使训练出的模型更准确，进而降低DL-SCA\chenggongtiaoshu 。然而，当前已有数据增强方法的参数选取通常高度依赖专家知识，且只适合对特定算法实现运行过程中采集到的数据集进行数据增强。因此，构造一个适用于多种算法实现数据集的通用数据增强方法、自适应地选取数据增强参数，具有非常重要的现实意义。
 	
-	本文选取了不同的AES实现作为分析目标，从数据增强的角度出发，研究减小成功实施DL-SCA所使用的能量迹条数的具有通用性的方法。分析目标包括无防护AES硬件实现、无防护AES软件实现、掩码（和随机延迟）防护AES软件实现以及随机延迟防护AES软件实现，这些实现对应的数据集分别为AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）、AES\_RD，他们都是侧信道领域权威公开数据集。本文提出了一种通用数据增强方法，其核心思想是采用模拟退火机制依据反馈信号自适应地选择数据增强策略参数。该方法主要由三个核心组件构成：采用模拟退火机制的主控制器、采用组合式数据增强机制的数据增强单元以及提供侧信道攻击代价反馈信号的攻击评估单元。以无防护软件和硬件AES实现、随机延迟和掩码防护AES软件实现为分析目标，在相应的本领域公开数据集上，开展了深度学习侧信道攻击实验对比研究，验证了本文所提出通用数据增强方法的有效性。具体地，在AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）三种数据集五个场景下，与未采用数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低21\%、25\%、24\%、48\%以及5\%。在AES\_HD、DPA v4、ASCADf（N=0/N=50）三种数据集四个场景中，与采用其他数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低22\%、40\%、10\%以及30\%。
+	本文选取了不同的AES实现作为分析目标，从数据增强的角度出发，研究减小\chenggongtiaoshu 的具有通用性的方法。分析目标包括无防护AES硬件实现、无防护AES软件实现、掩码（和随机延迟）防护AES软件实现以及随机延迟防护AES软件实现，这些实现对应的数据集分别为AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）、AES\_RD，他们都是侧信道领域权威公开数据集。本文提出了一种通用数据增强方法，其核心思想是采用模拟退火机制依据反馈信号自适应地选择数据增强策略参数。该方法主要由三个核心组件构成：采用模拟退火机制的主控制器、采用组合式数据增强机制的数据增强单元以及提供侧信道攻击代价反馈信号的攻击评估单元。以无防护软件和硬件AES实现、随机延迟和掩码防护AES软件实现为分析目标，在相应的本领域公开数据集上，开展了深度学习侧信道攻击实验对比研究，验证了本文所提出通用数据增强方法的有效性。具体地，在AES\_HD、DPA v4、ASCADf（N=0/N=50/N=100）三种数据集五个场景下，与未采用数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低21\%、25\%、24\%、48\%以及5\%。在AES\_HD、DPA v4、ASCADf（N=0/N=50）三种数据集四个场景中，与采用其他数据增强方法的DL-SCA效果相比，\chenggongtiaoshu 分别降低22\%、40\%、10\%以及30\%。
 	
 	{\color{\xchange}
 	
@@ -101,6 +101,7 @@
 	
 	\begin{figure}[!h]
 		\centering
+		\small
 		\begin{tikzpicture}[node distance=45pt, auto]
 			% 定义节点样式
 			\tikzstyle{reg} = [rectangle, draw,text centered]
@@ -320,6 +321,7 @@
 	
 	\begin{figure}[!h]
 		\centering
+		\small
 		\begin{tikzpicture}[node distance=45pt, auto]
 			% 定义节点样式
 			\tikzstyle{reg} = [rectangle, draw,text centered]
@@ -424,10 +426,11 @@
 		\bicaption{\enspace 数据集划分方式}{\enspace Partition of training/ test set for all open datasets}
 		\label{tab:partition}
 		\centering
+		\small
 		%\footnotesize% fontsize
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space 
-		\begin{tabular}{c|ccc}
+		\begin{tabular}{cccc}
 			\hline
 			数据集名称&训练样本数量&验证样本数量&测试样本数量\\
 			\hline
@@ -492,7 +495,7 @@
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space
 		\small 
-		\begin{tabular}{c|cc}
+		\begin{tabular}{ccc}
 			\hline
 			参数名称&功能&数值\\
 			\hline
@@ -601,24 +604,24 @@
 			\begin{subtable}[t]{\textwidth}
 				\caption{攻击不同数据集所对应算法实现的神经网络的不同超参数设定}
 				\centering
-				\begin{tabular}{cc|cccccc}
+				\begin{tabular}{cccccccc}
 					\hline
-					\multicolumn{2}{c|}{\multirow{2}{*}{网络结构}} &\multirow{2}{*}{AES\_RD}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{DPA v4}& \multicolumn{3}{c}{ASCADf} \\
+					\multicolumn{2}{c}{\multirow{2}{*}{网络结构}} &\multirow{2}{*}{AES\_RD}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{DPA v4}& \multicolumn{3}{c}{ASCADf} \\
 					%\cline{3-5}
-					\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
+					\multicolumn{2}{c}{}&&&&N=0 & N=50 & N=100 \\
 					\hline
 					\multirow{2}{*}{\shortstack{训练数据\\预处理}}      &\multirow{2}{*}{归一化}        &\multirow{2}{*}{无}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{\shortstack{标准差标准化\\极差标准化}}&\multirow{2}{*}{无}&\multirow{2}{*}{无}\\
 					&&&&&&&\\
 					\hline
 					\multirow{1}{*}{输入层}           &输入尺寸       &3500        &1250       &4000         &700                &700                &700               \\
-					\hline               
+					%\hline               
 					\multirow{2}{*}{卷积层 }          &输出维数       &(8,16,32)   &(2)        &(2)          &(4)                &(32,64,128)        &(32,64,128)        \\
 					                                  &卷积核大小     &(1,50,3)    &(1)        &(1)          &(1)                &(1,25,3)           &(1,50,3)        \\
-					\hline               
+					%\hline               
 					\multirow{1}{*}{池化层 }          &池化大小       &(2,50,7)    &(2)        &(2)          &(2)                &(2,25,4)           &(2,50,2)        \\
-					\hline               
+					%\hline               
 					\multirow{1}{*}{全连接层}         &神经元个数     &(10,10)     &(2)        &(2)          &(10,10)            &(15,15,15)         &(20,20,20)          \\
-					\hline          
+					%\hline          
 					\multirow{3}{*}{训练参数}          &学习率        &$10^{-2}$   &$10^{-3}$  &$10^{-3}$    &$5\cdot10^{-3}$    &$5\cdot10^{-3}$    &$10^{-2}$         \\
 					                                  &动态学习率    &OneCycleLR\citep{Smith18}  &无         &无           &OneCycleLR         &OneCycleLR         &OneCycleLR           \\
 					                                  &训练轮次      &50           &20         &50           &50                 &50                 &50                      \\
@@ -628,27 +631,27 @@
 			\end{subtable}
 		}
 		
-		\normalsize{
+		\small{
 			\begin{subtable}[t]{\textwidth}
 				\caption{攻击不同数据集所对应算法实现的神经网络的相同超参数设定}
 				\centering
-				\begin{tabular}{cc|c}
+				\begin{tabular}{ccc}
 					\hline
-					\multicolumn{2}{c|}{网络结构} &网络超参数\\
+					\multicolumn{2}{c}{网络结构} &网络超参数\\
 					\hline
 					\multirow{3}{*}{卷积层 }     &核初始化函数    &均匀分布初始化      \\
 					                             &激活函数  &selu     \\
 					                             &填充方式  &same     \\
-					\hline
+					%\hline
 					\multirow{2}{*}{池化层 }     &池化方式    &平均              \\
 					                             &步幅  &等于池化大小     \\
-					\hline
+					%\hline
 					\multirow{2}{*}{全连接层}    &核初始化函数    &均匀分布初始化          \\
 					                            &激活函数  &selu     \\
-					\hline
+					%\hline
 					\multirow{2}{*}{输出层}      &激活函数    &softmax          \\
 					                             &类别数目    &256                  \\
-					\hline
+					%\hline
 					\multirow{2}{*}{训练参数}      &损失函数    &分类交叉熵          \\
 				 	                               &度量       &准确率                  \\
 					\hline
@@ -672,8 +675,53 @@
 	这些特点使得正确密钥猜测熵收速度提供了更全面、准确的视角来观察和评估侧信道分析结果，并与已有的评价指标正确密钥猜测熵相匹配。
 	
 	\subsection{参数搜索结果}
-	本文针对不同数据集，在相同的迭代次数下使用模拟退火机制来搜索有效的数据增强策略参数。针对一个数据集的搜索会迭代227次，因此可以绘制出227条猜测熵曲线，如\appfigureref{appfig:ge3d}所示。搜索过程的迭代收敛曲线如\figureref{fig:convrateit}所示。
-	\begin{figure}[!htbp]
+	本文针对不同数据集，在相同的迭代次数下使用模拟退火机制来搜索有效的数据增强策略参数。针对一个数据集的搜索会迭代227次，因此可以绘制出227条猜测熵曲线，如\appfigureref{appfig:ge3d}所示。
+	
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3ddpav4}
+			\caption{DPA v4}
+			\label{fig:ge3ddpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3daeshd}
+			\caption{AES\_HD}
+			\label{fig:ge3daeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3daesrd}
+			\caption{AES\_RD}
+			\label{fig:ge3daesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:ge3dascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:ge3dascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/ge3dascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:ge3dascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 所有迭代过程正确密钥猜测熵曲线}{\enspace GE curves of correct key for all iterations}
+		\label{appfig:ge3d}
+	\end{figure}
+	
+	搜索过程的迭代收敛曲线如\figureref{fig:convrateit}所示。
+	
+	\begin{figure}[!h]
 		\centering
 		\begin{subfigure}[b]{\trif\textwidth}
 			\includegraphics[width=\textwidth]{convratedpav4}
@@ -711,7 +759,7 @@
 			\label{fig:convrateascad100}
 		\end{subfigure}
 		\\% line break
-		\bicaption{\enspace 深度学习训练过程的猜测上收敛速度曲线}{\enspace Curve of $convrate$ in Deep learning training process}
+		\bicaption{\enspace 深度学习训练过程的猜测上收敛速度曲线}{\enspace Curve of $convrate$ in DL training process}
 		\label{fig:convrateit}
 	\end{figure}
 	
@@ -729,11 +777,11 @@
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space
 		\small 
-		\begin{tabular}{cc|cccccc}
+		\begin{tabular}{cccccccc}
 			\hline
-			\multicolumn{2}{c|}{\multirow{2}{*}{参数数值}} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
+			\multicolumn{2}{c}{\multirow{2}{*}{参数数值}} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCADf} \\
 			%\cline{3-5}
-			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
+			\multicolumn{2}{c}{}&&&&N=0 & N=50 & N=100 \\
 			\hline
 			\multirow{6}{*}{数据增强策略参数}
 			&$p_{ro}$&0.676&0.720&0.762&0.161&0.749&0.621\\
@@ -755,6 +803,7 @@
 
 	\begin{figure}[!h]
 		\centering
+		\small
 		\begin{tikzpicture}[node distance=45pt, auto]
 			% 定义节点样式
 			\tikzstyle{reg} = [rectangle, draw,text centered]
@@ -799,6 +848,48 @@
 	
 	不同实验条件下DL-SCA的性能如\tableref{tab:adamtd}所示，表格中加粗的结果表示在对应数据集上取得的最优技术效果。根据实验结果可以看出，增广倍数为10倍或20倍时能取得最小的\chenggongtiaoshu 。例如，在分析引入随机延迟的软件AES实现数据集AES\_RD时，选取$C=20$。这样一来，在仅提供20000条能量迹用于DL-SCA的建模时，采用本文提出的数据增强方法可以将\chenggongtiaoshu 减小到5。在每个数据集上取得的最优技术效果的猜测熵曲线如\appfigureref{appfig:adadlsca}所示。
 	
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adadpav4}
+			\caption{DPA v4}
+			\label{fig:adadpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaaeshd}
+			\caption{AES\_HD}
+			\label{fig:adaaeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaaesrd}
+			\caption{AES\_RD}
+			\label{fig:adaaesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:adaascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:adaascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/adaascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:adaascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 采用通用数据增强方法时DL-SCA正确密钥猜测熵}{\enspace GE of DL-SCA with adaptive DA method}
+		\label{appfig:adadlsca}
+	\end{figure}
+	
 	\begin{table}[!h]
 		\bicaption{\enspace 采用通用数据增强方法的DL-SCA的性能}{\enspace Performance of DL-SCA with general DA method}
 		\label{tab:adamtd}
@@ -806,15 +897,15 @@
 		\footnotesize% fontsize
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space
-		\begin{tabular}{cc|cccccc}
+		\begin{tabular}{cccccccc}
 			\hline
-			\multirow{2}{*}{性能指标}&\multirow{2}{*}{增广倍数} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
+			\multirow{2}{*}{性能指标}&\multirow{2}{*}{增广倍数} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCADf} \\
 			%\cline{3-5}
-			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
+			\multicolumn{2}{c}{}&&&&N=0 & N=50 & N=100 \\
 			\hline
 			\multirow{2}{*}{\shortstack{数据增强前\\训练样本数量}}&&\multirow{2}{*}{4000}&\multirow{2}{*}{45000}&\multirow{2}{*}{20000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}&\multirow{2}{*}{45000}\\
 			&&&&&&&\\
-			\hline
+			%\hline
 			\multirow{4}{*}{\shortstack{成功开展攻击所需要\\的能量迹/电磁迹的条数}}
 			&1&9&1358&11&>300&>400&>400\\
 			&5&4&959&6&>300&273&>400\\
@@ -857,33 +948,76 @@
 %		\end{tabular}
 %	\end{table}
 	\subsection{无数据增强的技术效果}
-	不进行数据增强，直接训练深度学习模型，并使用训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:origindlsca}所示。我们从\appfigureref{appfig:origindlsca}提取\chenggongtiaoshu 的信息，将它们列举在\tableref{tab:originmtd}中。
+	不进行数据增强，直接训练深度学习模型（样本数量与使用数据增强的场景对应相同），并使用训练后的深度学习模型进行攻击的结果如\appfigureref{appfig:origindlsca}所示。我们从\appfigureref{appfig:origindlsca}提取\chenggongtiaoshu 的信息，将它们列举在\tableref{tab:originmtd}中。
+	
+	\begin{figure}[!h]
+		\centering
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/origindpav4}
+			\caption{DPA v4}
+			\label{fig:origindpav4}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originaeshd}
+			\caption{AES\_HD}
+			\label{fig:originaeshd}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originaesrd}
+			\caption{AES\_RD}
+			\label{fig:originaesrd}
+		\end{subfigure}
+		\\% line break
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad0}
+			\caption{ASCADf（N=0）}
+			\label{fig:originascad0}
+		\end{subfigure}%
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad50}
+			\caption{ASCADf（N=50）}
+			\label{fig:originascad50}
+		\end{subfigure}
+		~% add desired spacing
+		\begin{subfigure}[b]{\trif\textwidth}
+			\includegraphics[width=\textwidth]{appfig/originascad100}
+			\caption{ASCADf（N=100）}
+			\label{fig:originascad100}
+		\end{subfigure}
+		\\% line break
+		\bicaption{\enspace 无数据增强时DL-SCA正确密钥猜测熵}{\enspace GE of DL-SCA without DA}
+		\label{appfig:origindlsca}
+	\end{figure}
 	
 	\begin{table}[!h]
 		\bicaption{\enspace 无数据增强时DL-SCA的性能}{\enspace Performance of DL-SCA without any DA method}
 		\label{tab:originmtd}
 		\centering
+		\small
 		%\footnotesize% fontsize
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space 
-		\begin{tabular}{c|cc}
+		\begin{tabular}{ccc}
 			\hline
 			数据集名称&训练样本数量&\chenggongtiaoshu \\
 			\hline
 			DPA v4    &4000&4\\
-			\hline
+			%\hline
 			AES\_HD   &45000&1118\\
-			\hline
+			%\hline
 			\multirow{2}{*}{AES\_RD}
 			&5000&12\\
 			&20000&5\\
-			\hline
+			%\hline
 			\multirow{2}{*}{ASCADf(N=0)}
 			&38400&294\\
 			&45000&259\\
-			\hline
+			%\hline
 			ASCADf(N=50)&45000&369\\
-			\hline
+			%\hline
 			ASCADf(N=100)&45000&304\\
 			\hline
 		\end{tabular}
@@ -912,28 +1046,28 @@
 		%\setlength{\tabcolsep}{4pt}% column separation
 		%\renewcommand{\arraystretch}{1.2}%row space
 		\scriptsize
-		\begin{tabular}{cc|cccccc}
+		\begin{tabular}{cccccccc}
 			\hline
-			\multirow{2}{*}{数据增强方法} &\multirow{2}{*}{性能指标} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCAD} \\
+			\multirow{2}{*}{数据增强方法} &\multirow{2}{*}{性能指标} &\multirow{2}{*}{DPA v4}&\multirow{2}{*}{AES\_HD}&\multirow{2}{*}{AES\_RD}& \multicolumn{3}{c}{ASCADf} \\
 			%\cline{3-5}
-			\multicolumn{2}{c|}{}&&&&N=0 & N=50 & N=100 \\
+			\multicolumn{2}{c}{}&&&&N=0 & N=50 & N=100 \\
 			\hline
 			\multirow{2}{*}{Cagli等\citep{Cagli17}}
 				&数据增强前训练样本数量       &4000&45000&20000&45000&45000&45000\\
 				&\chenggongtiaoshu      &5&1252&7&219&328&364        \\
-			\hline
+			%\hline
 			\multirow{2}{*}{Kim等\citep{Kim19}}
 				&数据增强前训练集大小       &4000&45000&20000&45000&45000&45000\\
 				&\chenggongtiaoshu     &5&1127&5&249&276&346\\
-			\hline
+			%\hline
 			\multirow{2}{*}{Won等\citep{Won20}}
 				&数据增强前训练集大小       &/&/&5000&/&/&45000\\
 				&\chenggongtiaoshu     &/&/&15&/&/&190\\
-			\hline
+			%\hline
 			\multirow{2}{*}{Luo等\citep{Luo21}}
 				&数据增强前训练集大小       &/&/&50000&50000&50000&50000\\
 				&\chenggongtiaoshu     &/&/&>1000&1250&4000&7000\\
-			\hline
+			%\hline
 			\multirow{2}{*}{Mukhtar等\citep{Mukhtar22}}
 				&数据增强前训练集大小       &/&/&/&38400&/&/\\
 				&\chenggongtiaoshu     &/&/&/&410&/&/\\

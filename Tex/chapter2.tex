@@ -90,7 +90,7 @@
 		\hat y=\mathop{\mathrm{argmax}}\limits_{y\in\mathcal Y}\left\lbrace d_1(y)\right\rbrace
 	\end{equation}
 	
-	在算法数据给定的情况下，算法密钥和敏感中间值有对应关系。如果在算法输入不变的情况下，对于不同的算法(子)密钥的值，函数$g$计算出的敏感中间值一定不同\footnote{单射。}，那么迹和中间值$y$所对应的模板的匹配程度$d_1$可以与迹和（子）密钥值所对应的模板的匹配程度关联起来，如\equationref{eq:gsup-1}所示，本文将$\tilde d_1(k)$称为密钥值$k$的得分。在此基础上，攻击者得到算法（子）密钥值的估计，如\equationref{eq:1tracek}所示。
+	在算法数据给定的情况下，算法密钥和敏感中间值有对应关系。如果在算法输入不变的情况下，对于不同的算法（子）密钥的值，函数$g$计算出的敏感中间值一定不同\footnote{单射。}，那么迹和中间值$y$所对应的模板的匹配程度$d_1$可以与迹和（子）密钥值所对应的模板的匹配程度关联起来，如\equationref{eq:gsup-1}所示，本文将$\tilde d_1(k)$称为密钥值$k$的得分。在此基础上，攻击者得到算法（子）密钥值的估计，如\equationref{eq:1tracek}所示。
 	
 	\begin{equation}\label{eq:gsup-1}
 		\tilde d_1(k)=d_1\left(g(p,k) \right)=d_1(y)
@@ -193,29 +193,30 @@
 	猜测熵是一种依赖于攻击方法的评估指标。攻击者需要使用某种方法，选定攻击所使用的能量迹条数$t$，对分组密码算法的一个（子）密钥进行多次互相独立的攻击，记录每次攻击中某个（子）密钥值$k$得分$d_t(k)$在所有密钥得分中的排名$r_t(k)$，最后取排名的均值$\mathbb E\left(r_t(k) \right) $作为该密钥值$k$的猜测熵$GE_{t}(k)$。排名的计算方式是$r_t(k)=\left\vert\left\lbrace j\in\mathcal K|d_t(j)>d_t(k)\right\rbrace  \right\vert $，其中$\vert\cdot\vert$表示集合中元素的个数。
 	
 	\begin{example}\label{ex:badge}
-		假设在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。进一步假设5次攻击所计算出的密钥得分如\tableref{tab:scoredemo}所示。
+		假设在\exampleref{ex:aessw}中，主密钥第0字节的值被设置为204。攻击者使用传统模板攻击作为攻击方法，每次随机选择100条能量迹进行攻击，攻击5次。进一步假设5次攻击所计算出的密钥得分部分结果如\tableref{tab:scoredemo}所示。
 		
 		\begin{table}[!h]
-			\bicaption{\enspace 密钥得分示例}{\enspace Example of scores of key values}
+			\bicaption{\enspace 部分密钥值得分示例}{\enspace Example of scores of some key values}
 			\label{tab:scoredemo}
-			\scriptsize{
-				\begin{tabular}{cc|cccccccccccccc}
+			\centering
+			\small{
+				\begin{tabular}{cccccccccc}
 					\hline
-					\multicolumn{2}{c|}{\multirow{2}{*}{密钥得分}} & \multicolumn{14}{c}{密钥值} \\
+					\multicolumn{2}{c}{\multirow{2}{*}{密钥得分}} & \multicolumn{8}{c}{密钥值} \\
 					%\cline{3-5}
-					\multicolumn{2}{c|}{}
-					    &     0 & \dots &    76 & \dots &   140 & \dots &   200 & \dots &   204 &   205 & \dots &   236 & \dots &   255\\
+					\multicolumn{2}{c}{}
+					    &     0 &    76 &   140 &   200 &    204 &   205 &   236 &   255\\
 					\hline
 					\multirow{5}{*}{攻击编号} 
-					& 1 & 0.073 & \dots & 0.878 & \dots & 0.984$^*$ & \dots & 0.575 & \dots & 0.910 & 0.590 & \dots & 0.957$^*$ & \dots & 0.161\\
+					& 1 & 0.073 & 0.878 & 0.984$^*$ & 0.575 & 0.910 & 0.590 & 0.957$^*$ & 0.161\\
 					
-					& 2 & 0.208 & \dots & 0.861 & \dots & 0.659 & \dots & 0.609 & \dots & 0.939 & 0.904 & \dots & 0.722 & \dots & 0.240\\
+					& 2 & 0.208 & 0.861 & 0.659 & 0.609 & 0.939 & 0.904 & 0.722 & 0.240\\
 					
-					& 3 & 0.095 & \dots & 0.518 & \dots & 0.762$^*$ & \dots & 0.963$^*$ & \dots & 0.690 & 0.568 & \dots & 0.702$^*$ & \dots & 0.313\\
+					& 3 & 0.095 & 0.518 & 0.762$^*$ & 0.963$^*$ & 0.690 & 0.568 & 0.702$^*$ & 0.313\\
 					
-					& 4 & 0.228 & \dots & 0.962$^*$ & \dots & 0.674 & \dots & 0.733 & \dots & 0.884 & 0.643 & \dots & 0.617 & \dots & 0.253\\
+					& 4 & 0.228 & 0.962$^*$ & 0.674 & 0.733 & 0.884 & 0.643 & 0.617 & 0.253\\
 					
-					& 5 & 0.131 & \dots & 0.684 & \dots & 0.975$^*$ & \dots & 0.776 & \dots & 0.808 & 0.942$^*$ & \dots & 0.933$^*$ & \dots & 0.064\\
+					& 5 & 0.131 & 0.684 & 0.975$^*$ & 0.776 & 0.808 & 0.942$^*$ & 0.933$^*$ & 0.064\\
 					
 					\hline
 				\end{tabular}
@@ -223,7 +224,7 @@
 			\tabnote{在某一次攻击中，如果错误密钥的得分超过正确密钥的得分，那么错误密钥的得分右上角使用星号*标记。}
 		\end{table}
 	
-		为了方便解读，不妨假设未列举出来的其他密钥值的得分都小于0.5。观察表格容易知道，在5次攻击中，密钥值204的得分在所有得分的排名中分别位于第三位\footnote{本文使用汉字表述的次序从第一开始计数，有额外说明的情况除外。}、第一位、第四位、第二位、第四位。因此在每次使用100条能量迹进行传统模板攻击时，密钥值204的猜测熵为$GE_{100}(204)=\frac15$(2+ 0+ 3+ 1+ 3)= 1.8。同理可以算出其他每种密钥值的猜测熵，如密钥值140的猜测熵为$GE_{100}(140)=\frac15$(0+ 4+ 1+ 3+ 0)= 1.6，密钥值205的猜测熵为$GE_{100}(205)=\frac15$(4+ 1+ 4+ 4+ 1)= 2.8。因为正确密钥是204，所以正确密钥猜测熵是1.8。
+		为了方便解读，不妨假设未列举出来的其他密钥值（密钥值取值范围为区间[0,256)内的整数）的得分都小于0.5。观察表格容易知道，在5次攻击中，密钥值204的得分在所有得分的排名中分别位于第三位\footnote{本文使用汉字表述的次序从第一开始计数，有额外说明的情况除外。}、第一位、第四位、第二位、第四位。因此在每次使用100条能量迹进行传统模板攻击时，密钥值204的猜测熵为$GE_{100}(204)=\frac15$(2+ 0+ 3+ 1+ 3)= 1.8。同理可以算出其他每种密钥值的猜测熵，如密钥值140的猜测熵为$GE_{100}(140)=\frac15$(0+ 4+ 1+ 3+ 0)= 1.6，密钥值205的猜测熵为$GE_{100}(205)=\frac15$(4+ 1+ 4+ 4+ 1)= 2.8。因为正确密钥是204，所以正确密钥猜测熵是1.8。
 	\end{example}
 	\subsubsection{\chenggongtiaoshu }
 	\chenggongtiaoshu \citep{Kim14}（Measurements To Disclosure，MTD）定义为攻击成功时所使用的迹的最少条数，它能反映侧信道分析在
@@ -241,8 +242,6 @@
 %		TPR=\frac{TP}{TP+FP}
 %	\end{equation}
 %	
-%	就本文（见\chapref{chap:search2}）而言，因为ECDSA本身的特性以及后续格方法的特殊要求，假阴性的数量或比例在不超过阈值的情况下不会对求解私钥的效率和正确性产生影响，证明见\propositionref{prop:highalpha}。因此，虽然真阳性率作为评价指标的场景少见，但它适合作为本文评价指标。
-	
 %	具体来说，本文将敏感中间值（见\subsref{subs:ecdsasymbol}）$\nonce^{(i)}_j=0,i=0,1,\dots,T_a-1,j=0,1,\dots,n_s-1$的样本称为阳性样本，$\nonce^{(i)}_j=1,i=0,1,\dots,T_a,j=0,1,\dots,n_s-1$的样本称为阴性样本。
 
 	}
@@ -253,7 +252,58 @@
 	
 	Cagli等\citep{Cagli17}在2017年提出了一种数据增强方法，通过使用位移变形（见\algorithmref{alg:SH}）和添加删除变形（见\algorithmref{alg:AR}），分别模拟随机延迟和时钟抖动的技术效果进而合成新的迹，以提升原始DL-SCA技术效果。位移变形有两个可变的参数$lb,rb$\footnote{因为深度神经网络输入尺寸是个定值且深度神经网络不接受输入尺寸以外的数据，因此$M^\prime$必须恰好等于深度神经网络输入尺寸，$M^\prime$不是可变参数。}，它们分别描述了可能被截取的迹的起始采样点的下界和上界。添加删除变形有一个可变的参数$R$，它描述了时钟抖动的剧烈程度。对于Cagli等的数据增强方法实现，调用一次数据增强实现只能合成一条新的迹，为了构造训练集需要调用多次数据增强实现。
 	
+	\begin{breakablealgorithm}
+		\caption{位移变形}\label{alg:SH}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条能量迹或电磁迹
+			\Statex \textbf{输入:} $M^\prime$:合成的能量迹或电磁迹的采样点个数
+			\Statex \textbf{输入:} $lb,ub$:模拟随机延迟的范围
+			\Statex \textbf{输出:} $\Vector{l^\prime}$:采样点个数为$M^\prime$的新的能量迹或电磁迹
+			\State $j\stackrel{\$}\gets \{lb,lb+1,lb+2,\dots,rb-1\}$
+			\State $\Vector{l^\prime}:=\Vector {l^{(i)}}[j:j+M^\prime]$\Comment{获取索引从$j$到$j+M^\prime$的切片}
+			\State \Return $\Vector{l^\prime}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
+
+	\begin{breakablealgorithm}
+		\caption{添加删除变形}\label{alg:AR}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $\Vector {l^{(i)}}$:采样点个数为$M$的第$i$条能量迹或电磁迹
+			\Statex \textbf{输入:} $R$:需要添加或删除的采样点个数
+			\Statex \textbf{输出:} $\Vector{l^\prime}$:合成的能量迹或电磁迹
+			\State $\Vector{l^\prime}:=\Vector {l^{(i)}}$\Comment{拷贝副本}
+			\For {$r:=0,\dots,R-1$}\Comment{随机$R$个位置添加采样点}
+			\State $j\stackrel{\$}\gets \{0,1,\dots,M+r-1\}$
+			\State $v:=\frac{l^\prime_j+l^\prime_{j+1}}2$
+			\State 在$\Vector {l}^\prime$索引为$j$的位置插入值$v$\Comment{向量的分量个数增加}
+			\EndFor
+			\State $\mathcal A\stackrel{\$}\gets\left\lbrace \mathcal I\subset \{0,1,\dots,M+R-1\}:\vert\mathcal I\vert=M\right\rbrace $\Comment{随机$M$个位置保留采样点}
+			\State $\{a_0,a_1,\dots,a_{M-1}\}=\mathcal A,a_0<a_1<\dots<a_{M-1}$
+			\State $\Vector{l^\prime}=\begin{bmatrix} {l^\prime}_{a_0} & {l^\prime}_{a_1} & \ldots&{l^\prime}_{a_{M-1}} \end{bmatrix}$
+			\State \Return $\Vector{l^\prime}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
+	
 	Pu等\citep{Pu17}采用循环位移变形（见\algorithmref{alg:RO}）的方法来实现数据增强，大致思想与Cagli等\citep{Cagli17}的位移变形类似，但是它避免了数据增强后一条迹的采样点个数减小的问题。循环位移变形有两个可变参数$\gamma,C$，它们分别描述了实际循环位移幅度与采样点个数比值的上界、一条能量迹所合成的新的迹的数量。对于Pu的数据增强方法实现，调用一次数据增强实现可以合成多条新的迹，这使得构造训练集只需要调用一次数据增强实现。
+	
+	\begin{breakablealgorithm}
+		\caption{循环位移变形}\label{alg:RO}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的能量迹或电磁迹
+			\Statex \textbf{输入:} $\gamma$:最大平移率
+			\Statex \textbf{输入:} $C$:数据增强数量的比例
+			\Statex \textbf{输出:} $L^{agmt}$:合成的共$(1+\gamma C)T$条能量迹或电磁迹
+			\State $L^{agmt}:=L$\Comment{拷贝副本}
+			\For {$i:=0,\dots,T-1$}
+			\For {$r:=0,\dots,\gamma C-1$}
+			\State $j\stackrel{\$}\gets \{-\gamma M,-\gamma M+1,\dots,\gamma M-1,\gamma M\}$
+			\State 将$\Vector l^{(i)}$循环移动$j$个采样点得到$\Vector l^\prime$
+			\State 将$\Vector l^\prime$加入到$L^{agmt}$中
+			\EndFor
+			\EndFor
+			\State \Return $L^{agmt}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
 	
 	Kim等\citep{Kim19}提出向神经网络批归一化\footnote{在每个批次上独立地归一化。}处理后的数据添加高斯白噪声（见\equationref{eq:addnoise}）可以解决过拟合问题，从而显著提升池化模板攻击的攻击效果。在添加高斯白噪声的方法中，可变的参数是$\alpha$，它描述了噪声的方差。实际操作中可以在深度神经网络训练之前向训练数据叠加噪声矩阵，实现和\equationref{eq:addnoise}等效的效果，但是这需要额外增加参数来修正噪声方差并调整归一化函数。
 	
@@ -264,6 +314,37 @@
 	\noindent 其中，$L_{batch}$表示训练数据$L$分批后的张量\footnote{在深度神经网络训练之前，训练数据会执行分批操作，它会由二维（两个维度分别表示迹的条数、一条迹的采样点个数）矩阵变成了三维（三个维度分别表示批次数、一个批次的迹的条数、一条迹采样点个数）的张量。分批操作的输入和输出有对应关系，他们是相同数据的不同表现形式。}，$BN_0$表示批归一化函数，$\Psi$表示一个每个元素互相独立且都服从正态分布的噪声张量。
 	
 	Picek等\citep{Picek19}于2019年首次提出用SMOTE（见\algorithmref{alg:smotepolulate}）解决样本不平衡的问题，这使得使用敏感中间值的汉明重量作为训练标签时，DL-SCA的技术效果有所提升。SMOTE的核心是：特征空间上邻近的点其特征都是相似的。SMOTE并不是在数据空间上进行采样，而是在特征空间中进行采样，所以它的准确率会高于传统的采样方式。SMOTE有两个可变的参数$n,C$，它们分别描述了寻找最近的迹的数目以及一条迹所需要合成的新的迹的数目。对于SMOTE实现，调用一次数据增强实现可以合成多条新的迹，这使得构造训练集只需要调用一次数据增强实现。
+	
+	\begin{breakablealgorithm}
+		\caption{合成少数类过采样法}\label{alg:smotepolulate}
+		\begin{algorithmic}[1]
+			\Statex \textbf{输入:} $L$:$T$条采样点个数为$M$的能量迹或电磁迹
+			\Statex \textbf{输入:} $\mathcal I_y$:对应中间值为$y$能量迹或电磁迹的索引
+			\Statex \textbf{输入:} $n$:最近点的个数
+			\Statex \textbf{输入:} $C$:数据增强数量的比例
+			\Statex \textbf{输出:} $L^{agmt}$:合成的共$C\vert\mathcal I_y\vert$条中间值为$y$能量迹或电磁迹
+			\State $L^{agmt}:=[]$\Comment{初始化为空列表}
+			\If{$C<1$}
+			\State $\mathcal I\stackrel{\$}\gets\{\mathcal A\subset \mathcal I_y:\vert\mathcal A\vert=C\vert\mathcal I_y\vert\}$\Comment{随机保留比例为$C$的集合元素}
+			\State $C:=1$
+			\Else
+			\State $\mathcal I:=\mathcal I_y$
+			\State $C:=\lfloor C\rfloor$
+			\EndIf
+			\For {$i\in \mathcal I$}
+			\State 计算中间值为$y$的能量迹或电磁迹中距离$\Vector {l^{(i)}}$最近的$n$条能量迹或电磁迹的索引，索引集合记为$\mathcal J$
+			\For{$c:=0,\dots,C-1$}\Comment{每条能量迹或电磁迹会合成$C$条新的能量迹或电磁迹}
+			\State $j\stackrel{\$}\gets\mathcal J$
+			\For {$m:=0,\dots, M-1$}
+			\State $\lambda\stackrel{\$}\gets U(0,1)$\Comment{从均匀分布中采样}
+			\State $l^\prime_m:=\lambda l^{(i)}_m+(1-\lambda)l^{(j)}_m$
+			\EndFor
+			\State 将$\Vector l^\prime$加入到$L^{agmt}$中
+			\EndFor
+			\EndFor
+			\State \Return $L^{agmt}$
+		\end{algorithmic}
+	\end{breakablealgorithm}
 	
 %	Won等\citep{Won20}在Picek等\citep{Picek19}工作基础上，系统地研究了SMOTE及其多种变体\citep{Kovcs19}实现数据增强的技术效果，并发现SMOTE、CURE\_SMOTE、ASMOBD、MCT和MOT2LD相对来说有优良的技术效果。
 	Luo等\citep{Luo21}首次提出在DL-SCA中利用混淆（Mixup）技术实现数据增强，以扩大训练集，提高攻击成功率。该方法的核心思想是每次随机选取两条迹，并以一定的比例插值生成新的迹。与此同时，训练标签也需要重新生成，新的训练标签应当是迹所对应标签的one-hot编码进行同样比例插值的结果。训练过程只采用插值合成的新的训练数据和训练标签，不使用混淆前的训练数据和训练标签。
@@ -286,7 +367,7 @@
 			\draw[->] (step3) -| (step4);
 			\draw[->] (step4) |- (step1);
 			\end{tikzpicture}
-			\bicaption{\enspace 应用Autoaugment的框架总览}{\enspace Overview of Autoaugment Framework}
+			\bicaption{\enspace 应用Autoaugment的框架总览}{\enspace Overview of autoaugment framework}
 			\label{fig:autoaugment}
 		\end{center}
 	\end{figure}
@@ -344,7 +425,7 @@
 	\section{椭圆曲线数字签名算法}\label{sec:ecdsa}
 	椭圆曲线数字签名算法（ECDSA）是一种基于椭圆曲线密码学的数字签名算法。它被广泛应用于信息安全领域，用于验证数据的完整性和身份认证。
 	
-	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘(Scalar Multiplication)是基于椭圆曲线上的群运算特性，通过重复应用点加法(Add)和倍点(Double)操作实现的。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall i\in\mathbb Z,\forall P\in E, i\cdot P\in E$。
+	ECDSA基于椭圆曲线上的离散对数困难问题，利用椭圆曲线上的点运算来实现安全的加密和签名机制，具有较高的安全性和较小的计算复杂度。椭圆曲线上的点的数乘（Scalar Multiplication）是基于椭圆曲线上的群运算特性，通过重复应用点加法（Add）和倍点（Double）操作实现的。椭圆曲线上的点的数乘结果依然是椭圆曲线上的点，即$\forall i\in\mathbb Z,\forall P\in E, i\cdot P\in E$。
 	
 	%\subsection{一种ECDSA实际方案}\label{subs:ECDSAscheme}
 	接下来以SP 800-186\citep{SP800-186}指定的Weierstrass曲线NIST P-256为例，介绍ECDSA的基础原理的相关知识。
@@ -392,6 +473,32 @@
 	\end{equation}
 	
 	数字签名可以实现对消息的认证，推导过程如\propositionref{prop:ECDSA-authentication}所示。
+	
+	\begin{proposition}\label{prop:ECDSA-authentication}
+		如果$(r,s)$是签名者对消息$m_0$的签名，那么$R.x=r$。 
+	\end{proposition}
+	\begin{proof}
+		\begin{align*}
+		R&=u_1\cdot \pk+u_2\cdot G \\
+		&= u_1\sk\cdot G+u_2\cdot G \\
+		&= s^{-1}r\sk\cdot G+\left(s^{-1}H(m_0)\right)\cdot G \\
+		&= \left(s^{-1}r\sk+\left(s^{-1}H(m_0)\right)\right)\cdot G \\
+		&= \left(s^{-1}\left(r\sk+H(m_0)\right)\right)\cdot G \\
+		&= \left(s^{-1}\left(r\sk+H(m_0)\right)\bmod q\right)\cdot G
+		\end{align*}
+		因为$$s\equiv \nonce^{-1}(H(m_0)+r\sk) \pmod q$$
+		所以\begin{align*}
+		R&= \left(\frac{r\sk+H(m_0)}{\nonce^{-1}(H(m_0)+r\sk)}\bmod q\right)\cdot G \\
+		&= \left(\frac{\nonce(H(m_0)+r\sk)}{H(m_0)+r\sk}\bmod q\right)\cdot G \\
+		&= \left(\nonce\bmod q\right)\cdot G \\
+		&= \nonce\cdot G
+		\end{align*}
+		因此\begin{align*}
+		R.x&=\left(\nonce\cdot G\right).x\\
+		&=Q.x\\
+		&=r
+		\end{align*}
+	\end{proof}
 	
 %	\subsection{一种ECDSA中的数乘实现}
 %	Roche等\citep{Roche21}对使用了SmartMX\citep{p5x}安全微控制器芯片中ECDSA中的数乘实现进行了研究并进行合理的猜想，最终通过数乘实现中敏感随机数的泄漏恢复了使用SmartMX\citep{p5x}的\textit{Google Titan Security Key}\citep{Titan}的私钥。
@@ -480,7 +587,7 @@
 %		\end{algorithmic}
 %	\end{algorithm}
 	
-%	\subsection{随机数部分泄漏的请况下基于格的对ECDSA的攻击}\label{subs:infoforlattice}
+%	\subsection{随机数部分泄漏的情况下基于格的对ECDSA的攻击}\label{subs:infoforlattice}
 %	
 %	有大量工作\citep{Howgrave-Graham01,Nguyen02,Nguyen03,Hlavac06,Brumley11,Mulder14,Benger14,Goudarzi16,Fan16,Ryan19,Jancar20,Moghimi20,Weiser20,Micheli20}研究了在随机数泄漏少量比特的情况下攻击ECDSA方案，它们的主要思想是利用签名中的随机数的泄漏构造扩展隐藏数问题\citep{Boneh96}的方程并使用格基规约求解。
 %	
